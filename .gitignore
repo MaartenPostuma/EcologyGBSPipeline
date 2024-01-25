@@ -1,1 +1,4 @@
-"data/*"
+data/*
+results/*
+.Rproj.user
+EcologyGBSPipeline.Rproj

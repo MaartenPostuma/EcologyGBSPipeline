@@ -8,7 +8,7 @@ inputDir: "/path/to/directory/where/reads/and/barcode/file/are"
 tmpDir: "/path/to/a/place/to/store/temporaryFiles"
 
 #The location of the barcode file 
-#This should include the following columns: sample, pop, metaPop, barcode1, barcode2, rawR1, rawR2 seperated by commas (save as .csv (macintosh) in excel) 
+#This should include the following columns: sample, pop, metaPop, barcode1, barcode2, rawR1, rawR2 seperated by commas 
 #And see the readme for an example, and src/demultiplex/barcodeTemplate.csv for a template!
 #sample is the sample name,  there cannot be duplicated names otherwise the script will break in unexpected ways. If a sample is in multiple rawreads file consult the readme
 #pop is the pop code, 
