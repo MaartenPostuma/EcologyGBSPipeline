@@ -14,3 +14,6 @@ rule all:
     input:
         R1=expand("{path}/demultiplex/{R1}.1_R1.fq.gz",path=config["outputDir"],R1=RUN),
         R2=expand("{path}/demultiplex/{R2}.2_R2.fq.gz",path=config["outputDir"],R2=RUN)
+
+include:
+    "src/demultiplex.smk"
