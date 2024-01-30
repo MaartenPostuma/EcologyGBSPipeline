@@ -6,9 +6,9 @@ df = pd.read_csv(os.path.join("src/demultiplex/barcodeTemplate.csv"), sep=';', d
 
 #df = pd.read_csv(os.path.join(config["input_dir"],config["barcodes"]), sep='\t', dtype="object").set_index('Sample')
 SAMPLES = df.index
-RAWREADSR1 = df.rawR1.str.replace(".fq.gz","").unique()
-RAWREADSR2 = df.rawR2.str.replace(".fq.gz","").unique()
-RUN = df.rawR1.str.replace("_R1.fq.gz","").unique()
+RAWREADSR1 = df.rawR1.str.replace(".fq.gz","",regex=False).unique()
+RAWREADSR2 = df.rawR2.str.replace(".fq.gz","",regex=False).unique()
+RUN = df.rawR1.str.replace("_R1.fq.gz","",regex=False).unique()
 
 rule all:
     input:
