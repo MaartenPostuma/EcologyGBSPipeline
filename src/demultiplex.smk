@@ -14,13 +14,16 @@ def getParam_oligo(param_oligo):
 rule: "clone_filter"
     input:
         barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodes"]),
-        R1=expand("{path}/{R1}",path=config["inputDir"],R1=RAWREADSR1),
-        R2=expand("{path}/{R2}",path=config["inputDir"],R2=RAWREADSR2)
+        R1=expand("{path}/{R1}_R1.fq.gz",path=config["inputDir"],R1=RUN),
+        R2=expand("{path}/{R2}_R2.fq.gz",path=config["inputDir"],R2=RUN)
     params:
         tmpdir=expand("{path}/{dir}", path=config["tmpdir"],dir=projectName),
         outputdir=expand("{path}/output_demultiplex",  path=config["output_dir"]) 
         param_oligo=getParam_oligo(param_oligo)
     output:
+        R1=expand("{path}/demultiplex/{R1}.1_R1.fq.gz",path=config["outputDir"],R1=RUN),
+        R2=expand("{path}/demultiplex/{R2}.2_R2.fq.gz",path=config["outputDir"],R2=RUN)
+
     conda:
     shell: 
         """
@@ -29,15 +32,15 @@ rule: "clone_filter"
         """
 
 
-rule: "make_stacks_files"
-    input:
-        barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodes"])
-    output:
-        popmap=expand("{path}/popmap.tsv", path=config["inputDir"], bar=config["barcodes"]),
-        barcodes=expand("{path}/barcode_stacks.tsv", path=config["inputDir"], bar=config["barcodes"])
-    params:
-        inputDir=config["inputDir"]
-    conda: 
-
-    shell:
+#rule: "make_stacks_files"
+#    input:
+#        barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodes"])
+#    output:
+#        popmap=expand("{path}/popmap.tsv", path=config["inputDir"], bar=config["barcodes"]),
+#        barcodes=expand("{path}/barcode_stacks.tsv", path=config["inputDir"], bar=config["barcodes"])
+#    params:
+#        inputDir=config["inputDir"]
+#    conda:
+#
+#    shell:
 

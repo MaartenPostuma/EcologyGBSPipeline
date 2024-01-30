@@ -2,3 +2,5 @@ data/*
 results/*
 .Rproj.user
 EcologyGBSPipeline.Rproj
+.RData
+.Rhistory

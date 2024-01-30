@@ -6,8 +6,11 @@ df = pd.read_csv(os.path.join("src/demultiplex/barcodeTemplate.csv"), sep=';', d
 
 #df = pd.read_csv(os.path.join(config["input_dir"],config["barcodes"]), sep='\t', dtype="object").set_index('Sample')
 SAMPLES = df.index
-RAWREADSR1 = pd.unique(df.rawR1).astype(str)
-RAWREADSR2 = pd.unique(df.rawR2)
+RAWREADSR1 = df.rawR1.str.replace(".fq.gz","").unique()
+RAWREADSR2 = df.rawR2.str.replace(".fq.gz","").unique()
+RUN = df.rawR1.str.replace("_R1.fq.gz","").unique()
 
-
-RAWREADSR1.replace(".fq.gz","")
+rule all:
+    input:
+        R1=expand("{path}/demultiplex/{R1}.1_R1.fq.gz",path=config["outputDir"],R1=RUN),
+        R2=expand("{path}/demultiplex/{R2}.2_R2.fq.gz",path=config["outputDir"],R2=RUN)

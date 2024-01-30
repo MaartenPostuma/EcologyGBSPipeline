@@ -1,9 +1,9 @@
 configfile: "configParameter.yaml"
 LARGEM = list(range(1,12))
-rule all:
-    input:
-        MparameterPNG=expand("{dir}/LargeMparameter.png",dir=config["outdir"]),
-        testLargeM=expand("{dir}/LargeM{largeM}/test{largeM}",largeM=LARGEM,dir=config["outdir"])
+#rule all:
+#    input:
+#        MparameterPNG=expand("{dir}/LargeMparameter.png",dir=config["outdir"]),
+#        testLargeM=expand("{dir}/LargeM{largeM}/test{largeM}",largeM=LARGEM,dir=config["outdir"])
 
 rule subset_popmap:
     input:

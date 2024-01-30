@@ -7,6 +7,10 @@ inputDir: "/path/to/directory/where/reads/and/barcode/file/are"
 #Temporary directory, where temporary files are stored. Make sure you have enough space here!
 tmpDir: "/path/to/a/place/to/store/temporaryFiles"
 
+#Output dir, directory where all of the output files will be stored
+outputDir: "/path/to/directory/where/you/want/to/store/your/output"
+
+
 #The location of the barcode file 
 #This should include the following columns: sample, pop, metaPop, barcode1, barcode2, rawR1, rawR2 seperated by commas 
 #And see the readme for an example, and src/demultiplex/barcodeTemplate.csv for a template!
