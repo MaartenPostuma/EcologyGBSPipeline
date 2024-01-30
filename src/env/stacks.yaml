@@ -5,5 +5,5 @@ channels:
   - defaults
   - r
 dependencies: 
-  - stacks=2.66
+  - stacks=2.65
 prefix: stacks2.6
