@@ -13,7 +13,7 @@ def getParam_oligo(param_oligo):
 
 rule: "clone_filter"
     input:
-        barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodes"]),
+        barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"]),
         R1=expand("{path}/{R1}_R1.fq.gz",path=config["inputDir"],R1=RUN),
         R2=expand("{path}/{R2}_R2.fq.gz",path=config["inputDir"],R2=RUN)
     params:
