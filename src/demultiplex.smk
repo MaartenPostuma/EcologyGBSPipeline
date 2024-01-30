@@ -18,11 +18,11 @@ rule: "clone_filter"
         R2=expand("{path}/{R2}_R2.fq.gz",path=config["inputDir"],R2=RUN)
     params:
         tmpdir=expand("{path}/{dir}", path=config["tmpDir"],dir=projectName),
-        outputdir=expand("{path}/output_demultiplex",  path=config["ouputDir"]),
+        outputdir=expand("{path}/demultiplex",  path=config["ouputDir"]),
         param_oligo=getParam_oligo(param_oligo)
     output:
-        R1=expand("{path}/demultiplex/{R1}.1_R1.fq.gz",path=config["outputDir"],R1=RUN),
-        R2=expand("{path}/demultiplex/{R2}.2_R2.fq.gz",path=config["outputDir"],R2=RUN)
+        R1=expand("{path}/demultiplex/clone_filter/{R1}.1_R1.fq.gz",path=config["outputDir"],R1=RUN),
+        R2=expand("{path}/demultiplex/clone_filter/{R2}.2_R2.fq.gz",path=config["outputDir"],R2=RUN)
     shell: 
         """
         mkdir -p {params.tmpdir}
