@@ -1,4 +1,4 @@
-configfile: "configParameter.yaml"
+configfile: "config.yaml"
 import pandas as pd
 import os
 import random
