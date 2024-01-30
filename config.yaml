@@ -2,13 +2,13 @@
 
 
 #Input folder #The place where you have the rawReads and the barcode file
-inputDir: "/path/to/directory/where/reads/and/barcode/file/are"
+inputDir: "data/"
 
 #Temporary directory, where temporary files are stored. Make sure you have enough space here!
-tmpDir: "/path/to/a/place/to/store/temporaryFiles"
+tmpDir: "/scratch/tmp/"
 
 #Output dir, directory where all of the output files will be stored
-outputDir: "/path/to/directory/where/you/want/to/store/your/output"
+outputDir: "results/"
 
 
 #The location of the barcode file 
@@ -22,7 +22,7 @@ outputDir: "/path/to/directory/where/you/want/to/store/your/output"
 #rawR1 is the file name of the rawReads_R1 file in which the samples are (if there are multiple illumina indices used)
 #rawR2 is the file name of the rawReads_R2 file 
 
-barcodeFile: "nameOfBarcodeFile.csv"
+barcodeFile: "barcodes.csv"
 
 
 
