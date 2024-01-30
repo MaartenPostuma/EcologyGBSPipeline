@@ -1,7 +1,7 @@
 
 #TODO MAKE THE CONDA ENVIRONMENTS
 
-param_oligo=config["param_denovo"]["identity"]
+param_oligo=config["param_demultiplex"]["nOligo"]
 
 def getParam_oligo(param_oligo):
     if param_oligo == "default" or param_oligo == "":
