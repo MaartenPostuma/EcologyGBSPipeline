@@ -21,8 +21,8 @@ rule clone_filter:
         outputdir=expand("{path}/demultiplex", path=config["outputDir"]),
         param_oligo=getParam_oligo(param_oligo)
     output:
-        R1=expand("{path}/demultiplex/clone_filter/{R1}.1_R1.fq.gz",path=config["outputDir"],R1=RUN),
-        R2=expand("{path}/demultiplex/clone_filter/{R2}.2_R2.fq.gz",path=config["outputDir"],R2=RUN)
+        R1=expand("{path}/demultiplex/clone_filter/{{run}}.1_R1.fq.gz",path=config["outputDir"]),
+        R2=expand("{path}/demultiplex/clone_filter/{{run}}.2_R2.fq.gz",path=config["outputDir"])
     conda:
         "src/env/stacks.yaml"
     shell: 
