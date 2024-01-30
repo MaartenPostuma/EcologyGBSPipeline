@@ -18,13 +18,11 @@ rule: "clone_filter"
         R2=expand("{path}/{R2}_R2.fq.gz",path=config["inputDir"],R2=RUN)
     params:
         tmpdir=expand("{path}/{dir}", path=config["tmpdir"],dir=projectName),
-        outputdir=expand("{path}/output_demultiplex",  path=config["output_dir"]) 
+        outputdir=expand("{path}/output_demultiplex",  path=config["output_dir"]),
         param_oligo=getParam_oligo(param_oligo)
     output:
         R1=expand("{path}/demultiplex/{R1}.1_R1.fq.gz",path=config["outputDir"],R1=RUN),
         R2=expand("{path}/demultiplex/{R2}.2_R2.fq.gz",path=config["outputDir"],R2=RUN)
-
-    conda:
     shell: 
         """
         mkdir -p {params.tmpdir}
