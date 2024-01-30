@@ -11,7 +11,7 @@ def getParam_oligo(param_oligo):
     return id
 
 
-rule: "clone_filter"
+rule: clone_filter
     input:
         barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"]),
         R1=expand("{path}/{R1}_R1.fq.gz",path=config["inputDir"],R1=RUN),
@@ -23,6 +23,8 @@ rule: "clone_filter"
     output:
         R1=expand("{path}/demultiplex/clone_filter/{R1}.1_R1.fq.gz",path=config["outputDir"],R1=RUN),
         R2=expand("{path}/demultiplex/clone_filter/{R2}.2_R2.fq.gz",path=config["outputDir"],R2=RUN)
+    conda:
+        "src/env/stacks.yaml"
     shell: 
         """
         mkdir -p {params.tmpdir}

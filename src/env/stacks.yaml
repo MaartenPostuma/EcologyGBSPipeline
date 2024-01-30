@@ -1,0 +1,8 @@
+name: stacks2.6
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - r
+dependencies: 
+  - stacks=2.66
