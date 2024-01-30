@@ -42,13 +42,13 @@ rule clone_filter:
 #and an input file for SNPFilter report to add nice colours to the plots based on a priori clustering
 rule make_stacks_files:
     input:
-        barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodes"])
+        barcodes=expand("{path}/{bar}", path=config["outputDir"], bar=config["barcodes"])
     output:
-        popmap=expand("{path}/popmap.tsv", path=config["inputDir"], bar=config["barcodes"]),
-        barcodes=expand("{path}/barcodestacks{{run}}.tsv", path=config["inputDir"], bar=config["barcodes"])
+        popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"], bar=config["barcodes"]),
+        barcodes=expand("{path}/stacksFiles/barcodestacks{{run}}.tsv", path=config["inputDir"], bar=config["barcodes"])
     params:
-        inputDir=config["inputDir"]
+        outputDir=expand("{path}/stacksFiles",path=config["outputDir"])
     conda:
         "env/R.yaml"
     shell:
-        "Rscript src/demultiplex/createFilesFromBarcodeFile.R {input.barcodes}"
+        "Rscript src/demultiplex/createFilesFromBarcodeFile.R {input.barcodes} {output.outputDir}"
