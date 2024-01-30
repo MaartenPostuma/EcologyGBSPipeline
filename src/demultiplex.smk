@@ -5,7 +5,7 @@ param_oligo=config["param_demultiplex"]["nOligo"]
 
 def getParam_oligo(param_oligo):
     if param_oligo == "default" or param_oligo == "":
-        id = 0.97
+        id = 3
     else:
         id = param_oligo
     return id
