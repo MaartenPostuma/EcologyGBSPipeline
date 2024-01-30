@@ -2,13 +2,13 @@
 
 
 #Input folder #The place where you have the rawReads and the barcode file
-inputDir: "data/"
+inputDir: "data"
 
 #Temporary directory, where temporary files are stored. Make sure you have enough space here!
 tmpDir: "/scratch/tmp/"
 
 #Output dir, directory where all of the output files will be stored
-outputDir: "results/"
+outputDir: "results"
 
 
 #The location of the barcode file 

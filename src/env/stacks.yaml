@@ -6,3 +6,4 @@ channels:
   - r
 dependencies: 
   - stacks=2.66
+prefix: stacks2.6
