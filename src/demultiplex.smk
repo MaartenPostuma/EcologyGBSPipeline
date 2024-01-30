@@ -24,7 +24,7 @@ rule clone_filter:
         R1=expand("{path}/demultiplex/clone_filter/{{run}}.1_R1.fq.gz",path=config["outputDir"]),
         R2=expand("{path}/demultiplex/clone_filter/{{run}}.2_R2.fq.gz",path=config["outputDir"])
     conda:
-        "src/env/stacks.yaml"
+        "env/stacks.yaml"
     threads: 1
     shell: 
         """
