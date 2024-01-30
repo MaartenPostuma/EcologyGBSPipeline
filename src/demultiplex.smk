@@ -3,6 +3,7 @@
 
 param_oligo=config["param_demultiplex"]["nOligo"]
 
+#We always use 3 as the number of oligo for our adapters. (If we would ever change this we can account for this)
 def getParam_oligo(param_oligo):
     if param_oligo == "default" or param_oligo == "":
         id = 3
@@ -10,7 +11,10 @@ def getParam_oligo(param_oligo):
         id = param_oligo
     return id
 
-
+#Clone_filter removes PCR duplicates
+#It compares reads that are removes reads that are completely identical 
+#including the UMI/wobble/oligo's (random bases that are added at the beginning of the reads)
+#as if all of these are identical it will most likely be a PCR artifact
 rule clone_filter:
     input:
         barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"]),
@@ -32,16 +36,19 @@ rule clone_filter:
         clone_filter -1 {input.R1} -2 {input.R2} -o {params.outputdir}/clone_filter/ --oligo_len_1 {params.param_oligo} --oligo_len_2 {params.param_oligo} --inline_inline -i gzfastq
         """
 
-
-#rule: "make_stacks_files"
-#    input:
-#        barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodes"])
-#    output:
-#        popmap=expand("{path}/popmap.tsv", path=config["inputDir"], bar=config["barcodes"]),
-#        barcodes=expand("{path}/barcode_stacks.tsv", path=config["inputDir"], bar=config["barcodes"])
-#    params:
-#        inputDir=config["inputDir"]
-#    conda:
-#
-#    shell:
-
+#Stacks and the rest of the pipeline need to have specific files for barcodes, 
+#the format is different and we add the control nucleotide and we need to split it per run so we can demultiplex them in parallel
+#popmap (to which population do samples belong),
+#and an input file for SNPFilter report to add nice colours to the plots based on a priori clustering
+rule make_stacks_files:
+    input:
+        barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodes"])
+    output:
+        popmap=expand("{path}/popmap.tsv", path=config["inputDir"], bar=config["barcodes"]),
+        barcodes=expand("{path}/barcodestacks{{run}}.tsv", path=config["inputDir"], bar=config["barcodes"])
+    params:
+        inputDir=config["inputDir"]
+    conda:
+        "env/R.yaml"
+    shell:
+        "Rscript src/demultiplex/createFilesFromBarcodeFile.R {input.barcodes}"
