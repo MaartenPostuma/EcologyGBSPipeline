@@ -18,7 +18,7 @@ rule: "clone_filter"
         R2=expand("{path}/{R2}_R2.fq.gz",path=config["inputDir"],R2=RUN)
     params:
         tmpdir=expand("{path}/{dir}", path=config["tmpDir"],dir=projectName),
-        outputdir=expand("{path}/demultiplex", path=config["ouputDir"]),
+        outputdir=expand("{path}/demultiplex", path=config["outputDir"]),
         param_oligo=getParam_oligo(param_oligo)
     output:
         R1=expand("{path}/demultiplex/clone_filter/{R1}.1_R1.fq.gz",path=config["outputDir"],R1=RUN),
