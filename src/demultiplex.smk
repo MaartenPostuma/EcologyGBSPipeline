@@ -45,7 +45,7 @@ rule make_stacks_files:
         barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"])
     output:
         popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"], bar=config["barcodeFile"]),
-        barcodes=expand("{path}/stacksFiles/barcodestacks{run}.tsv", path=config["outputDir"], bar=config["barcodeFile"],run=RUN)
+        barcodes=expand("{path}/stacksFiles/barcodeStacks{run}.tsv", path=config["outputDir"], bar=config["barcodeFile"],run=RUN)
     params:
         outputDir=expand("{path}/stacksFiles",path=config["outputDir"])
     conda:
