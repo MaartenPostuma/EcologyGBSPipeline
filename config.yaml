@@ -12,7 +12,7 @@ outputDir: "results"
 
 
 #The location of the barcode file 
-#This should include the following columns: sample, pop, metaPop, barcode1, barcode2, rawR1, rawR2 seperated by commas 
+#This should include the following columns: sample, pop, metaPop, barcode1, barcode2, rawR1, rawR2 seperated by tabs (save as .) 
 #And see the readme for an example, and src/demultiplex/barcodeTemplate.csv for a template!
 #sample is the sample name,  there cannot be duplicated names otherwise the script will break in unexpected ways. If a sample is in multiple rawreads file consult the readme
 #pop is the pop code, 
@@ -22,7 +22,7 @@ outputDir: "results"
 #rawR1 is the file name of the rawReads_R1 file in which the samples are (if there are multiple illumina indices used)
 #rawR2 is the file name of the rawReads_R2 file 
 
-barcodeFile: "barcodes.csv"
+barcodeFile: "barcodes.txt"
 
 
 

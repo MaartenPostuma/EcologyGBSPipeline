@@ -3,12 +3,7 @@ rm(list=ls())
 #TODO make the SNPFIlter popmap but first rewrite most of the SNPFiltering scripts!
 args = commandArgs(trailingOnly=TRUE)
 
-if(ncol(read.csv(args[1]))==1){
-  barcodes<-read.csv2(args[1])
-}else{
-  barcodes<-read.csv(args[1])
-}
-
+barcodes<-read.table(args[1])
 barcodes$run<-sub("_R1.fq.gz","",barcodes$rawR1)
 
 barcodeStacks<-data.frame(sample=barcodes$sample,
