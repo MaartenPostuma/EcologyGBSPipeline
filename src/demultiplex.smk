@@ -51,4 +51,4 @@ rule make_stacks_files:
     conda:
         "env/R.yaml"
     shell:
-        "Rscript src/demultiplex/createFilesFromBarcodeFile.R {input.barcodes} {output.outputDir}"
+        "Rscript src/demultiplex/createFilesFromBarcodeFile.R {input.barcodes} {params.outputDir}"
