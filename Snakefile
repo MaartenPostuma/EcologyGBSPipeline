@@ -16,11 +16,9 @@ RUNSAMPLE = df.rawR1.str.replace("_R1.fq.gz","",regex=False) + df.index
 
 rule all:
     input:
-        DeDuplR1=expand("{path}/demultiplex/clone_filter/{R1}_R1.1.fq.gz",path=config["outputDir"],R1=RUN),
-        DeDuplR2=expand("{path}/demultiplex/clone_filter/{R2}_R2.2.fq.gz",path=config["outputDir"],R2=RUN),
+        DeDuplR1=expand("{path}/demultiplex/clone_filter/{run}_R1.1.fq.gz",path=config["outputDir"],R1=RUN),
+        DeDuplR2=expand("{path}/demultiplex/clone_filter/{run}_R2.2.fq.gz",path=config["outputDir"],R2=RUN),
         popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
-        DemultR1=expand("{path}/demultiplex/samples/{run}{sample}_R1.fq.gz",path=config["outputDir"],run=RUN,sample=SAMPLES),
-        DemultR2=expand("{path}/demultiplex/samples/{run}{sample}_R2.fq.gz",path=config["outputDir"],run=RUN,sample=SAMPLES)
-
+        perRUNDemulti=expand("{path}/demultiplex/samples/{run}/process_radtags.log",path=config["outputDir"],run=RUN)
 
 include: "src/demultiplex.smk"
