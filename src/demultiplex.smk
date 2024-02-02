@@ -59,8 +59,6 @@ rule process_radtags:
         barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"], run=RUN)
     params:
         outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
-    wildcard_constraints:
-        sample="{run}"
     output:
         DemultR1=expand("{path}/demultiplex/samples/{run}{sample}_R1.fq.gz",path=config["outputDir"],),
         DemultR2=expand("{path}/demultiplex/samples/{run}{sample}_R2.fq.gz",path=config["outputDir"],runsample=RUNSAMPLE)
