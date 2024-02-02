@@ -19,6 +19,9 @@ rule all:
         DeDuplR1=expand("{path}/demultiplex/clone_filter/{run}_R1.1.fq.gz",path=config["outputDir"],run=RUN),
         DeDuplR2=expand("{path}/demultiplex/clone_filter/{run}_R2.2.fq.gz",path=config["outputDir"],run=RUN),
         popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
-        perRUNDemulti=expand("{path}/demultiplex/samples/{run}/process_radtags.log",path=config["outputDir"],run=RUN)
+        perRUNDemulti=expand("{path}/demultiplex/samples/{run}/process_radtags.log",path=config["outputDir"],run=RUN),
+        samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz.log",path=config["outputDir"],samples=SAMPLES),
+        samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz.log",path=config["outputDir"],samples=SAMPLES)
+
 
 include: "src/demultiplex.smk"
