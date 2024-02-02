@@ -86,5 +86,5 @@ rule moveDemultiplexFiles:
     shell:
         """
         echo {input.log} {params.outputDir}/logs/
-        mv {params.inputDir}/*/*.fq.gz {params.outputDir}/
+        echo {params.inputDir}/*/*.fq.gz {params.outputDir}/
         """
