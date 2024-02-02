@@ -61,8 +61,8 @@ rule make_stacks_files:
 rule process_radtags:
     input:
         barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"], bar=config["barcodeFile"]),
-        R1=expand("{path}/{{run}}_R1.fq.gz",path=config["inputDir"],R1=RUN),
-        R2=expand("{path}/{{run}}_R2.fq.gz",path=config["inputDir"],R2=RUN)
+        R1=expand("{path}/demultiplex/clone_filter/{run}_R1.1.fq.gz",path=config["outputDir"],run=RUN),
+        R2=expand("{path}/demultiplex/clone_filter/{run}_R2.2.fq.gz",path=config["outputDir"],run=RUN)
     params:
         outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
     conda:
