@@ -67,7 +67,7 @@ rule process_radtags:
         outputDir=expand("{path}/demultiplex/logs/{{run}}/",path=config["outputDir"])
     conda:
         "env/stacks.yaml"
-    threads: floor(workflow.cores/RUN.size)
+    threads: THREADSPERRUN
     output:
         log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.clone_filter.log",path=config["outputDir"])
     shell:

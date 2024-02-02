@@ -12,7 +12,7 @@ RAWREADSR1 = df.rawR1.str.replace(".fq.gz","",regex=False).unique()
 RAWREADSR2 = df.rawR2.str.replace(".fq.gz","",regex=False).unique()
 RUN = df.rawR1.str.replace("_R1.fq.gz","",regex=False).unique()
 RUNSAMPLE = df.rawR1.str.replace("_R1.fq.gz","",regex=False) + df.index
-
+THREADSPERRUN=workflow.cores/RUN.size
 
 rule all:
     input:
