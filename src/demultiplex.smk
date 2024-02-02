@@ -70,7 +70,7 @@ rule process_radtags:
     output:
         log=expand("{path}/demultiplex/samples/{{run}}/process_radtags.log",path=config["outputDir"])
     shell:
-        "process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline"
+        "process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline"
 
 #This moves all samples into the demultiplex file
 rule moveDemultiplexFiles:
