@@ -52,3 +52,17 @@ rule make_stacks_files:
         "env/R.yaml"
     shell:
         "Rscript src/demultiplex/createFilesFromBarcodeFile.R {input.barcodes} {params.outputDir}"
+
+
+rule process_radtags:
+    input:
+        barcodes=expand("{path}/stacksFiles/barcodeStacks{run}.tsv", path=config["outputDir"], bar=config["barcodeFile"],run=RUN)
+        R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
+        R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"])
+    params:
+        outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
+    output:
+        R1=expand("{path}/demultiplex/samples/{{RUNSAMPLE}}_R1.1.fq.gz",path=config["outputDir"]),
+        R2=expand("{path}/demultiplex/samples/{{RUNSAMPLE}}_R2.2.fq.gz",path=config["outputDir"])
+    shell:
+        "echo {input.R1} {output.R1}"
