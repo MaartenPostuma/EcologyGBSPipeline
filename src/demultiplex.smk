@@ -77,14 +77,14 @@ rule moveDemultiplexFiles:
     input:
         log=expand("{path}/demultiplex/samples/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN)
     params:
-        inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"],run=RUN),
-        outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"],run=RUN)
+        inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"]),
+        outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
     output:
-        log=expand("{path}/logs/{run}/process_radtags.log",path=config["outputDir"],run=RUN),
+        #log=expand("{path}/logs/{run}/process_radtags.log",path=config["outputDir"],run=RUN),
         samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
         samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES)
     shell:
         """
         echo {input.log} {params.outputDir}/logs/
-        echo {params.inputDir}/*/*.fq.gz {params.outputDir}/
+        mv {params.inputDir}/*/*.fq.gz {params.outputDir}/
         """
