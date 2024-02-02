@@ -53,6 +53,7 @@ rule make_stacks_files:
     shell:
         "Rscript src/demultiplex/createFilesFromBarcodeFile.R {input.barcodes} {params.outputDir}"
 
+#We then do some snakemake magic to run 
 
 rule process_radtags:
     input:
@@ -64,7 +65,7 @@ rule process_radtags:
     output:
         log=expand("{path}/demultiplex/samples/{{run}}/process_radtags.log",path=config["outputDir"])
     shell:
-        "echo {input.barcodes} {output.log}"
+        "process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline"
 
 rule moveDemultiplexFiles:
     input:
@@ -72,13 +73,11 @@ rule moveDemultiplexFiles:
     params:
         inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"],run=RUN),
         outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"],run=RUN),
-
     output:
         log=expand("{path}/logs/{run}/process_radtags.log",path=config["outputDir"],run=RUN),
         samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
         samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES)
     shell:
         """
-        echo {params.inputDir}/*.fq.gz {params.outputDir}
-    
+        mv {params.inputDir}/*.fq.gz {params.outputDir}
         """
