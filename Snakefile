@@ -18,6 +18,9 @@ rule all:
     input:
         R1=expand("{path}/demultiplex/clone_filter/{R1}_R1.1.fq.gz",path=config["outputDir"],R1=RUN),
         R2=expand("{path}/demultiplex/clone_filter/{R2}_R2.2.fq.gz",path=config["outputDir"],R2=RUN),
-        popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"])
+        popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+        R1=expand("{path}/demultiplex/samples/{{RUNSAMPLE}}_R1.1.fq.gz",path=config["outputDir"]),
+        R2=expand("{path}/demultiplex/samples/{{RUNSAMPLE}}_R2.2.fq.gz",path=config["outputDir"])
+
 
 include: "src/demultiplex.smk"
