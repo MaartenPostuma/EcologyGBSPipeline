@@ -53,8 +53,11 @@ rule make_stacks_files:
     shell:
         "Rscript src/demultiplex/createFilesFromBarcodeFile.R {input.barcodes} {params.outputDir}"
 
-#We then do some snakemake magic to run 
-
+#We then do some snakemake magic to run process radtags for each run.
+#This outputs 2 files per sample (the R1 and R2) 
+#TODO figure out to have this not be completely dependent on the process_radtags.log file being generated.
+#Howver this is complicated due to the samples needing to be split up per file...
+#TODO make the output be in the tempdir if it works
 rule process_radtags:
     input:
         barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"], bar=config["barcodeFile"]),
@@ -67,6 +70,7 @@ rule process_radtags:
     shell:
         "process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline"
 
+#This moves all samples into the demultiplex file
 rule moveDemultiplexFiles:
     input:
         log=expand("{path}/demultiplex/samples/{run}/process_radtags.log",path=config["outputDir"],run=RUN)
