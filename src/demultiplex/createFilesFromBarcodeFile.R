@@ -13,9 +13,9 @@ write.table(barcodeStacks,paste0(args[2],"/barcodeStacks.tsv"),row.names = F,col
 
 for(run in barcodes$run){
   barcodesSub<-barcodes[barcodes$run==run,]
-  barcodeStacks<-data.frame(sample=barcodesSub$sample,
-                            barcode1=paste0(barcodesSub$barcode1,"C"),
-                            barcode2=paste0(barcodesSub$barcode2,"C"))
+  barcodeStacks<-data.frame(barcode1=paste0(barcodesSub$barcode1,"C"),
+                            barcode2=paste0(barcodesSub$barcode2,"C"),
+                            sample=barcodesSub$sample)
   write.table(barcodeStacks,paste0(args[2],"/barcodeStacks",run,".tsv"),row.names = F,col.names = F,quote=F,sep="\t")
               
               
