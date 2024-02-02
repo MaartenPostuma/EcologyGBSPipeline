@@ -65,3 +65,19 @@ rule process_radtags:
         log=expand("{path}/demultiplex/samples/{{run}}/process_radtags.log",path=config["outputDir"])
     shell:
         "echo {input.barcodes} {output.log}"
+
+rule moveDemultiplexFiles:
+    input:
+        log=expand("{path}/demultiplex/samples/{run}/process_radtags.log",path=config["outputDir"],run=RUN)
+    params:
+        inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"],run=RUN),
+        outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"],run=RUN),
+
+    output:
+        log=expand("{path}/logs/{{run}}/process_radtags.log",path=config["outputDir"]),
+        samples=expand("{path}/demultiplex/samples/{{samples}}/process_radtags.log",path=config["outputDir"],sample=SAMPLES)
+    shell:
+        """
+        echo {params.inputDir}/*.fq.gz {params.outputDir}
+        
+        """
