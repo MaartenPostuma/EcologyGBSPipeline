@@ -57,7 +57,8 @@ rule make_stacks_files:
 #This outputs 2 files per sample (the R1 and R2) 
 #TODO figure out to have this not be completely dependent on the process_radtags.log file being generated.
 #Howver this is complicated due to the samples needing to be split up per file...
-#TODO make the output be in the tempdir if it works
+#TODO make this less janky... so we do not do weird shit with the logs...
+#Figure out what happesn if this breaks.
 rule process_radtags:
     input:
         barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"], bar=config["barcodeFile"]),
@@ -73,7 +74,7 @@ rule process_radtags:
     shell:
         "process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads}"
 
-#This moves all samples into the demultiplex file
+#This moves all samples into the demultiplex/samples directory
 rule moveDemultiplexFiles:
     input:
         log=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN)
