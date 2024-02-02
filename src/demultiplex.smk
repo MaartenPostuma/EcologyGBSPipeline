@@ -68,7 +68,7 @@ rule process_radtags:
     conda:
         "env/stacks.yaml"
     output:
-        log=expand("{path}/demultiplex/samples/{{run}}/process_radtags.clone_filter.log",path=config["outputDir"])
+        log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.clone_filter.log",path=config["outputDir"])
     shell:
         "process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline"
 
