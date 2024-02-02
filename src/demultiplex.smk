@@ -78,7 +78,7 @@ rule moveDemultiplexFiles:
         log=expand("{path}/demultiplex/samples/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN)
     params:
         inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"]),
-        outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
+        outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"]),
         log=expand("{path}/logs/",path=config["outputDir"])
     output:
         log=expand("{path}/logs/{run}/process_radtags.log",path=config["outputDir"],run=RUN),
