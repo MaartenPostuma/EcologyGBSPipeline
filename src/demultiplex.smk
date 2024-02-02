@@ -56,7 +56,7 @@ rule make_stacks_files:
 
 rule process_radtags:
     input:
-        barcodes=expand("{path}/stacksFiles/barcodeStacks{run}.tsv", path=config["outputDir"], run=config["barcodeFile"])
+        barcodes=expand("{path}/stacksFiles/barcodeStacks{run}.tsv", path=config["outputDir"], run=RUN)
     params:
         outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
     output:
