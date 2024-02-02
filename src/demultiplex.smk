@@ -64,7 +64,7 @@ rule process_radtags:
         R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
         R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"])
     params:
-        outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
+        outputDir=expand("{path}/demultiplex/samples/{{run}}/",path=config["outputDir"])
     conda:
         "env/stacks.yaml"
     output:
