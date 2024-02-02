@@ -60,7 +60,7 @@ rule process_radtags:
     params:
         outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
     output:
-        DemultR1=expand("{path}/demultiplex/samples/{}_R1.fq.gz",path=config["outputDir"],runsample=RUNSAMPLE),
+        DemultR1=expand("{path}/demultiplex/samples/{runsample}_R1.fq.gz",path=config["outputDir"],runsample=RUNSAMPLE),
         DemultR2=expand("{path}/demultiplex/samples/{runsample}_R2.fq.gz",path=config["outputDir"],runsample=RUNSAMPLE)
     shell:
         "echo {input.barcodes} {output.DemultR1}"
