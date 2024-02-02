@@ -56,13 +56,11 @@ rule make_stacks_files:
 
 rule process_radtags:
     input:
-        barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"], bar=config["barcodeFile"]),
-        R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
-        R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"])
+        barcodes=expand("{path}/stacksFiles/barcodeStacks{run}.tsv", path=config["outputDir"], run=config["barcodeFile"])
     params:
         outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
     output:
-        DemultR1=expand("{path}/demultiplex/samples/{runsample}_R1.fq.gz",path=config["outputDir"],runsample=RUNSAMPLE),
+        DemultR1=expand("{path}/demultiplex/samples/{}_R1.fq.gz",path=config["outputDir"],runsample=RUNSAMPLE),
         DemultR2=expand("{path}/demultiplex/samples/{runsample}_R2.fq.gz",path=config["outputDir"],runsample=RUNSAMPLE)
     shell:
-        "echo {input.R1} {output.DemultR1}"
+        "echo {input.barcodes} {output.DemultR1}"
