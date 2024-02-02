@@ -67,11 +67,11 @@ rule process_radtags:
         outputDir=expand("{path}/demultiplex/logs/{{run}}/",path=config["outputDir"])
     conda:
         "env/stacks.yaml"
-    threads: workflow.cores/RUN.size
+    threads: floor(workflow.cores/RUN.size)
     output:
         log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.clone_filter.log",path=config["outputDir"])
     shell:
-        "process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads"
+        "process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads}"
 
 #This moves all samples into the demultiplex file
 rule moveDemultiplexFiles:
