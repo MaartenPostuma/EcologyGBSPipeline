@@ -62,7 +62,7 @@ rule process_radtags:
     params:
         outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
     output:
-        R1=expand("{path}/demultiplex/samples/{{RUNSAMPLE}}_R1.1.fq.gz",path=config["outputDir"]),
-        R2=expand("{path}/demultiplex/samples/{{RUNSAMPLE}}_R2.2.fq.gz",path=config["outputDir"])
+        DemultR1=expand("{path}/demultiplex/samples/{runsample}_R1.fq.gz",path=config["outputDir"],runsample=RUNSAMPLE),
+        DemultR2=expand("{path}/demultiplex/samples/{runsample}_R2.fq.gz",path=config["outputDir"],runsample=RUNSAMPLE)
     shell:
         "echo {input.R1} {output.R1}"
