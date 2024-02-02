@@ -85,5 +85,6 @@ rule moveDemultiplexFiles:
         samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES)
     shell:
         """
+        echo {input.log} {params.outputDir}/logs/
         mv {params.inputDir}/*/*.fq.gz {params.outputDir}/
         """
