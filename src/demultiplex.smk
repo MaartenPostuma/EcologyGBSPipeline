@@ -75,7 +75,7 @@ rule process_radtags:
 #This moves all samples into the demultiplex file
 rule moveDemultiplexFiles:
     input:
-        log=expand("{path}/demultiplex/samples/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN)
+        log=expand("{path}/demultiplex/samples/{run}/process_radtags.clone_filter.log",path=config["tmpDir"],run=RUN)
     params:
         inputDir=expand("{path}/demultiplex/samples/",path=config["tmpDir"]),
         outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"]),
