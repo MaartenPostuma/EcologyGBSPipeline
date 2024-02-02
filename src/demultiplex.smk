@@ -76,7 +76,9 @@ rule moveDemultiplexFiles:
         log=expand("{path}/demultiplex/samples/{run}/process_radtags.log",path=config["outputDir"],run=RUN)
     params:
         inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"],run=RUN),
-        outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"],run=RUN),
+        outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"],run=RUN)
+    conda:
+        "env/stacks.yaml"
     output:
         log=expand("{path}/logs/{run}/process_radtags.log",path=config["outputDir"],run=RUN),
         samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
