@@ -1,4 +1,5 @@
-configfile: "config.yaml"
+param_nInds=config["param_demultiplex"]["nInds"]
+
 LARGEM = list(range(1,12))
 #rule all:
 #    input:
@@ -11,7 +12,7 @@ rule subset_popmap:
     output:
         expand("{dir}/popmapSub.tsv",dir=config["outputDir"])
     params:
-        config["nInds"]
+        param_nInds
     shell:
         "paste <(shuf -n {params} {input} | cut -f1) <(yes opt | head -n {params}) > {output}"
 
