@@ -70,5 +70,7 @@ rule makePlotLargeM:
         MparameterPNG=expand("{dir}/stacksTestparameter.png",dir=config["outputDir"])
     params:
         dir=config["outputDir"]
+    conda:
+        "env/R.yaml"
     shell:
         "Rscript src/stacksTestparameterTest.R {params.dir}"

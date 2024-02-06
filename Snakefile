@@ -25,6 +25,6 @@ if config["mode"]== "StacksTest":
             MparameterPNG=expand("{dir}/stacksTestparameter.png",dir=config["outputDir"])
 
 
-if config["mode"]== "stacksTest":
+if config["mode"]== "StacksTest":
     include: "src/demultiplex.smk"
     include: "src/stacksParameterTest.smk"
