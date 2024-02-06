@@ -14,4 +14,4 @@ rule denovo_map:
         "env/stacks.yaml"
     threads:workflow.cores
     shell:
-        "denovo_map.pl --samples {params.inputDir} --popmap {input.popmap} -T  {threads}       -o outputDir -n {params.M} -m {params.M} -X 'populations: --vcf'"
+        "denovo_map.pl --samples {params.inputDir} --popmap {input.popmap} -T  {threads}       -o {params.outputDir} -n {params.M} -m {params.M} -X 'populations: --vcf'"
