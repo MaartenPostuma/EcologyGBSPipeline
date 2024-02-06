@@ -57,9 +57,9 @@ rule runStacksLargeM:
 
 rule extractInfoLargeM:
     input:
-        outLog=expand("{dir}/stacksTest{largeM}/denovo_map.log",largeM=LARGEM,dir=config["outputDir"])
+        outLog=expand("{dir}/stacksTest/M{largeM}/denovo_map.log",largeM=LARGEM,dir=config["outputDir"])
     output:
-        MparameterTSV=expand("{dir}/stacksTestparameter.tsv",dir=config["outputDir"])
+        MparameterTSV=expand("{dir}/stacksTest/stacksTestparameter.tsv",dir=config["outputDir"])
     params:
         dir=config["outputDir"]
     shell:
@@ -72,11 +72,11 @@ rule extractInfoLargeM:
 
 rule makePlotLargeM:
     input:
-        MparameterTSV=expand("{dir}/stacksTestparameter.tsv",dir=config["outputDir"])
+        MparameterTSV=expand("{dir}/stacksTest/stacksTestparameter.tsv",dir=config["outputDir"])
     output:
-        MparameterPNG=expand("{dir}/stacksTestparameter.png",dir=config["outputDir"])
+        MparameterPNG=expand("{dir}/stacksTest/stacksTestparameter.png",dir=config["outputDir"])
     params:
-        dir=config["outputDir"]
+        dir=expand("{dir}/stacksTest/",dir=config["outputDir"])
     conda:
         "env/R.yaml"
     shell:
