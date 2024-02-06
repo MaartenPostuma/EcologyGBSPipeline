@@ -28,3 +28,20 @@ if config["mode"]== "StacksTest":
 if config["mode"]== "StacksTest":
     include: "src/demultiplex.smk"
     include: "src/stacksParameterTest.smk"
+
+
+if config["mode"]== "Denovo":
+    include: "src/demultiplex.smk"
+    include: "src/stacks.smk"
+
+
+if config["mode"]== "Denovo":
+    rule all:
+        input:
+            DeDuplR1=expand("{path}/demultiplex/clone_filter/{run}_R1.1.fq.gz",path=config["outputDir"],run=RUN),
+            DeDuplR2=expand("{path}/demultiplex/clone_filter/{run}_R2.2.fq.gz",path=config["outputDir"],run=RUN),
+            popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+            perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN),
+            samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
+            samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES)
+    

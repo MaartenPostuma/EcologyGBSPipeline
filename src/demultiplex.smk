@@ -1,6 +1,4 @@
 
-#TODO MAKE THE CONDA ENVIRONMENTS
-
 param_oligo=config["param_demultiplex"]["nOligo"]
 
 #We always use 3 as the number of oligo for our adapters. (If we would ever change this we can account for this)
@@ -21,7 +19,7 @@ rule clone_filter:
         R1=expand("{path}/{{run}}_R1.fq.gz",path=config["inputDir"],R1=RUN),
         R2=expand("{path}/{{run}}_R2.fq.gz",path=config["inputDir"],R2=RUN)
     params:
-        outputDir=expand("{path}/{dir}", path=config["outputDir"],dir=projectName),
+        outputDir=expand("{path}/{dir}", path=config["outputDir"]),
         outputdir=expand("{path}/demultiplex", path=config["outputDir"]),
         param_oligo=getParam_oligo(param_oligo)
     output:
@@ -31,10 +29,7 @@ rule clone_filter:
         "env/stacks.yaml"
     threads: 1
     shell: 
-        """
-        mkdir -p {params.outputDir}
-        clone_filter -1 {input.R1} -2 {input.R2} -o {params.outputdir}/clone_filter/ --oligo_len_1 {params.param_oligo} --oligo_len_2 {params.param_oligo} --inline_inline -i gzfastq
-        """
+        "clone_filter -1 {input.R1} -2 {input.R2} -o {params.outputdir}/clone_filter/ --oligo_len_1 {params.param_oligo} --oligo_len_2 {params.param_oligo} --inline_inline -i gzfastq"
 
 #Stacks and the rest of the pipeline need to have specific files for barcodes, 
 #the format is different and we add the control nucleotide and we need to split it per run so we can demultiplex them in parallel
