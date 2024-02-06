@@ -3,7 +3,7 @@ rule denovo_map:
     input: 
         samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
         samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
-        popmapSub= expand("{dir}/stacksTest/popmap.tsv",dir=config["outputDir"])
+        popmapSub= expand("{dir}/stacksFiles/popmap.tsv",dir=config["outputDir"])
     params:
         M=config["M"],
         outputDir=expand("{path}/stacks/",path=config["outputDir"]),
