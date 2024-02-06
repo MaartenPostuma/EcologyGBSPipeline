@@ -5,8 +5,8 @@ rule denovo_map:
         samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
         popmapSub= expand("{dir}/stacksTest/popmap.tsv",dir=config["outputDir"])
     params:
-        M=config["M"]
-        outputDir=expand("{path}/stacks/",path=config["outputDir"])
+        M=config["M"],
+        outputDir=expand("{path}/stacks/",path=config["outputDir"]),
         inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
     output:
         vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"])
