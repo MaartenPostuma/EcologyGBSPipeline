@@ -43,5 +43,5 @@ if config["mode"]== "Denovo":
             popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
             perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN),
             samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
-            samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES)
-    
+            samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
+            vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"])

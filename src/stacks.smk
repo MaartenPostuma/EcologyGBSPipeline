@@ -10,6 +10,8 @@ rule denovo_map:
         inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
     output:
         vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"])
+    conda:
+        "env/stacks.yaml"
     threads:workflow.cores
     shell:
         "denovo_map.pl --samples {params.inputDir} --popmap {input.popmap} -T  {threads}       -o outputDir -n {params.M} -m {params.M} -X 'populations: --vcf'
