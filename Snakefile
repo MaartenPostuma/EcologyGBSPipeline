@@ -11,17 +11,18 @@ SAMPLES = df.index
 RAWREADSR1 = df.rawR1.str.replace(".fq.gz","",regex=False).unique()
 RAWREADSR2 = df.rawR2.str.replace(".fq.gz","",regex=False).unique()
 RUN = df.rawR1.str.replace("_R1.fq.gz","",regex=False).unique()
-RUNSAMPLE = df.rawR1.str.replace("_R1.fq.gz","",regex=False) + df.index
 THREADSPERRUN=workflow.cores/RUN.size
 
-rule all:
-    input:
-        DeDuplR1=expand("{path}/demultiplex/clone_filter/{run}_R1.1.fq.gz",path=config["outputDir"],run=RUN),
-        DeDuplR2=expand("{path}/demultiplex/clone_filter/{run}_R2.2.fq.gz",path=config["outputDir"],run=RUN),
-        popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
-        perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN),
-        samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
-        samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES)
+if config["mode"]== "stacksTest":
+    rule all:
+        input:
+            DeDuplR1=expand("{path}/demultiplex/clone_filter/{run}_R1.1.fq.gz",path=config["outputDir"],run=RUN),
+            DeDuplR2=expand("{path}/demultiplex/clone_filter/{run}_R2.2.fq.gz",path=config["outputDir"],run=RUN),
+            popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+            perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN),
+            samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
+            samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES)
 
-
-include: "src/demultiplex.smk"
+if config["mode"]== "stacksTest":
+    include: "src/demultiplex.smk"
+    include: "src/stacksParameterTest.smk"

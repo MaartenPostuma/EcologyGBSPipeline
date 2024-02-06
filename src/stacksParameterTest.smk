@@ -1,15 +1,15 @@
-configfile: "configParameter.yaml"
+configfile: "config.yaml"
 LARGEM = list(range(1,12))
 #rule all:
 #    input:
-#        MparameterPNG=expand("{dir}/LargeMparameter.png",dir=config["outdir"]),
-#        testLargeM=expand("{dir}/LargeM{largeM}/test{largeM}",largeM=LARGEM,dir=config["outdir"])
+#        MparameterPNG=expand("{dir}/stacksTestparameter.png",dir=config["outputDir"]),
+#        testLargeM=expand("{dir}/stacksTest{largeM}/test{largeM}",largeM=LARGEM,dir=config["outputDir"])
 
 rule subset_popmap:
     input:
-        config["popmap"]
+        popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
     output:
-        expand("{dir}/popmapSub.tsv",dir=config["outdir"])
+        expand("{dir}/popmapSub.tsv",dir=config["outputDir"])
     params:
         config["nInds"]
     shell:
@@ -17,9 +17,9 @@ rule subset_popmap:
 
 rule mkdirLargeM:
     input:
-        expand("{dir}/popmapSub.tsv",dir=config["outdir"])
+        expand("{dir}/popmapSub.tsv",dir=config["outputDir"])
     output:
-        expand("{dir}/LargeM{{largeM}}/test{{largeM}}",dir=config["outdir"])
+        expand("{dir}/stacksTest{{largeM}}/test{{largeM}}",dir=config["outputDir"])
     params:
         largeM="{largeM}"
     shell:
@@ -27,13 +27,15 @@ rule mkdirLargeM:
 
 rule runStacksLargeM:
     input:
-        inDir=expand("{dir}/LargeM{{largeM}}/test{{largeM}}",dir=config["outdir"])
+        samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
+        samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
+        inDir=expand("{dir}/stacksTest{{largeM}}/test{{largeM}}",dir=config["outputDir"])
     output:
-        outLog=expand("{dir}/LargeM{{largeM}}/denovo_map.log",dir=config["outdir"])
+        outLog=expand("{dir}/stacksTest{{largeM}}/denovo_map.log",dir=config["outputDir"])
     params:
         largeM="{largeM}",
-        popmapSub=expand("{dir}/popmapSub.tsv",dir=config["outdir"]),
-        outDir=expand("{dir}/LargeM{{largeM}}/",dir=config["outdir"]),
+        popmapSub=expand("{dir}/popmapSub.tsv",dir=config["outputDir"]),
+        outputDir=expand("{dir}/stacksTest{{largeM}}/",dir=config["outputDir"]),
         indir=config["indir"]
     conda:
         "src/env/stacks.yaml"
@@ -41,31 +43,31 @@ rule runStacksLargeM:
     shell:
         """
         denovo_map.pl --samples {params.indir} --popmap {params.popmapSub} -T {threads} \
-        -o {params.outDir} -n {params.largeM} -M {params.largeM}  \
+        -o {params.outputDir} -n {params.largeM} -M {params.largeM}  \
         -X 'populations: -R 80'
         """
 
 rule extractInfoLargeM:
     input:
-        outLog=expand("{dir}/LargeM{largeM}/denovo_map.log",largeM=LARGEM,dir=config["outdir"])
+        outLog=expand("{dir}/stacksTest{largeM}/denovo_map.log",largeM=LARGEM,dir=config["outputDir"])
     output:
-        MparameterTSV=expand("{dir}/LargeMparameter.tsv",dir=config["outdir"])
+        MparameterTSV=expand("{dir}/stacksTestparameter.tsv",dir=config["outputDir"])
     params:
-        dir=config["outdir"]
+        dir=config["outputDir"]
     shell:
         """
-        paste <(cat {params.dir}/LargeM*/denovo_map.log | grep "Kept" | cut -f2,14 -d " ") \
-        <(cat {params.dir}/LargeM*/denovo_map.log | grep "per-sample coverage" | cut -f2 -d "=" | cut -f1 -d "x") \
-        <(cat {params.dir}/LargeM*/denovo_map.log | grep "\-M" | grep "denovo_map.pl" | cut -f 13 -d " ") >\
-        {params.dir}/LargeMparameter.tsv
+        paste <(cat {params.dir}/stacksTest*/denovo_map.log | grep "Kept" | cut -f2,14 -d " ") \
+        <(cat {params.dir}/stacksTest*/denovo_map.log | grep "per-sample coverage" | cut -f2 -d "=" | cut -f1 -d "x") \
+        <(cat {params.dir}/stacksTest*/denovo_map.log | grep "\-M" | grep "denovo_map.pl" | cut -f 13 -d " ") >\
+        {params.dir}/stacksTestparameter.tsv
         """
 
 rule makePlotLargeM:
     input:
-        MparameterTSV=expand("{dir}/LargeMparameter.tsv",dir=config["outdir"])
+        MparameterTSV=expand("{dir}/stacksTestparameter.tsv",dir=config["outputDir"])
     output:
-        MparameterPNG=expand("{dir}/LargeMparameter.png",dir=config["outdir"])
+        MparameterPNG=expand("{dir}/stacksTestparameter.png",dir=config["outputDir"])
     params:
-        dir=config["outdir"]
+        dir=config["outputDir"]
     shell:
-        "Rscript src/LargeMparameterTest.R {params.dir}"
+        "Rscript src/stacksTestparameterTest.R {params.dir}"

@@ -1,6 +1,9 @@
 #In this file you need to specify certain things
-
-
+#this is the mode and can be three different things:
+#Reference (if your species has a reference genome)
+#Denovo (if your species does not have a reference genome). This will use stacks but if you want to use this correctly (according to Paris 2017/2022) you will first need to run:
+#StacksTest (this generates the plots from the paper to make a decision for which parameters to use in stacks)
+mode: "StacksTest"
 #Input folder #The place where you have the rawReads and the barcode file
 inputDir: "data"
 
@@ -34,6 +37,10 @@ barcodeFile: "barcodes.txt"
 
 
 #Parameters (if you want to do something different) otherwise you can leave these blank
+#Demulitplex parameters: How many oligos are there in your adapters (default = 3)
 param_demultiplex:
   nOligo: ""
-  
+
+#For the parameter test how many samples do you need. (Default = 20) (See paris et al. 2017 for specifics)
+param_StacksTest:
+  nInds: ""
