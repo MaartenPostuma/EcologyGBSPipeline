@@ -1,4 +1,11 @@
 param_nInds=config["param_StacksTest"]["nInds"]
+def getParam_nInds(param_nInds):
+    if param_nInds == "default" or param_oligo == "":
+        id = 20
+    else:
+        id = param_nInds
+    return id
+
 
 LARGEM = list(range(1,12))
 #rule all:
@@ -12,13 +19,13 @@ rule subset_popmap:
     output:
         expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"])
     params:
-        param_nInds
+        getParam_nInds(param_nInds)
     shell:
         "paste <(shuf -n {params} {input} | cut -f1) <(yes opt | head -n {params}) > {output}"
 
 rule mkdirLargeM:
     input:
-        expand("{dir}/popmapSub.tsv",dir=config["outputDir"])
+        expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"])
     output:
         expand("{dir}/stacksTest/M{{largeM}}/test{{largeM}}",dir=config["outputDir"])
     params:
