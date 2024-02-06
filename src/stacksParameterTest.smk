@@ -37,7 +37,7 @@ rule runStacksLargeM:
     input:
         samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
         samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
-        popmapSub= expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"])
+        popmapSub= expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"]),
         inputDir=expand("{dir}/stacksTest/M{{largeM}}/test{{largeM}}",dir=config["outputDir"])
     output:
         outLog=expand("{dir}/stacksTest/M{{largeM}}/denovo_map.log",dir=config["outputDir"])
