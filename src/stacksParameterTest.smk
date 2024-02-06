@@ -37,7 +37,7 @@ rule runStacksLargeM:
         largeM="{largeM}",
         popmapSub=expand("{dir}/popmapSub.tsv",dir=config["outputDir"]),
         outputDir=expand("{dir}/stacksTest{{largeM}}/",dir=config["outputDir"]),
-        inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"]
+        inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
     conda:
         "src/env/stacks.yaml"
     threads: 4
