@@ -30,20 +30,20 @@ rule runStacksLargeM:
     input:
         samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
         samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
-        inDir=expand("{dir}/stacksTest{{largeM}}/test{{largeM}}",dir=config["outputDir"])
+        inputDir=expand("{dir}/stacksTest{{largeM}}/test{{largeM}}",dir=config["outputDir"])
     output:
         outLog=expand("{dir}/stacksTest{{largeM}}/denovo_map.log",dir=config["outputDir"])
     params:
         largeM="{largeM}",
         popmapSub=expand("{dir}/popmapSub.tsv",dir=config["outputDir"]),
         outputDir=expand("{dir}/stacksTest{{largeM}}/",dir=config["outputDir"]),
-        indir=config["indir"]
+        inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"]
     conda:
         "src/env/stacks.yaml"
     threads: 4
     shell:
         """
-        denovo_map.pl --samples {params.indir} --popmap {params.popmapSub} -T {threads} \
+        denovo_map.pl --samples {params.inputDir} --popmap {params.popmapSub} -T {threads} \
         -o {params.outputDir} -n {params.largeM} -M {params.largeM}  \
         -X 'populations: -R 80'
         """
