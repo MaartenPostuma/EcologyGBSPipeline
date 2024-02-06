@@ -21,7 +21,9 @@ if config["mode"]== "stacksTest":
             popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
             perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN),
             samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
-            samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES)
+            samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
+            MparameterPNG=expand("{dir}/stacksTestparameter.png",dir=config["outputDir"])
+
 
 if config["mode"]== "stacksTest":
     include: "src/demultiplex.smk"
