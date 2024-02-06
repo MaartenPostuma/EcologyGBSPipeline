@@ -39,7 +39,7 @@ rule runStacksLargeM:
         outputDir=expand("{dir}/stacksTest{{largeM}}/",dir=config["outputDir"]),
         inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
     conda:
-        "src/env/stacks.yaml"
+        "env/stacks.yaml"
     threads: 4
     shell:
         """
@@ -73,4 +73,4 @@ rule makePlotLargeM:
     conda:
         "env/R.yaml"
     shell:
-        "Rscript src/stacksTestparameterTest.R {params.dir}"
+        "Rscript src/stacksTest/parameterTest.R {params.dir}"
