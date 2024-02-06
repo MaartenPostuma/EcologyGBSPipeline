@@ -1,4 +1,4 @@
-param_nInds=config["param_demultiplex"]["nInds"]
+param_nInds=config["param_StacksTest"]["nInds"]
 
 LARGEM = list(range(1,12))
 #rule all:
