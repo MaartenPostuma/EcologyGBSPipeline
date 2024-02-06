@@ -10,7 +10,7 @@ rule subset_popmap:
     input:
         popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
     output:
-        expand("{dir}/popmapSub.tsv",dir=config["outputDir"])
+        expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"])
     params:
         param_nInds
     shell:
@@ -20,7 +20,7 @@ rule mkdirLargeM:
     input:
         expand("{dir}/popmapSub.tsv",dir=config["outputDir"])
     output:
-        expand("{dir}/stacksTest{{largeM}}/test{{largeM}}",dir=config["outputDir"])
+        expand("{dir}/stacksTest/M{{largeM}}/test{{largeM}}",dir=config["outputDir"])
     params:
         largeM="{largeM}"
     shell:
@@ -30,13 +30,13 @@ rule runStacksLargeM:
     input:
         samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
         samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
-        inputDir=expand("{dir}/stacksTest{{largeM}}/test{{largeM}}",dir=config["outputDir"])
+        inputDir=expand("{dir}/stacksTest/M{{largeM}}/test{{largeM}}",dir=config["outputDir"])
     output:
-        outLog=expand("{dir}/stacksTest{{largeM}}/denovo_map.log",dir=config["outputDir"])
+        outLog=expand("{dir}/stacksTest/M{{largeM}}/denovo_map.log",dir=config["outputDir"])
     params:
         largeM="{largeM}",
         popmapSub=expand("{dir}/popmapSub.tsv",dir=config["outputDir"]),
-        outputDir=expand("{dir}/stacksTest{{largeM}}/",dir=config["outputDir"]),
+        outputDir=expand("{dir}/stacksTest/M{{largeM}}/",dir=config["outputDir"]),
         inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
     conda:
         "env/stacks.yaml"
