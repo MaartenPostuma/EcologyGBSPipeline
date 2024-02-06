@@ -13,7 +13,7 @@ RAWREADSR2 = df.rawR2.str.replace(".fq.gz","",regex=False).unique()
 RUN = df.rawR1.str.replace("_R1.fq.gz","",regex=False).unique()
 THREADSPERRUN=workflow.cores/RUN.size
 
-if config["mode"]== "stacksTest":
+if config["mode"]== "StacksTest":
     rule all:
         input:
             DeDuplR1=expand("{path}/demultiplex/clone_filter/{run}_R1.1.fq.gz",path=config["outputDir"],run=RUN),
