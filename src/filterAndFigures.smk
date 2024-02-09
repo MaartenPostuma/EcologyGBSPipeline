@@ -55,7 +55,7 @@ rule filter:
         vcf=expand("{path}/filters/{params}/step1.recode.p.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
         sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
     params:
-        outputDir=expand("{path}/filters/",path=config["outputDir"]),
+        outputDir=expand("{path}",path=config["outputDir"]),
         parDir=expand("{path}/filters/{params}",path=config["outputDir"],params=paramspace.wildcard_pattern),
         maf="0."+(str(paramspace.wildcard_pattern).split("/")[1].split("~")[1])
     threads:
@@ -63,7 +63,7 @@ rule filter:
     conda:
         "env/stacks.yaml"
     shell:
-        "populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R 0.{wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.outputDir}/filters/ --threads {threads}"    
+        "populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R 0.{wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --threads {threads}"    
 
 rule test:
     input:
