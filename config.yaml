@@ -38,7 +38,10 @@ param_filtering:
   hwe_range: 0
   DP_range: 0
 
-
+hwe_val: 0
+DP_val: 0
+maf_val: 0
+max_missing_val: 0
 
 
 
