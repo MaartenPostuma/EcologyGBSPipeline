@@ -3,7 +3,7 @@
 #Reference (if your species has a reference genome)
 #Denovo (if your species does not have a reference genome). This will use stacks but if you want to use this correctly (according to Paris 2017/2022) you will first need to run:
 #StacksTest (this generates the plots from the paper to make a decision for which parameters to use in stacks)
-mode: "Stacks"
+mode: "Denovo"
 #Input folder #The place where you have the rawReads and the barcode file
 inputDir: "data"
 
