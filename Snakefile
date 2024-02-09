@@ -33,7 +33,7 @@ if config["mode"]== "StacksTest":
 if config["mode"]== "Denovo":
     include: "src/demultiplex.smk"
     include: "src/stacks.smk"
-
+    include: "src/filterAndFigures.smk"
 
 if config["mode"]== "Denovo":
     rule all:
