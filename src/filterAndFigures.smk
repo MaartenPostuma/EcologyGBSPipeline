@@ -52,7 +52,7 @@ rule filter:
     input:
         vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"])
     output:
-        vcf=expand("{path}/filters/{params}/step1.recode.p.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
+        vcf=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
         sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
     params:
         outputDir=expand("{path}",path=config["outputDir"]),
@@ -65,14 +65,6 @@ rule filter:
     shell:
         "populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R 0.{wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --threads {threads}"    
 
-rule test:
-    input:
-        vcf=expand("{path}/filters/{params}/step1.recode.p.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
-        sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
-    output:
-        worked=expand("{path}/worked.tsv",path=config["outputDir"])
-    shell:
-        "cat {input.sumstats} > {output.worked}"
 
 
 rule filter1:
