@@ -48,7 +48,6 @@ if config["mode"]== "Denovo":
             samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
             samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
             vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"]),
-            vcfFilt=expand("{path}/filters/{params}/step1.recode.p.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
-            sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+            worked=expand("{path}/worked.tsv",path=config["outputDir"])
 
 

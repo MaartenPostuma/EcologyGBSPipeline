@@ -65,6 +65,15 @@ rule filter:
     shell:
         "populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.outputDir}/filters/ --threads {threads}"    
 
+rule test:
+    input:
+        vcf=expand("{path}/filters/{params}/step1.recode.p.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
+        sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+    output:
+        worked=expand("{path}/worked.tsv",path=config["outputDir"])
+    shell:
+        "cat {input.sumstats} > {output.worked}"
+
 
 rule filter1:
     input:
