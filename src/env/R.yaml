@@ -8,3 +8,4 @@ dependencies:
   - r-base
   - r-ggplot2
   - r-reshape2
+  - bioconductor-snprelate
