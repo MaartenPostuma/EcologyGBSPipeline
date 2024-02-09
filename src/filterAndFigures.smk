@@ -43,7 +43,7 @@ rule step_1:
     conda:
         "env/vcftools.yaml"
     params:
-        outputDir=expand("{path}/filter/",path=config["outputDir"]),
+        outputDir=expand("{path}/filters/",path=config["outputDir"]),
         indMissing=individual_missingness,
     shell:
         '''vcftools --vcf {input.vcfIn}  --missing-indv --out {params.outputDir}/missingIndvs
