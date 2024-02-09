@@ -1,8 +1,7 @@
 configfile: "config.yaml"
-max_missing_range=config["max_missing_range"]
-maf_range=config["maf_range"]
-hwe_range=config["hwe_range"]
-DP_range=config["DP_range"]
+
+
+individual_missingness=config["param_filtering"]["individual_missingness"]
 
 
 rule makeGDS:
@@ -41,7 +40,7 @@ rule step_1:
     conda:
         "env/vcftools.yaml"
     params:
-        indMissing=config["individual_missingness"],
+        indMissing=individual_missingness,
         outputDir=expand("{path}/filters/",path=config["outputDir"])
     shell:
         '''vcftools --vcf {input.vcf_in}  --missing-indv --out {params.outputDir}/missingIndvs

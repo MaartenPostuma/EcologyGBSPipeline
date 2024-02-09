@@ -32,8 +32,7 @@ M: 4
 #Parameters for the filtering: What are the filtering parameters you want to explore?
  
 param_filtering:
-  max_missing_range: 0.8
-
+  individual_missingness: 0.8
 
 
 
