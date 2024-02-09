@@ -57,13 +57,13 @@ rule filter:
     params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
         parDir=expand("{path}/filters/{params}",path=config["outputDir"],params=paramspace.wildcard_pattern),
-        maf=str(paramspace.wildcard_pattern).split("/")[1].split("~")[1]
+        maf="0."+(str(paramspace.wildcard_pattern).split("/")[1].split("~")[1])
     threads:
         THREADSPERRUN//1
     conda:
         "env/stacks.yaml"
     shell:
-        "populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.outputDir}/filters/ --threads {threads}"    
+        "populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R 0.{wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.outputDir}/filters/ --threads {threads}"    
 
 rule test:
     input:
