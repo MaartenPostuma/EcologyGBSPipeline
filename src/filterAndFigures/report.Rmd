@@ -1,0 +1,1045 @@
+---
+title: "filtering report"
+#code-author: MaartenPostuma
+#date: 23-07-2019
+output:
+  html_document:
+    df_print: paged
+params:
+  dir: "vcf/"
+  rmd: "report.Rmd"
+---
+
+#### author: `r system("whoami",inter=T)`
+#### date: `r system("date",intern=T)`
+
+
+```{r setup, include=FALSE}
+#setwd("./output")
+chooseCRANmirror(graphics=FALSE, ind=33)
+args <- commandArgs(TRUE)
+usePackage <- function(p) 
+{
+  if (!is.element(p, installed.packages()[,1]))
+    install.packages(p, dep = TRUE)
+  require(p, character.only = TRUE)
+}
+usePackage("ggplot2")
+usePackage("SNPrelate")
+usePackage("knitr")
+usePackage("ggdendro")
+usePackage("reshape2")
+
+options(stringsAsFactors = FALSE)
+
+knitr::opts_chunk$set(echo = FALSE)
+options(tinytex.verbose = TRUE)
+```
+
+This report contains all the information needed to make descisions about your filtering steps.
+
+# Filter Steps {.tabset .tabset-fade .tabset-pills}
+
+## First Steps
+
+Here you can find the information from the log files of the first 2 filtering steps:
+
+```{bash capture="step 1 log"}
+cat ./vcf/step1.log | grep -v "VCFtools" | grep -v "(C)" | grep -v "Individuals" | grep -v "Outputting"| grep -v "Run Time"
+```
+
+The distribution of individual missingness
+
+```{r fig.cap="Fig.1: Histogram of the fraction of missingness across individuals, red line indicates the cutoff used in filtering step 2"}
+indCoverage<-read.table("vcf/missingIndvs.imiss",h=T)
+cutOff<-as.numeric(system("cat configFiltering.yaml | grep 'individual_missingness'| cut -f2 -d :",intern=T))
+numberOfIndividuals<-system("cat vcf/step2.log|grep 'Individuals' ",intern=T)
+ggplot(indCoverage,aes(x=F_MISS))+geom_histogram(col="black",fill="lightblue",binwidth=0.025)+
+  ggtitle(numberOfIndividuals)+ylab("fraction missing")+
+  theme_light()+geom_vline(xintercept=cutOff,col="red")
+```
+
+These are the individuals that are excluded from further analysis
+
+```{bash capture="missing individuals"}
+cat ./vcf/lowDP.step2.indv
+```
+
+## Max missing. Others=0
+Filter 1 used `r system('cat configFiltering.yaml| grep max_missing_range | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)` as a range for max-missing. 
+Max-missing specifies the maximum percentage of individuals a SNP can be missing to not be filtered.
+
+All other variables were set to 0
+
+### Plots {.tabset .tabset-fade .tabset-pills}
+#### PCA
+
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("PCA of filter1 max missing =",ranges)}
+invisible(library(SNPRelate))
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter1/",full.names = T),value = T)
+ranges<-sub('vcf/filter1//filter1_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter1//filter1_','',sub('.recode.vcf','',i))
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)#Needs to be taken from config BLEGH
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+invisible(snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only"))}
+invisible(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+snp.id<-read.gdsn(index.gdsn(genofile,"snp.id"))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+invisible(pca <- snpgdsPCA(genofile, snp.id=snp.id))
+pcaPlot <- data.frame(sample.id = pca$sample.id,
+                  EV1 = pca$eigenvect[,1],    # the first eigenvector
+                  EV2 = pca$eigenvect[,2],
+                  EV3 = pca$eigenvect[,3],# the second eigenvector
+                  stringsAsFactors = FALSE)
+pcaPlot$pop<-as.character(sub('_.*$', '', pcaPlot$sample.id))
+pcavar<-pca$varpro/sum(pca$varpro,na.rm=T)
+
+pcaPlotFinal<-merge(pcaPlot,dataLoc,by="pop",all=F)
+print(ggplot(pcaPlotFinal,aes(x=EV1,y=EV2,col=metaPop,label=sample.id))+geom_text()+
+theme_light()+ylab(paste("PCA 2 ",round(pcavar[2],3)*100,"%",sep=""))+ggtitle(vcfPath)+xlab(paste("PCA 1 ",round(pcavar[1],3)*100,"%",sep=""))+scale_colour_discrete("meta populations")+
+ggtitle(paste("number of SNPs =",nSNPs,"\n maxMissing =",range)))
+snpgdsClose(genofile)
+
+})
+
+```
+
+#### MDS
+
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("MDS of filter 1 max missing =",ranges)}
+library("SNPRelate")
+library("ggplot2")
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter1/",full.names = T),value = T)
+ranges<-sub('vcf/filter1//filter1_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter1//filter1_','',sub('.recode.vcf','',i))
+
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)
+
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only")}
+(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+
+
+ibs <- snpgdsIBS(genofile, num.thread=1)
+pop_code<-sub('_.*$', '', sub('_.*$', '', as.character(sub('_.*$', '', ibs$sample.id))))
+
+ibsPlot <- data.frame(x=cmdscale(1 - ibs$ibs, k = 2)[,1], y=cmdscale(1 - ibs$ibs, k = 2)[,2],sample.id=ibs$sample.id,pop=pop_code,inbreeding=substr(ibs$sample,0,1))
+ibsPlotFinal<-merge(ibsPlot,dataLoc,by="pop")
+
+
+print(ggplot(ibsPlotFinal,aes(x=x,y=y,col=metaPop,label=sample.id))+theme_light()+xlab("MDS dim. 2 ")+ylab("MDS dim. 1")+scale_colour_discrete("meta populations")+geom_text()+ggtitle(paste("number of SNPs =",nSNPs,"\n maxMissing =",range)))
+snpgdsClose(genofile)
+})
+snpgdsClose(genofile)
+```
+
+#### Cluster
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("Tree of filter1 max missing =",ranges)}
+library("SNPRelate")
+library("ggplot2")
+library("ggdendro")
+library("reshape2")
+
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter1/",full.names = T),value = T)
+ranges<-sub('vcf/filter1//filter1_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter1//filter1_','',sub('.recode.vcf','',i))
+
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+  snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only")}
+(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+ind.id<-read.gdsn(index.gdsn(genofile,"sample.id"))
+pop<-as.character(sub('_.*$', '', ind.id))
+pop<-data.frame(sample=ind.id,pop=pop)
+sample.id<-data.frame(sample=ind.id)
+dataTot<-merge(pop,dataLoc,"pop",sort = F)
+dataTot2<-merge(sample.id,dataTot,"sample",sort=F)
+diss<-snpgdsDiss(genofile)
+hc<-snpgdsHCluster(diss)
+
+fit <- hclust(as.dist(hc$dist), method="ward.D") 
+dend_data <- dendro_data(fit, type = "rectangle")
+dend_data$labels$col<-as.character(sub('_.*$', '', dend_data$labels$label))
+dend_data$labels$pop<-dend_data$labels$col
+dend_data2<-merge(dend_data$labels,dataLoc,by="pop",sort = F)
+
+
+print(ggplot(dend_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend))+theme_light()+coord_cartesian(ylim=c(-3,max(dend_data$segment$y)*1.15))+
+  geom_text(data = dend_data2, aes(x, y, label = label,col=metaPop),
+            hjust = 1, angle = 90, size = 5)+xlab("")+ylab("genetic distance")+ggtitle(paste("number of SNPs =",nSNPs,"\n maxMissing =",range)))
+})
+snpgdsClose(genofile)
+```
+## Minor allele frequency. Others=0
+Filter 2 used `r system('cat configFiltering.yaml| grep maf_range | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)` as a range for minor allele frequency. This is the minimum frequency the "minor" allele of a SNP has to occur to not be filtered
+
+All other variables were set to 0
+
+### Plots {.tabset .tabset-fade .tabset-pills}
+
+#### PCA
+
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("PCA of filter2 max missing =",ranges)}
+invisible(library(SNPRelate))
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter2/",full.names = T),value = T)
+ranges<-sub('vcf/filter2//filter2_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter2//filter2_','',sub('.recode.vcf','',i))
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)#Needs to be taken from config
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+invisible(snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only"))}
+invisible(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+snp.id<-read.gdsn(index.gdsn(genofile,"snp.id"))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+invisible(pca <- snpgdsPCA(genofile, snp.id=snp.id))
+pcaPlot <- data.frame(sample.id = pca$sample.id,
+                  EV1 = pca$eigenvect[,1],    # the first eigenvector
+                  EV2 = pca$eigenvect[,2],
+                  EV3 = pca$eigenvect[,3],# the second eigenvector
+                  stringsAsFactors = FALSE)
+pcaPlot$pop<-as.character(sub('_.*$', '', pcaPlot$sample.id))
+pcavar<-pca$varpro/sum(pca$varpro,na.rm=T)
+
+pcaPlotFinal<-merge(pcaPlot,dataLoc,by="pop",all=F)
+print(ggplot(pcaPlotFinal,aes(x=EV1,y=EV2,col=metaPop,label=sample.id))+geom_text()+
+theme_light()+ylab(paste("PCA 2 ",round(pcavar[2],3)*100,"%",sep=""))+ggtitle(vcfPath)+xlab(paste("PCA 1 ",round(pcavar[1],3)*100,"%",sep=""))+scale_colour_discrete("meta populations")+
+  ggtitle(paste("number of SNPs =",nSNPs,"\n minor allele frequency =",range)))
+snpgdsClose(genofile)
+})
+snpgdsClose(genofile)
+```
+
+#### MDS
+
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("MDS of filter 2 minor allel frequency =",ranges)}
+library("SNPRelate")
+library("ggplot2")
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter2/",full.names = T),value = T)
+ranges<-sub('vcf/filter2//filter2_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter2//filter2_','',sub('.recode.vcf','',i))
+
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)
+
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only")}
+(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+
+
+ibs <- snpgdsIBS(genofile, num.thread=1)
+pop_code<-sub('_.*$', '', sub('_.*$', '', as.character(sub('_.*$', '', ibs$sample.id))))
+
+ibsPlot <- data.frame(x=cmdscale(1 - ibs$ibs, k = 2)[,1], y=cmdscale(1 - ibs$ibs, k = 2)[,2],sample.id=ibs$sample.id,pop=pop_code,inbreeding=substr(ibs$sample,0,1))
+ibsPlotFinal<-merge(ibsPlot,dataLoc,by="pop")
+
+
+print(ggplot(ibsPlotFinal,aes(x=x,y=y,col=metaPop,label=sample.id))+theme_light()+xlab("MDS dim. 2 ")+ylab("MDS dim. 1")+scale_colour_discrete("meta populations")+geom_text()+ggtitle(paste("number of SNPs =",nSNPs,"\n minor allele frequency =",range)))
+snpgdsClose(genofile)
+
+})
+snpgdsClose(genofile)
+```
+
+#### Cluster
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("Tree of filter2 max missing =",ranges)}
+library("SNPRelate")
+library("ggplot2")
+library("ggdendro")
+library("reshape2")
+
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter2/",full.names = T),value = T)
+ranges<-sub('vcf/filter2//filter2_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter2//filter2_','',sub('.recode.vcf','',i))
+
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+  snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only")}
+(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+ind.id<-read.gdsn(index.gdsn(genofile,"sample.id"))
+pop<-as.character(sub('_.*$', '', ind.id))
+pop<-data.frame(sample=ind.id,pop=pop)
+sample.id<-data.frame(sample=ind.id)
+dataTot<-merge(pop,dataLoc,"pop",sort = F)
+dataTot2<-merge(sample.id,dataTot,"sample",sort=F)
+diss<-snpgdsDiss(genofile)
+hc<-snpgdsHCluster(diss)
+
+fit <- hclust(as.dist(hc$dist), method="ward.D") 
+dend_data <- dendro_data(fit, type = "rectangle")
+dend_data$labels$col<-as.character(sub('_.*$', '', dend_data$labels$label))
+dend_data$labels$pop<-dend_data$labels$col
+dend_data2<-merge(dend_data$labels,dataLoc,by="pop",sort = F)
+
+
+print(ggplot(dend_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend))+theme_light()+coord_cartesian(ylim=c(-3,max(dend_data$segment$y)*1.15))+
+  geom_text(data = dend_data2, aes(x, y, label = label,col=metaPop),
+            hjust = 1, angle = 90, size = 5)+xlab("")+ylab("genetic distance")+ggtitle(paste("number of SNPs =",nSNPs,"\n minor alle frequency =",range)))
+})
+snpgdsClose(genofile)
+```
+## Hardy Weinberg. Others=0
+Filter 3 used `r system('cat configFiltering.yaml| grep hwe_range | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)` as a range for p-values of Hardy-weinberg. Any SNP which has a lower p-value then the ones specified is considered out of hardy weinberg equilibrium and filtered on this basis.
+
+All other variables were set to 0
+
+### Plots {.tabset .tabset-fade .tabset-pills}
+
+#### PCA
+
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("PCA of filter3 hardy weinberg p-value =",ranges)}
+invisible(library(SNPRelate))
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter3/",full.names = T),value = T)
+ranges<-sub('vcf/filter3//filter3_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter3//filter3_','',sub('.recode.vcf','',i))
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)#Needs to be taken from config
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+invisible(snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only"))}
+invisible(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+snp.id<-read.gdsn(index.gdsn(genofile,"snp.id"))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+invisible(pca <- snpgdsPCA(genofile, snp.id=snp.id))
+pcaPlot <- data.frame(sample.id = pca$sample.id,
+                  EV1 = pca$eigenvect[,1],    # the first eigenvector
+                  EV2 = pca$eigenvect[,2],
+                  EV3 = pca$eigenvect[,3],# the second eigenvector
+                  stringsAsFactors = FALSE)
+pcaPlot$pop<-as.character(sub('_.*$', '', pcaPlot$sample.id))
+pcavar<-pca$varpro/sum(pca$varpro,na.rm=T)
+pcaPlotFinal<-merge(pcaPlot,dataLoc,by="pop",all=F)
+print(ggplot(pcaPlotFinal,aes(x=EV1,y=EV2,col=metaPop,label=sample.id))+geom_text()+
+theme_light()+ylab(paste("PCA 2 ",round(pcavar[2],3)*100,"%",sep=""))+ggtitle(vcfPath)+xlab(paste("PCA 1 ",round(pcavar[1],3)*100,"%",sep=""))+scale_colour_discrete("meta populations")+
+  ggtitle(paste("number of SNPs =",nSNPs,"\n HWE p-value =",range)))
+snpgdsClose(genofile)
+
+})
+snpgdsClose(genofile)
+```
+
+
+#### MDS
+
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("MDS of filter3 hwe p-value =",ranges)}
+library("SNPRelate")
+library("ggplot2")
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter3/",full.names = T),value = T)
+ranges<-sub('vcf/filter3//filter3_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter3//filter3_','',sub('.recode.vcf','',i))
+
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)
+
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only")}
+(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+
+
+ibs <- snpgdsIBS(genofile, num.thread=1)
+pop_code<-sub('_.*$', '', sub('_.*$', '', as.character(sub('_.*$', '', ibs$sample.id))))
+
+ibsPlot <- data.frame(x=cmdscale(1 - ibs$ibs, k = 2)[,1], y=cmdscale(1 - ibs$ibs, k = 2)[,2],sample.id=ibs$sample.id,pop=pop_code,inbreeding=substr(ibs$sample,0,1))
+ibsPlotFinal<-merge(ibsPlot,dataLoc,by="pop")
+
+
+print(ggplot(ibsPlotFinal,aes(x=x,y=y,col=metaPop,label=sample.id))+theme_light()+xlab("MDS dim. 2 ")+ylab("MDS dim. 1")+scale_colour_discrete("meta populations")+geom_text()+ggtitle(paste("number of SNPs =",nSNPs,"\n hwe p-value =",range)))
+snpgdsClose(genofile)
+
+})
+snpgdsClose(genofile)
+```
+
+#### Cluster
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("Tree of filter3 max missing =",ranges)}
+library("SNPRelate")
+library("ggplot2")
+library("ggdendro")
+library("reshape2")
+
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter3/",full.names = T),value = T)
+ranges<-sub('vcf/filter3//filter3_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter3//filter3_','',sub('.recode.vcf','',i))
+
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+  snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only")}
+(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+ind.id<-read.gdsn(index.gdsn(genofile,"sample.id"))
+pop<-as.character(sub('_.*$', '', ind.id))
+pop<-data.frame(sample=ind.id,pop=pop)
+sample.id<-data.frame(sample=ind.id)
+dataTot<-merge(pop,dataLoc,"pop",sort = F)
+dataTot2<-merge(sample.id,dataTot,"sample",sort=F)
+diss<-snpgdsDiss(genofile)
+hc<-snpgdsHCluster(diss)
+
+fit <- hclust(as.dist(hc$dist), method="ward.D") 
+dend_data <- dendro_data(fit, type = "rectangle")
+dend_data$labels$col<-as.character(sub('_.*$', '', dend_data$labels$label))
+dend_data$labels$pop<-dend_data$labels$col
+dend_data2<-merge(dend_data$labels,dataLoc,by="pop",sort = F)
+
+
+print(ggplot(dend_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend))+theme_light()+coord_cartesian(ylim=c(-3,max(dend_data$segment$y)*1.15))+
+  geom_text(data = dend_data2, aes(x, y, label = label,col=metaPop),
+            hjust = 1, angle = 90, size = 5)+xlab("")+ylab("genetic distance")+ggtitle(paste("number of SNPs =",nSNPs,"\n hwe p-value =",range)))
+})
+snpgdsClose(genofile)
+```
+
+## Minimal Depth. Others=0
+Filter 4 used `r system('cat configFiltering.yaml| grep DP_range | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)` as a range for minimal depth. However, it does not seem to work when not combined with another filter.
+
+All other variables were set to 0
+
+### Plots {.tabset .tabset-fade .tabset-pills}
+
+#### PCA
+
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("PCA of filter4 min depth =",ranges)}
+invisible(library(SNPRelate))
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter4/",full.names = T),value = T)
+ranges<-sub('vcf/filter4//filter4_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter4//filter4_','',sub('.recode.vcf','',i))
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)#Needs to be taken from config
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+invisible(snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only"))}
+invisible(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+snp.id<-read.gdsn(index.gdsn(genofile,"snp.id"))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+invisible(pca <- snpgdsPCA(genofile, snp.id=snp.id))
+pcaPlot <- data.frame(sample.id = pca$sample.id,
+                  EV1 = pca$eigenvect[,1],    # the first eigenvector
+                  EV2 = pca$eigenvect[,2],
+                  EV3 = pca$eigenvect[,3],# the second eigenvector
+                  stringsAsFactors = FALSE)
+pcaPlot$pop<-as.character(sub('_.*$', '', pcaPlot$sample.id))
+pcavar<-pca$varpro/sum(pca$varpro,na.rm=T)
+pcaPlotFinal<-merge(pcaPlot,dataLoc,by="pop",all=F)
+print(ggplot(pcaPlotFinal,aes(x=EV1,y=EV2,col=metaPop,label=sample.id))+geom_text()+
+theme_light()+ylab(paste("PCA 2 ",round(pcavar[2],3)*100,"%",sep=""))+ggtitle(vcfPath)+xlab(paste("PCA 1 ",round(pcavar[1],3)*100,"%",sep=""))+scale_colour_discrete("meta populations")+
+  ggtitle(paste("number of SNPs =",nSNPs,"\n min Depth =",range)))
+snpgdsClose(genofile)
+
+})
+snpgdsClose(genofile)
+```
+
+
+#### MDS
+
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("MDS of filter4 minimal depth=",ranges)}
+library("SNPRelate")
+library("ggplot2")
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter4/",full.names = T),value = T)
+ranges<-sub('vcf/filter4//filter4_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter4//filter4_','',sub('.recode.vcf','',i))
+
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)
+
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only")}
+(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+
+
+ibs <- snpgdsIBS(genofile, num.thread=1)
+pop_code<-sub('_.*$', '', sub('_.*$', '', as.character(sub('_.*$', '', ibs$sample.id))))
+
+ibsPlot <- data.frame(x=cmdscale(1 - ibs$ibs, k = 2)[,1], y=cmdscale(1 - ibs$ibs, k = 2)[,2],sample.id=ibs$sample.id,pop=pop_code,inbreeding=substr(ibs$sample,0,1))
+ibsPlotFinal<-merge(ibsPlot,dataLoc,by="pop")
+
+
+print(ggplot(ibsPlotFinal,aes(x=x,y=y,col=metaPop,label=sample.id))+theme_light()+xlab("MDS dim. 2 ")+ylab("MDS dim. 1")+scale_colour_discrete("meta populations")+geom_text()+ggtitle(paste("number of SNPs =",nSNPs,"\n minimal depth =",range)))
+snpgdsClose(genofile)
+
+})
+snpgdsClose(genofile)
+```
+
+#### Cluster
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("Tree of filter4 min depth =",ranges)}
+library("SNPRelate")
+library("ggplot2")
+library("ggdendro")
+library("reshape2")
+
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter4/",full.names = T),value = T)
+ranges<-sub('vcf/filter4//filter4_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter4//filter4_','',sub('.recode.vcf','',i))
+
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+  snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only")}
+(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+ind.id<-read.gdsn(index.gdsn(genofile,"sample.id"))
+pop<-as.character(sub('_.*$', '', ind.id))
+pop<-data.frame(sample=ind.id,pop=pop)
+sample.id<-data.frame(sample=ind.id)
+dataTot<-merge(pop,dataLoc,"pop",sort = F)
+dataTot2<-merge(sample.id,dataTot,"sample",sort=F)
+diss<-snpgdsDiss(genofile)
+hc<-snpgdsHCluster(diss)
+
+fit <- hclust(as.dist(hc$dist), method="ward.D") 
+dend_data <- dendro_data(fit, type = "rectangle")
+dend_data$labels$col<-as.character(sub('_.*$', '', dend_data$labels$label))
+dend_data$labels$pop<-dend_data$labels$col
+dend_data2<-merge(dend_data$labels,dataLoc,by="pop",sort = F)
+
+
+print(ggplot(dend_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend))+theme_light()+coord_cartesian(ylim=c(-3,max(dend_data$segment$y)*1.15))+
+  geom_text(data = dend_data2, aes(x, y, label = label,col=metaPop),
+            hjust = 1, angle = 90, size = 5)+xlab("")+ylab("genetic distance")+ggtitle(paste("number of SNPs =",nSNPs,"\n minimum depth =",range)))
+})
+snpgdsClose(genofile)
+```
+
+
+
+## Max missing. Others=set
+Filter 5 used `r system('cat configFiltering.yaml| grep max_missing_range | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)` as a range for max-missing. 
+Max-missing specifies the maximum percentage of individuals a SNP can be missing to not be filtered.
+
+Minor allele frequency was set to `r system('cat configFiltering.yaml| grep maf_val | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)`, Hardy weinberg p-value was set to `r system('cat configFiltering.yaml| grep hwe_val | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)` and minimal depth was set to `r system('cat configFiltering.yaml| grep DP_val | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)`
+
+
+### Plots {.tabset .tabset-fade .tabset-pills}
+
+#### PCA
+
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("PCA of filter5 max missing =",ranges)}
+invisible(library(SNPRelate))
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter5/",full.names = T),value = T)
+ranges<-sub('vcf/filter5//filter5_','',sub('.recode.vcf','',fileList))
+read.table(str)
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter5//filter5_','',sub('.recode.vcf','',i))
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)#Needs to be taken from config
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+invisible(snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only"))}
+invisible(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+snp.id<-read.gdsn(index.gdsn(genofile,"snp.id"))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+invisible(pca <- snpgdsPCA(genofile, snp.id=snp.id))
+pcaPlot <- data.frame(sample.id = pca$sample.id,
+                  EV1 = pca$eigenvect[,1],    # the first eigenvector
+                  EV2 = pca$eigenvect[,2],
+                  EV3 = pca$eigenvect[,3],# the second eigenvector
+                  stringsAsFactors = FALSE)
+pcaPlot$pop<-as.character(sub('_.*$', '', pcaPlot$sample.id))
+pcavar<-pca$varpro/sum(pca$varpro,na.rm=T)
+
+pcaPlotFinal<-merge(pcaPlot,dataLoc,by="pop",all=F)
+print(ggplot(pcaPlotFinal,aes(x=EV1,y=EV2,col=metaPop,label=sample.id))+geom_text()+
+theme_light()+ylab(paste("PCA 2 ",round(pcavar[2],3)*100,"%",sep=""))+ggtitle(vcfPath)+xlab(paste("PCA 1 ",round(pcavar[1],3)*100,"%",sep=""))+scale_colour_discrete("meta populations")+
+  ggtitle(paste("number of SNPs =",nSNPs,"\n maxMissing =",range)))
+snpgdsClose(genofile)
+
+})
+snpgdsClose(genofile)
+```
+
+#### MDS
+
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("MDS of filter 5 max missing =",ranges)}
+library("SNPRelate")
+library("ggplot2")
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter5/",full.names = T),value = T)
+ranges<-sub('vcf/filter5//filter5_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter5//filter5_','',sub('.recode.vcf','',i))
+
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)
+
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only")}
+(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+
+
+ibs <- snpgdsIBS(genofile, num.thread=1)
+pop_code<-sub('_.*$', '', sub('_.*$', '', as.character(sub('_.*$', '', ibs$sample.id))))
+
+ibsPlot <- data.frame(x=cmdscale(1 - ibs$ibs, k = 2)[,1], y=cmdscale(1 - ibs$ibs, k = 2)[,2],sample.id=ibs$sample.id,pop=pop_code,inbreeding=substr(ibs$sample,0,1))
+ibsPlotFinal<-merge(ibsPlot,dataLoc,by="pop")
+
+
+print(ggplot(ibsPlotFinal,aes(x=x,y=y,col=metaPop,label=sample.id))+theme_light()+xlab("MDS dim. 2 ")+ylab("MDS dim. 1")+scale_colour_discrete("meta populations")+geom_text()+ggtitle(paste("number of SNPs =",nSNPs,"\n maxMissing =",range)))
+snpgdsClose(genofile)
+})
+snpgdsClose(genofile)
+```
+
+
+#### Cluster
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("Tree of filter5 max missing =",ranges)}
+library("SNPRelate")
+library("ggplot2")
+library("ggdendro")
+library("reshape2")
+
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter5/",full.names = T),value = T)
+ranges<-sub('vcf/filter5//filter5_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter5//filter5_','',sub('.recode.vcf','',i))
+
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+  snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only")}
+(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+ind.id<-read.gdsn(index.gdsn(genofile,"sample.id"))
+pop<-as.character(sub('_.*$', '', ind.id))
+pop<-data.frame(sample=ind.id,pop=pop)
+sample.id<-data.frame(sample=ind.id)
+dataTot<-merge(pop,dataLoc,"pop",sort = F)
+dataTot2<-merge(sample.id,dataTot,"sample",sort=F)
+diss<-snpgdsDiss(genofile)
+hc<-snpgdsHCluster(diss)
+
+fit <- hclust(as.dist(hc$dist), method="ward.D") 
+dend_data <- dendro_data(fit, type = "rectangle")
+dend_data$labels$col<-as.character(sub('_.*$', '', dend_data$labels$label))
+dend_data$labels$pop<-dend_data$labels$col
+dend_data2<-merge(dend_data$labels,dataLoc,by="pop",sort = F)
+
+
+print(ggplot(dend_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend))+theme_light()+coord_cartesian(ylim=c(-3,max(dend_data$segment$y)*1.15))+
+  geom_text(data = dend_data2, aes(x, y, label = label,col=metaPop),
+            hjust = 1, angle = 90, size = 5)+xlab("")+ylab("genetic distance")+ggtitle(paste("number of SNPs =",nSNPs,"\n maxMissing =",range)))
+})
+snpgdsClose(genofile)
+```
+
+## Minor allele frequency. Others=set
+Filter 6 used `r system('cat configFiltering.yaml| grep maf_range | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)` as a range for minor allele frequency. This is the minimum frequency the "minor" allele of a SNP has to occur to not be filtered.
+
+Max missing was set to `r system('cat configFiltering.yaml| grep max_missing_val | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)`, Hardy weinberg p-value was set to `r system('cat configFiltering.yaml| grep hwe_val | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)` and minimal depth was set to `r system('cat configFiltering.yaml| grep DP_val | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)`
+
+### Plots {.tabset .tabset-fade .tabset-pills}
+
+
+#### PCA
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("PCA of filter6 max missing =",ranges)}
+invisible(library(SNPRelate))
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter6/",full.names = T),value = T)
+ranges<-sub('vcf/filter6//filter6_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter6//filter6_','',sub('.recode.vcf','',i))
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)#Needs to be taken from config
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+invisible(snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only"))}
+invisible(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+snp.id<-read.gdsn(index.gdsn(genofile,"snp.id"))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+invisible(pca <- snpgdsPCA(genofile, snp.id=snp.id))
+pcaPlot <- data.frame(sample.id = pca$sample.id,
+                  EV1 = pca$eigenvect[,1],    # the first eigenvector
+                  EV2 = pca$eigenvect[,2],
+                  EV3 = pca$eigenvect[,3],# the second eigenvector
+                  stringsAsFactors = FALSE)
+pcaPlot$pop<-as.character(sub('_.*$', '', pcaPlot$sample.id))
+pcavar<-pca$varpro/sum(pca$varpro,na.rm=T)
+
+pcaPlotFinal<-merge(pcaPlot,dataLoc,by="pop",all=F)
+print(ggplot(pcaPlotFinal,aes(x=EV1,y=EV2,col=metaPop,label=sample.id))+geom_text()+
+theme_light()+ylab(paste("PCA 2 ",round(pcavar[2],3)*100,"%",sep=""))+ggtitle(vcfPath)+xlab(paste("PCA 1 ",round(pcavar[1],3)*100,"%",sep=""))+scale_colour_discrete("meta populations")+
+  ggtitle(paste("number of SNPs =",nSNPs,"\n minor allele frequency =",range)))
+snpgdsClose(genofile)
+
+})
+snpgdsClose(genofile)
+```
+#### MDS
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("MDS of filter 6 minor allel frequency =",ranges)}
+library("SNPRelate")
+library("ggplot2")
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter6/",full.names = T),value = T)
+ranges<-sub('vcf/filter6//filter6_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter6//filter6_','',sub('.recode.vcf','',i))
+
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)
+
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only")}
+(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+
+
+ibs <- snpgdsIBS(genofile, num.thread=1)
+pop_code<-sub('_.*$', '', sub('_.*$', '', as.character(sub('_.*$', '', ibs$sample.id))))
+
+ibsPlot <- data.frame(x=cmdscale(1 - ibs$ibs, k = 2)[,1], y=cmdscale(1 - ibs$ibs, k = 2)[,2],sample.id=ibs$sample.id,pop=pop_code,inbreeding=substr(ibs$sample,0,1))
+ibsPlotFinal<-merge(ibsPlot,dataLoc,by="pop")
+
+
+print(ggplot(ibsPlotFinal,aes(x=x,y=y,col=metaPop,label=sample.id))+theme_light()+xlab("MDS dim. 2 ")+ylab("MDS dim. 1")+scale_colour_discrete("meta populations")+geom_text()+ggtitle(paste("number of SNPs =",nSNPs,"\n minor allele frequency =",range)))
+snpgdsClose(genofile)
+
+})
+snpgdsClose(genofile)
+```
+
+
+
+#### Cluster
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("Tree of filter6 max missing =",ranges)}
+library("SNPRelate")
+library("ggplot2")
+library("ggdendro")
+library("reshape2")
+
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter6/",full.names = T),value = T)
+ranges<-sub('vcf/filter6//filter6_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter6//filter6_','',sub('.recode.vcf','',i))
+
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+  snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only")}
+(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+ind.id<-read.gdsn(index.gdsn(genofile,"sample.id"))
+pop<-as.character(sub('_.*$', '', ind.id))
+pop<-data.frame(sample=ind.id,pop=pop)
+sample.id<-data.frame(sample=ind.id)
+dataTot<-merge(pop,dataLoc,"pop",sort = F)
+dataTot2<-merge(sample.id,dataTot,"sample",sort=F)
+diss<-snpgdsDiss(genofile)
+hc<-snpgdsHCluster(diss)
+
+fit <- hclust(as.dist(hc$dist), method="ward.D") 
+dend_data <- dendro_data(fit, type = "rectangle")
+dend_data$labels$col<-as.character(sub('_.*$', '', dend_data$labels$label))
+dend_data$labels$pop<-dend_data$labels$col
+dend_data2<-merge(dend_data$labels,dataLoc,by="pop",sort = F)
+
+
+print(ggplot(dend_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend))+theme_light()+coord_cartesian(ylim=c(-3,max(dend_data$segment$y)*1.15))+
+  geom_text(data = dend_data2, aes(x, y, label = label,col=metaPop),
+            hjust = 1, angle = 90, size = 5)+xlab("")+ylab("genetic distance")+ggtitle(paste("number of SNPs =",nSNPs,"\n minor allele frequency =",range)))
+})
+snpgdsClose(genofile)
+```
+
+
+
+## Hardy Weinberg. Others=set
+Filter 7 used `r system('cat configFiltering.yaml| grep hwe_range | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)` as a range for p-values of Hardy-weinberg. Any SNP which has a lower p-value then the ones specified is considered out of hardy weinberg equilibrium and filtered on this basis.
+
+Max missing was set to `r system('cat configFiltering.yaml| grep max_missing_val | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)`, minor allele frequency was set to `r system('cat configFiltering.yaml| grep maf_val | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)` and minimal depth was set to `r system('cat configFiltering.yaml| grep DP_val | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)`
+
+### Plots {.tabset .tabset-fade .tabset-pills}
+
+#### PCA
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("PCA of filter7 max missing =",ranges)}
+invisible(library(SNPRelate))
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter7/",full.names = T),value = T)
+ranges<-sub('vcf/filter7//filter7_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter7//filter7_','',sub('.recode.vcf','',i))
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)#Needs to be taken from config
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+invisible(snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only"))}
+invisible(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+snp.id<-read.gdsn(index.gdsn(genofile,"snp.id"))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+invisible(pca <- snpgdsPCA(genofile, snp.id=snp.id))
+pcaPlot <- data.frame(sample.id = pca$sample.id,
+                  EV1 = pca$eigenvect[,1],    # the first eigenvector
+                  EV2 = pca$eigenvect[,2],
+                  EV3 = pca$eigenvect[,3],# the second eigenvector
+                  stringsAsFactors = FALSE)
+pcaPlot$pop<-as.character(sub('_.*$', '', pcaPlot$sample.id))
+pcavar<-pca$varpro/sum(pca$varpro,na.rm=T)
+
+pcaPlotFinal<-merge(pcaPlot,dataLoc,by="pop",all=F)
+print(ggplot(pcaPlotFinal,aes(x=EV1,y=EV2,col=metaPop,label=sample.id))+geom_text()+
+theme_light()+ylab(paste("PCA 2 ",round(pcavar[2],3)*100,"%",sep=""))+ggtitle(vcfPath)+xlab(paste("PCA 1 ",round(pcavar[1],3)*100,"%",sep=""))+scale_colour_discrete("meta populations")+
+  ggtitle(paste("number of SNPs =",nSNPs,"\n HWE p-value =",range)))
+snpgdsClose(genofile)
+})
+
+```
+
+#### MDS
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("MDS of filter7 hwe p-value =",ranges)}
+library("SNPRelate")
+library("ggplot2")
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter7/",full.names = T),value = T)
+ranges<-sub('vcf/filter7//filter7_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter7//filter7_','',sub('.recode.vcf','',i))
+
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)
+
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only")}
+(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+
+
+ibs <- snpgdsIBS(genofile, num.thread=1)
+pop_code<-sub('_.*$', '', sub('_.*$', '', as.character(sub('_.*$', '', ibs$sample.id))))
+
+ibsPlot <- data.frame(x=cmdscale(1 - ibs$ibs, k = 2)[,1], y=cmdscale(1 - ibs$ibs, k = 2)[,2],sample.id=ibs$sample.id,pop=pop_code,inbreeding=substr(ibs$sample,0,1))
+ibsPlotFinal<-merge(ibsPlot,dataLoc,by="pop")
+
+
+print(ggplot(ibsPlotFinal,aes(x=x,y=y,col=metaPop,label=sample.id))+theme_light()+xlab("MDS dim. 2 ")+ylab("MDS dim. 1")+scale_colour_discrete("meta populations")+geom_text()+ggtitle(paste("number of SNPs =",nSNPs,"\n hwe p-value =",range)))
+snpgdsClose(genofile)
+
+})
+snpgdsClose(genofile)
+```
+
+
+
+#### Cluster
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("Tree of filter7 max missing =",ranges)}
+library("SNPRelate")
+library("ggplot2")
+library("ggdendro")
+library("reshape2")
+
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter7/",full.names = T),value = T)
+ranges<-sub('vcf/filter7//filter7_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter7//filter7_','',sub('.recode.vcf','',i))
+
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+  snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only")}
+(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+ind.id<-read.gdsn(index.gdsn(genofile,"sample.id"))
+pop<-as.character(sub('_.*$', '', ind.id))
+pop<-data.frame(sample=ind.id,pop=pop)
+sample.id<-data.frame(sample=ind.id)
+dataTot<-merge(pop,dataLoc,"pop",sort = F)
+dataTot2<-merge(sample.id,dataTot,"sample",sort=F)
+diss<-snpgdsDiss(genofile)
+hc<-snpgdsHCluster(diss)
+
+fit <- hclust(as.dist(hc$dist), method="ward.D") 
+dend_data <- dendro_data(fit, type = "rectangle")
+dend_data$labels$col<-as.character(sub('_.*$', '', dend_data$labels$label))
+dend_data$labels$pop<-dend_data$labels$col
+dend_data2<-merge(dend_data$labels,dataLoc,by="pop",sort = F)
+
+
+print(ggplot(dend_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend))+theme_light()+coord_cartesian(ylim=c(-3,max(dend_data$segment$y)*1.15))+
+  geom_text(data = dend_data2, aes(x, y, label = label,col=metaPop),
+            hjust = 1, angle = 90, size = 5)+xlab("")+ylab("genetic distance")+ggtitle(paste("number of SNPs =",nSNPs,"\n hwe p-value =",range)))
+snpgdsClose(genofile)
+})
+
+```
+## Minimal Depth. Others=set
+Filter 4 used `r system('cat configFiltering.yaml| grep DP_range | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)` as a range for minimal depth. However, it does not seem to work when not combined with another filter.
+
+Max missing was set to `r system('cat configFiltering.yaml| grep max_missing_val | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)`, minor allele frequency was set to `r system('cat configFiltering.yaml| grep maf_val | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)` and hwe p-value was set to `r system('cat configFiltering.yaml| grep hwe_val | cut -f2 -d [| cut -f1 -d ] | tr "," " "',intern=T)`
+
+### Plots {.tabset .tabset-fade .tabset-pills}
+
+#### PCA
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("PCA of filter8 max missing =",ranges)}
+invisible(library(SNPRelate))
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter8/",full.names = T),value = T)
+ranges<-sub('vcf/filter8//filter8_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter8//filter8_','',sub('.recode.vcf','',i))
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)#Needs to be taken from config
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+invisible(snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only"))}
+invisible(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+snp.id<-read.gdsn(index.gdsn(genofile,"snp.id"))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+invisible(pca <- snpgdsPCA(genofile, snp.id=snp.id))
+pcaPlot <- data.frame(sample.id = pca$sample.id,
+                  EV1 = pca$eigenvect[,1],    # the first eigenvector
+                  EV2 = pca$eigenvect[,2],
+                  EV3 = pca$eigenvect[,3],# the second eigenvector
+                  stringsAsFactors = FALSE)
+pcaPlot$pop<-as.character(sub('_.*$', '', pcaPlot$sample.id))
+pcavar<-pca$varpro/sum(pca$varpro,na.rm=T)
+
+pcaPlotFinal<-merge(pcaPlot,dataLoc,by="pop",all=F)
+print(ggplot(pcaPlotFinal,aes(x=EV1,y=EV2,col=metaPop,label=sample.id))+geom_text()+
+theme_light()+ylab(paste("PCA 2 ",round(pcavar[2],3)*100,"%",sep=""))+ggtitle(vcfPath)+xlab(paste("PCA 1 ",round(pcavar[1],3)*100,"%",sep=""))+scale_colour_discrete("meta populations")+
+  ggtitle(paste("number of SNPs =",nSNPs,"\n minDepth =",range)))
+snpgdsClose(genofile)
+
+})
+snpgdsClose(genofile)
+```
+
+
+
+### MDS
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("MDS of filter8 minimal depth=",ranges)}
+library("SNPRelate")
+library("ggplot2")
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter8/",full.names = T),value = T)
+ranges<-sub('vcf/filter8//filter8_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter8//filter8_','',sub('.recode.vcf','',i))
+
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)
+
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only")}
+(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+
+
+ibs <- snpgdsIBS(genofile, num.thread=1)
+pop_code<-sub('_.*$', '', sub('_.*$', '', as.character(sub('_.*$', '', ibs$sample.id))))
+
+ibsPlot <- data.frame(x=cmdscale(1 - ibs$ibs, k = 2)[,1], y=cmdscale(1 - ibs$ibs, k = 2)[,2],sample.id=ibs$sample.id,pop=pop_code,inbreeding=substr(ibs$sample,0,1))
+ibsPlotFinal<-merge(ibsPlot,dataLoc,by="pop")
+
+
+print(ggplot(ibsPlotFinal,aes(x=x,y=y,col=metaPop,label=sample.id))+theme_light()+xlab("MDS dim. 2 ")+ylab("MDS dim. 1")+scale_colour_discrete("meta populations")+geom_text()+ggtitle(paste("number of SNPs =",nSNPs,"\n minimal depth =",range)))
+snpgdsClose(genofile)
+
+})
+snpgdsClose(genofile)
+```
+
+
+
+#### Cluster
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("Tree of filter8 max missing =",ranges)}
+library("SNPRelate")
+library("ggplot2")
+library("ggdendro")
+library("reshape2")
+
+dataPop<-system("cat configFiltering.yaml | grep dataPop | sed 's|[^/]*/||' |sed 's|^|/|'",intern=T)
+fileList<-grep(".vcf",list.files("vcf/filter8/",full.names = T),value = T)
+ranges<-sub('vcf/filter8//filter8_','',sub('.recode.vcf','',fileList))
+
+tryCatch(for(i in fileList){
+range<-sub('vcf/filter8//filter8_','',sub('.recode.vcf','',i))
+
+vcfPath<-i
+dataLoc<-read.table(dataPop,h=T)
+if(!file.exists(sub(".vcf",".gds",vcfPath))){
+  snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only")}
+(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
+nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
+ind.id<-read.gdsn(index.gdsn(genofile,"sample.id"))
+pop<-as.character(sub('_.*$', '', ind.id))
+pop<-data.frame(sample=ind.id,pop=pop)
+sample.id<-data.frame(sample=ind.id)
+dataTot<-merge(pop,dataLoc,"pop",sort = F)
+dataTot2<-merge(sample.id,dataTot,"sample",sort=F)
+diss<-snpgdsDiss(genofile)
+hc<-snpgdsHCluster(diss)
+
+fit <- hclust(as.dist(hc$dist), method="ward.D") 
+dend_data <- dendro_data(fit, type = "rectangle")
+dend_data$labels$col<-as.character(sub('_.*$', '', dend_data$labels$label))
+dend_data$labels$pop<-dend_data$labels$col
+dend_data2<-merge(dend_data$labels,dataLoc,by="pop",sort = F)
+
+
+print(ggplot(dend_data$segments) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend))+theme_light()+coord_cartesian(ylim=c(-3,max(dend_data$segment$y)*1.15))+
+  geom_text(data = dend_data2, aes(x, y, label = label,col=metaPop),
+            hjust = 1, angle = 90, size = 5)+xlab("")+ylab("genetic distance")+ggtitle(paste("number of SNPs =",nSNPs,"\n min depth =",range)))
+})
+snpgdsClose(genofile)
+```
