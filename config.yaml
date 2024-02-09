@@ -33,7 +33,10 @@ M: 4
  
 param_filtering:
   individual_missingness: 0.8
-
+  max_missing_range: 0.8
+  maf_range: 0.05
+  hwe_range: 0
+  DP_range: 0
 
 
 

@@ -1,7 +1,11 @@
 configfile: "config.yaml"
 
 
+max_missing_range=config["param_filtering"]["max_missing_range"]
 individual_missingness=config["param_filtering"]["individual_missingness"]
+maf_range=config["param_filtering"]maf_range
+hwe_range=config["param_filtering"]hwe_range
+DP_range=config["param_filtering"]DP_range
 
 
 rule makeGDS:
@@ -16,14 +20,14 @@ rule makeGDS:
 
 rule makeReport:
     input:
-        gds_out1=expand("vcf/filter1/filter1_{MAX_MISSING}.recode.gds",MAX_MISSING=config["max_missing_range"]),
-        gds_out2=expand("vcf/filter2/filter2_{MAF}.recode.gds",MAF=config["maf_range"]),
-	    gds_out3=expand("vcf/filter3/filter3_{HWE}.recode.gds",HWE=config["hwe_range"]),
-	    gds_out4=expand("vcf/filter4/filter4_{DP}.recode.gds",DP=config["DP_range"]),
-        gds_out5=expand("vcf/filter5/filter5_{MAX_MISSING}.recode.gds",MAX_MISSING=config["max_missing_range"]),
-        gds_out6=expand("vcf/filter6/filter6_{MAF}.recode.gds",MAF=config["maf_range"]),
-	    gds_out7=expand("vcf/filter7/filter7_{HWE}.recode.gds",HWE=config["hwe_range"]),
-	    gds_out8=expand("vcf/filter8/filter8_{DP}.recode.gds",DP=config["DP_range"])
+        gds_out1=expand("vcf/filter1/filter1_{MAX_MISSING}.recode.gds",MAX_MISSING=max_missing_range),
+        gds_out2=expand("vcf/filter2/filter2_{MAF}.recode.gds",MAF=maf_range),
+	    gds_out3=expand("vcf/filter3/filter3_{HWE}.recode.gds",HWE=hwe_range),
+	    gds_out4=expand("vcf/filter4/filter4_{DP}.recode.gds",DP=DP_range),
+        gds_out5=expand("vcf/filter5/filter5_{MAX_MISSING}.recode.gds",MAX_MISSING=max_missing_range),
+        gds_out6=expand("vcf/filter6/filter6_{MAF}.recode.gds",MAF=maf_range),
+	    gds_out7=expand("vcf/filter7/filter7_{HWE}.recode.gds",HWE=hwe_range),
+	    gds_out8=expand("vcf/filter8/filter8_{DP}.recode.gds",DP=DP_range)
     output:
         report_out="report.html"
     shell:
