@@ -47,7 +47,7 @@ rule step_1:
         indMissing=individual_missingness,
     shell:
         '''vcftools --vcf {input.vcfIn}  --missing-indv --out {params.outputDir}/missingIndvs
-        mawk '$5 < {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/highDP.step1.indv
+        mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/lowDP.step1.indv
         vcftools --vcf {input.vcfIn}  --remove {params.outputDir}/lowDP.step1.indv --recode --out {params.outputDir}/step1 --recode-INFO-all'''
 
 rule filter1:
