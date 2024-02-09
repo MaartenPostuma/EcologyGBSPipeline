@@ -38,7 +38,7 @@ rule makeReport:
 
 rule step_1:
     input:
-        vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"]),
+        vcfIn=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"]),
     output:
         vcf_out=expand("{path}/filters/step1.recode.vcf",path=config["outputDir"])
     conda:
@@ -47,9 +47,9 @@ rule step_1:
         indMissing=individual_missingness,
         outputDir=expand("{path}/filters/",path=config["outputDir"])
     shell:
-        '''vcftools --vcf {input.vcf_in}  --missing-indv --out {params.outputDir}/missingIndvs
+        '''vcftools --vcf {input.vcfIn}  --missing-indv --out {params.outputDir}/missingIndvs
         mawk '$5 < {params.indMissing}' vcf/missingIndvs.imiss | cut -f1 > {params.outputDir}/highDP.step1.indv
-        vcftools --vcf {input.vcf_in}  --remove {params.outputDir}/lowDP.step2.indv --recode --out {params.outputDir}/step1 --recode-INFO-all'''
+        vcftools --vcf {input.vcfIn}  --remove {params.outputDir}/lowDP.step2.indv --recode --out {params.outputDir}/step1 --recode-INFO-all'''
 
 rule filter1:
     input:
