@@ -7,11 +7,11 @@ maf_range=config["param_filtering"]["maf_range"]
 
 
 rule makeGDS:
-	input:
+    input:
         vcf_in=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern)
-	output:
+    output:
         gds_out=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.wildcard_pattern)
-	shell:
+    shell:
 		"""
 		R -e "SNPRelate::snpgdsVCF2GDS("{input.vcf_in}","{output.gds_out}")"
 		"""
