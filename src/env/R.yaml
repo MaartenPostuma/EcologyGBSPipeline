@@ -9,3 +9,5 @@ dependencies:
   - r-ggplot2
   - r-reshape2
   - bioconductor-snprelate
+  - r-knitr
+  - r-ggdendro
