@@ -5,7 +5,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 
 
-dataPop<-read.table(args[1])
+dataPop<-read.table(args[1],h=T)
 gdsFile<-args[2]
 popmap<-read.table(args[3])
 genofile<-snpgdsOpen(gdsFile)
