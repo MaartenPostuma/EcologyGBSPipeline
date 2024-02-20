@@ -11,6 +11,8 @@ rule makeGDS:
         vcf_in=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern)
     output:
         gds_out=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.wildcard_pattern)
+    conda:
+        "env/R.yaml"
     shell:
         'R -e "SNPRelate::snpgdsVCF2GDS("{input.vcf_in}","{output.gds_out}")"'
 
