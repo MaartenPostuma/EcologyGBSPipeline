@@ -65,7 +65,7 @@ rule filter:
 
 rule makePCAData:
     input:
-        vcf=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.wildcard_pattern),	output:
+        gds=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.wildcard_pattern)
     output:
         pcaPlot=expand("{path}/filters/{params}/pcaPlot.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern), 
         pcaVar=expand("{path}/filters/{params}/pcaVar.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern),    
@@ -73,5 +73,5 @@ rule makePCAData:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
         popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv",path=config["outputDir"])
     shell:
-        "Rscript {params.popmapSNPFilter} {input.vcf}"
+        "Rscript {params.popmapSNPFilter} {input.gds}"
     
