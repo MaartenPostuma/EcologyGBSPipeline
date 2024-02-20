@@ -12,9 +12,9 @@ rule makeGDS:
     output:
         gds_out=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.wildcard_pattern)
     shell:
-		"""
+		'''
 		R -e "SNPRelate::snpgdsVCF2GDS("{input.vcf_in}","{output.gds_out}")"
-		"""
+		'''
 
 rule makeReport:
     input:
