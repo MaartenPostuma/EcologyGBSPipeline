@@ -7,7 +7,6 @@ popmap<-read.table(args[3])
 genofile<-snpgdsOpen(gdsFile)
 
 colnames(popmap)<-c("sample.id","pop")
-#gdsFile<-"results/filters/max_missing~0.8/maf~0.0/populations.snps.gds"
 
 snp.id<-read.gdsn(index.gdsn(genofile,"snp.id"))
 nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))

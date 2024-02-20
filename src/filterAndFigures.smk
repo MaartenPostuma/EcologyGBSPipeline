@@ -87,4 +87,4 @@ rule combinePCAData:
     output:
         pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"])
     shell:
-        "cat {input.pcaData}  > {output.pcaDataAll}"
+        "cat <(cat {input.pcaData} | head -n 1) <(cat {input.pcaData} | grep -v sample.id)  > {output.pcaDataAll}"
