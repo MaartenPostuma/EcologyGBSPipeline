@@ -14,7 +14,9 @@ rule makeGDS:
     conda:
         "env/R.yaml"
     shell:
-        'R -e "SNPRelate::snpgdsVCF2GDS("{input.vcf_in}","{output.gds_out}")"'
+        '''
+        R -e "SNPRelate::snpgdsVCF2GDS('{input.vcf_out}','{output.gds_out}')"
+        '''
 
 rule makeReport:
     input:
