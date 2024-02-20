@@ -83,8 +83,8 @@ rule makePCAData:
 
 rule combinePCAData:
     input:
-        pcaData=expand("{path}/filters/{max_missing}/{maf}/pcaPlot.tsv",path=config["outputDir"],allow_missing=True)
+        pcaData=expand("{path}/filters/{params}/pcaPlot.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern,allow_missing=True)
     output:
-        pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+        pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"])
     shell:
         "cat {input.pcaData}  > {output.pcaDataAll}"
