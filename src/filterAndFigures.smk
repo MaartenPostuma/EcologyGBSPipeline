@@ -79,7 +79,7 @@ rule makePCAData:
     params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
     shell:
-        "Rscript {input.popmapSNPFilter} {input.gds} {input.popmap.tsv} {output.pcaData}"
+        "Rscript {input.popmapSNPFilter} {input.gds} {input.popmap} {output.pcaData}"
 
 rule combinePCAData:
     input:
