@@ -64,16 +64,14 @@ rule filter:
         "populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R 0.{wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --threads {threads}"    
 
 rule makePCAData:
-	input:
+    input:
         vcf=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.wildcard_pattern),	output:
-     output:
+    output:
         pcaPlot=expand("{path}/filters/{params}/pcaPlot.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern), 
-        pcaVar=expand("{path}/filters/{params}/pcaVar.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern), 
+        pcaVar=expand("{path}/filters/{params}/pcaVar.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern),    
     params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
         popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv",path=config["outputDir"])
-	shell:
-		"""
-		Rscript {params.popmapSNPFilter} {input.vcf}
-		"""
+    shell:
+        "Rscript {params.popmapSNPFilter} {input.vcf}"
     
