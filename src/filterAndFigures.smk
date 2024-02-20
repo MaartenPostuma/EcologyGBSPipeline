@@ -10,7 +10,7 @@ rule makeGDS:
 	input:
         vcf=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
 	output:
-        vcf=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.wildcard_pattern),
+        gds_out=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.wildcard_pattern),
 	shell:
 		"""
 		R -e "SNPRelate::snpgdsVCF2GDS("{input.vcf}","{output.gds_out}")"
