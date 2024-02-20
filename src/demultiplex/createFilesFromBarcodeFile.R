@@ -29,5 +29,5 @@ write.table(popmapStacks,paste0(args[2],"/popmap.tsv"),row.names = F,col.names =
 
 
 popmapSNPFilter<-data.frame(pop=unique(barcodes$pop),metaPop=barcodes$metaPop[duplicated(barcodes$pop)==F])
-write.table(popmapStacks,paste0(args[2],"/SNPFilterPopMap.tsv"),row.names =T,col.names = F,quote=F,sep="\t")
+write.table(popmapSNPFilter,paste0(args[2],"results/SNPFilterPopMap.tsv"),row.names =F,col.names =T,quote=F,sep="\t")
 

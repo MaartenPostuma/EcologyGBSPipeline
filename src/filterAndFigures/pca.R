@@ -6,37 +6,39 @@ args = commandArgs(trailingOnly=TRUE)
 
 
 dataPop<-read.table(args[1])
-genofile<-snpgdsOpen(args[2])
+gdsFile<-args[2]
+popmap<-read.table(args[3])
+genofile<-snpgdsOpen(gdsFile)
 
-#dataPop<-read.table("results/stacksFiles/SNPFilterPopMap.tsv")
-gdsFile<-"results/filters/max_missing~0.8/maf~0.0/populations.snps.gds"
-genofile<-snpgdsOpen("results/filters/max_missing~0.8/maf~0.0/populations.snps.gds")
+#dataPop<-read.table("results/stacksFiles/SNPFilterPopMap.tsv",h=T)
+#popmap<-read.table("results/stacksFiles/popmapFiltered.tsv")
+colnames(popmap)<-c("sample.id","pop")
+#gdsFile<-"results/filters/max_missing~0.8/maf~0.0/populations.snps.gds"
+genofile<-snpgdsOpen(gdsFile)
 
-
-ranges<-sub('vcf/filter1//filter1_','',sub('.recode.vcf','',fileList))
-
-tryCatch(for(i in fileList){
-range<-sub('vcf/filter1//filter1_','',sub('.recode.vcf','',i))
-vcfPath<-i
-dataLoc<-read.table(dataPop,h=T)#Needs to be taken from config BLEGH
-if(!file.exists(sub(".vcf",".gds",vcfPath))){
-invisible(snpgdsVCF2GDS(vcfPath, sub(".vcf",".gds",vcfPath), method="biallelic.only"))}
-invisible(genofile <- snpgdsOpen(sub(".vcf",".gds",vcfPath)))
 snp.id<-read.gdsn(index.gdsn(genofile,"snp.id"))
 nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
-invisible(pca <- snpgdsPCA(genofile, snp.id=snp.id))
+pca <- snpgdsPCA(genofile, snp.id=snp.id)
+pcavar<-pca$varpro/sum(pca$varpro,na.rm=T)
 pcaPlot <- data.frame(sample.id = pca$sample.id,
                   EV1 = pca$eigenvect[,1],    # the first eigenvector
                   EV2 = pca$eigenvect[,2],
-                  EV3 = pca$eigenvect[,3],# the second eigenvector
+                  EV3 = pca$eigenvect[,3],
+                  EV1Var=pcavar[1],
+                  EV2Var=pcavar[2],
+                  EV3Var=pcavar[3],# the second eigenvector
                   stringsAsFactors = FALSE)
-pcaPlot$pop<-as.character(sub('_.*$', '', pcaPlot$sample.id))
+pcaPlot<-merge(pcaPlot,popmap,by="sample.id")
+
 pcavar<-pca$varpro/sum(pca$varpro,na.rm=T)
 
-pcaPlotFinal<-merge(pcaPlot,dataLoc,by="pop",all=F)
-print(ggplot(pcaPlotFinal,aes(x=EV1,y=EV2,col=metaPop,label=sample.id))+geom_text()+
-theme_light()+ylab(paste("PCA 2 ",round(pcavar[2],3)*100,"%",sep=""))+ggtitle(vcfPath)+xlab(paste("PCA 1 ",round(pcavar[1],3)*100,"%",sep=""))+scale_colour_discrete("meta populations")+
-ggtitle(paste("number of SNPs =",nSNPs,"\n maxMissing =",range)))
-snpgdsClose(genofile)
+pcaPlotFinal<-merge(pcaPlot,dataPop,by="pop",all=F)
 
-})
+splittedPath<-strsplit(gdsFile,split="/")[[1]]
+max_missingString<-splittedPath[grep("max_missing",splittedPath)]
+pcaPlotFinal$max_missing<-sub("^.*~","",max_missingString)
+mafString<-splittedPath[grep("maf~",splittedPath)]
+pcaPlotFinal$maf<-sub("^.*~","",mafString)
+write.table(pcaPlotFinal,args[4],row.names=F,quote=F)
+
+snpgdsClose(genofile)

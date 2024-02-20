@@ -69,13 +69,22 @@ rule filter:
 
 rule makePCAData:
     input:
-        gds=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.wildcard_pattern)
+        gds=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.wildcard_pattern),
+        popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv",path=config["outputDir"]),
+        popmap=expand("{path}/stacksFiles/popmap.tsv",path=config["outputDir"]),
     output:
-        pcaPlot=expand("{path}/filters/{params}/pcaPlot.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern), 
-        pcaVar=expand("{path}/filters/{params}/pcaVar.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern),    
+        pcaData=expand("{path}/filters/{params}/pcaPlot.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+    conda:
+        "env/R.yaml"
     params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
-        popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv",path=config["outputDir"])
     shell:
-        "Rscript {params.popmapSNPFilter} {input.gds}"
-    
+        "Rscript {input.popmapSNPFilter} {input.gds} {input.popmap.tsv} {output.pcaData}"
+
+rule combinePCAData:
+    input:
+        pcaData=expand("{path}/filters/{params}/pcaPlot.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+    output:
+        pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"])
+    shell:
+        "cat {input.pcaData}  > {output.pcaDataAll}"
