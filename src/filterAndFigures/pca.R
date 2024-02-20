@@ -1,12 +1,7 @@
-print("test0")
 library(SNPRelate)
 
 args = commandArgs(trailingOnly=TRUE)
-print(args[1])
-
-print("test")
 dataPop<-read.table(args[1],h=T)
-print("test2")
 gdsFile<-args[2]
 popmap<-read.table(args[3])
 genofile<-snpgdsOpen(gdsFile)
