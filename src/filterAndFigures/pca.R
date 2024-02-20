@@ -1,4 +1,4 @@
-rm(list=ls())
+print("test0")
 library(SNPRelate)
 
 args = commandArgs(trailingOnly=TRUE)
