@@ -9,6 +9,7 @@ dataPop<-read.table(args[1])
 genofile<-snpgdsOpen(args[2])
 
 #dataPop<-read.table("results/stacksFiles/SNPFilterPopMap.tsv")
+gdsFile<-"results/filters/max_missing~0.8/maf~0.0/populations.snps.gds"
 genofile<-snpgdsOpen("results/filters/max_missing~0.8/maf~0.0/populations.snps.gds")
 
 
