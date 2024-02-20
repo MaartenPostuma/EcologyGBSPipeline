@@ -71,7 +71,7 @@ rule makePCAData:
     input:
         gds=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.wildcard_pattern),
         popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv",path=config["outputDir"]),
-        popmap=expand("{path}/stacksFiles/popmap.tsv",path=config["outputDir"]),
+        popmap=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
     output:
         pcaData=expand("{path}/filters/{params}/pcaPlot.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
     conda:
