@@ -2,7 +2,7 @@ rm(list=ls())
 library(SNPRelate)
 
 args = commandArgs(trailingOnly=TRUE)
-
+print(args[1])
 
 print("test")
 dataPop<-read.table(args[1],h=T)
