@@ -31,6 +31,7 @@ usePackage("knitr")
 usePackage("ggdendro")
 usePackage("shiny")
 usePackage("ggrepel")
+usePackage("rmarkdown")
 
 options(stringsAsFactors = FALSE)
 
