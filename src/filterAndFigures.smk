@@ -29,7 +29,7 @@ rule makeReport:
         "env/R.yaml"
     shell:
         '''
-        R -e "rmarkdown::render("report.Rmd",output_file="report.html",params=list(args='{params.outputDir}''))"
+        R -e "rmarkdown::render("report.Rmd",output_file="report.html",params=list(args='{params.outputDir}'))"
         '''
 
 #So this does a lot of things 
