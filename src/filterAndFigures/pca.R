@@ -13,12 +13,12 @@ nSNPs<-length(read.gdsn(index.gdsn(genofile,"snp.id")))
 pca <- snpgdsPCA(genofile, snp.id=snp.id)
 pcavar<-pca$varpro/sum(pca$varpro,na.rm=T)
 pcaPlot <- data.frame(sample.id = pca$sample.id,
-                  EV1 = pca$eigenvect[,1],    # the first eigenvector
-                  EV2 = pca$eigenvect[,2],
-                  EV3 = pca$eigenvect[,3],
-                  EV1Var=pcavar[1],
-                  EV2Var=pcavar[2],
-                  EV3Var=pcavar[3],# the second eigenvector
+                  PCA1 = pca$eigenvect[,1],    # the first eigenvector
+                  PCA2 = pca$eigenvect[,2],
+                  PCA3 = pca$eigenvect[,3],
+                  PCA1Var=pcavar[1],
+                  PCA2Var=pcavar[2],
+                  PCA3Var=pcavar[3],# the second eigenvector
                   stringsAsFactors = FALSE)
 pcaPlot<-merge(pcaPlot,popmap,by="sample.id")
 
