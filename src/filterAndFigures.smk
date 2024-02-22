@@ -46,7 +46,7 @@ rule step_1:
         """vcftools --vcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs
         mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/lowDP.step1.indv
         mawk '$5 < {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/highDP.step1.indv
-        cat {params.outputDir}/stacksFiles/popmap.tsv | grep -f  {params.outputDir}/filters/highDP.step1.indv > {params.outputDir}/stacksFiles/popmapFiltered.tsv
+        cat {params.outputDir}/stacksFiles/popmap.tsv | grep -f  {params.outputDir}/filters/highDP.step1.indv > {output.vcf}
         mkdir -p {params.outputDir}/finalVCF/
         """
 
