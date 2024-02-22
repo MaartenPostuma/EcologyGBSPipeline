@@ -52,9 +52,12 @@ print()
 indCoverage<-read.table(paste0(params$args[1],"filters/missingIndvs.imiss"),h=T)
 cutOff<-as.numeric(system("cat config.yaml | grep 'individual_missingness'| cut -f2 -d :"),intern=T)
 numberOfIndividuals<-system(paste0("cat ",params$args[1],"/stackFiles/popmapFiltered.tsv"),intern=T)
-ggplot(indCoverage,aes(x=F_MISS))+geom_histogram(col="black",fill="lightblue",binwidth=0.025)+
-  ggtitle(numberOfIndividuals)+ylab("fraction missing")+
-  theme_light()+geom_vline(xintercept=cutOff,col="red")
+print(indCoverage)
+print(cutOff)
+print(numberOfIndividuals)
+# ggplot(indCoverage,aes(x=F_MISS))+geom_histogram(col="black",fill="lightblue",binwidth=0.025)+
+#   ggtitle(numberOfIndividuals)+ylab("fraction missing")+
+#   theme_light()+geom_vline(xintercept=cutOff,col="red")
 
 ```
 
