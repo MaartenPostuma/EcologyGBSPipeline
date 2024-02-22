@@ -8,6 +8,7 @@ output:
 params:
   dir: "vcf/"
   rmd: "report.Rmd"
+  args: " "
 ---
 
 #### author: `r system("whoami",inter=T)`
@@ -43,32 +44,10 @@ This report contains all the information needed to make descisions about your fi
 
 ## First Steps
 
-Here you can find the information from the log files of the first 2 filtering steps:
-
-```{bash capture="step 1 log"}
-cat ./vcf/step1.log | grep -v "VCFtools" | grep -v "(C)" | grep -v "Individuals" | grep -v "Outputting"| grep -v "Run Time"
-```
-
 The distribution of individual missingness
 
 ```{r fig.cap="Fig.1: Histogram of the fraction of missingness across individuals, red line indicates the cutoff used in filtering step 2"}
-indCoverage<-read.table("vcf/missingIndvs.imiss",h=T)
-cutOff<-as.numeric(system("cat configFiltering.yaml | grep 'individual_missingness'| cut -f2 -d :",intern=T))
-numberOfIndividuals<-system("cat vcf/step2.log|grep 'Individuals' ",intern=T)
-ggplot(indCoverage,aes(x=F_MISS))+geom_histogram(col="black",fill="lightblue",binwidth=0.025)+
-  ggtitle(numberOfIndividuals)+ylab("fraction missing")+
-  theme_light()+geom_vline(xintercept=cutOff,col="red")
+indCoverage<-read.table(paste0(params$args[1],"missingIndvs.imiss"),h=T)
+print(indCoverage)
 ```
 
-These are the individuals that are excluded from further analysis
-
-```{bash capture="missing individuals"}
-cat ./vcf/lowDP.step2.indv
-```
-
-## PCA {.tabset .tabset-fade .tabset-pills}
-#### PCA
-
-```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("PCAs)}
-
-```
