@@ -47,7 +47,6 @@ This report contains all the information needed to make descisions about your fi
 The distribution of individual missingness
 
 ```{r fig.cap="Fig.1: Histogram of the fraction of missingness across individuals, red line indicates the cutoff used in filtering step 2"}
-indCoverage<-read.table(paste0(params$args[1],"missingIndvs.imiss"),h=T)
-print(indCoverage)
+print(paste0(params$args[1],"missingIndvs.imiss"))
 ```
 
