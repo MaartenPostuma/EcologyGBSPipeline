@@ -23,7 +23,7 @@ rule makeReport:
         pcaPlot=expand("{path}/filters/{params}/pcaPlot.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern), 
         pcaVar=expand("{path}/filters/{params}/pcaVar.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern), 
     output:
-        report_out="report.html"
+        report_out=expand("{path}/report.html",path=config["outputDir"])
     params:
         outputDir=expand("{path}/filters/",path=config["outputDir"])
     shell:
