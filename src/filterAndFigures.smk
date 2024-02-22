@@ -35,6 +35,7 @@ rule makeReport:
 rule step_1:
     input:
         vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"]),
+        popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
     output:
         vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"])
     conda:
@@ -46,7 +47,7 @@ rule step_1:
         """vcftools --vcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs
         mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/lowDP.step1.indv
         mawk '$5 < {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/highDP.step1.indv
-        cat {params.outputDir}/stacksFiles/popmap.tsv | grep -f  {params.outputDir}/filters/highDP.step1.indv > {output.vcf}
+        cat {input.popmap} | grep -f  {params.outputDir}/filters/highDP.step1.indv > {output.vcf}
         mkdir -p {params.outputDir}/finalVCF/
         """
 
