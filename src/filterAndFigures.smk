@@ -25,6 +25,8 @@ rule makeReport:
         report_out=expand("{path}/report.html",path=config["outputDir"])
     params:
         outputDir=expand("{path}/filters/",path=config["outputDir"])
+    conda:
+        "env/R.yaml"
     shell:
         '''
         R -e "rmarkdown::render("report.Rmd",output_file="report.html",params=list(args={params.outputDir}))"
