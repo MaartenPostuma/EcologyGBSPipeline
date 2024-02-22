@@ -28,7 +28,7 @@ rule makeReport:
         outputDir=expand("{path}/filters/",path=config["outputDir"])
     shell:
         '''
-        R -e "rmarkdown::render("report.Rmd",output_file="report.html",params=list())"
+        R -e "rmarkdown::render("report.Rmd",output_file="report.html",params=list(outDir))"
         '''
 
 #So this does a lot of things 
