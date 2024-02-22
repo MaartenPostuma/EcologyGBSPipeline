@@ -24,7 +24,7 @@ rule makeReport:
     output:
         report_out=expand("{path}/report.html",path=config["outputDir"])
     params:
-        outputDir=expand("{path}/filters/",path=config["outputDir"]),
+        outputDir=expand("{path}/",path=config["outputDir"]),
     conda:
         "env/R.yaml"
     shell:
