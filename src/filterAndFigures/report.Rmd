@@ -8,7 +8,7 @@ output:
 params:
   dir: "vcf/"
   rmd: "report.Rmd"
-  args: " "
+  args: myargs
 ---
 
 #### author: `r system("whoami",inter=T)`
