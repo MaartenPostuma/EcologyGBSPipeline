@@ -20,8 +20,8 @@ rule makeGDS:
 
 rule makeReport:
     input:
-        pcaPlot=expand("{path}/filters/{params}/pcaPlot.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern), 
-        pcaVar=expand("{path}/filters/{params}/pcaVar.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern), 
+        pcaPlot=expand("{path}/filters/{params}/pcaPlot.tsv",path=config["outputDir"],params=paramspace.instance_patterns), 
+        pcaVar=expand("{path}/filters/{params}/pcaVar.tsv",path=config["outputDir"],params=paramspace.instance_patterns), 
     output:
         report_out=expand("{path}/report.html",path=config["outputDir"])
     params:
