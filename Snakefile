@@ -55,7 +55,9 @@ if config["mode"]== "Denovo":
             sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.instance_patterns),
             gds=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.instance_patterns),
             pcaData=expand("{path}/filters/{params}/pcaPlot.tsv",path=config["outputDir"],params=paramspace.instance_patterns),
-            pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"])
+            pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"]),
+            report_out=expand("{path}/report.html",path=config["outputDir"])
+
 
 
 
