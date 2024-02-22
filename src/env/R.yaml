@@ -11,3 +11,5 @@ dependencies:
   - bioconductor-snprelate
   - r-knitr
   - r-ggdendro
+  - r-rmarkdown
+  - r-ggpubr

@@ -29,7 +29,6 @@ usePackage("ggplot2")
 usePackage("ggpubr")
 usePackage("knitr")
 usePackage("ggdendro")
-usePackage("shiny")
 usePackage("ggrepel")
 usePackage("rmarkdown")
 
