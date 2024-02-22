@@ -29,7 +29,8 @@ rule makeReport:
         "env/R.yaml"
     shell:
         '''
-        R -e "rmarkdown::render('src/filterAndFigures/report.Rmd',output_file=paste0('{params.outputDir}','report.html'),params=list(args='{params.outputDir}'))"
+        R -e "rmarkdown::render('src/filterAndFigures/report.Rmd',output_file='report.html',params=list(args='{params.outputDir}'))"
+        mv src/filterAndFigures/report.html {output.report_out}
         '''
 
 #So this does a lot of things 
