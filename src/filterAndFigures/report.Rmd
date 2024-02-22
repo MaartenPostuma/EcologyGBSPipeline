@@ -36,6 +36,7 @@ options(stringsAsFactors = FALSE)
 
 knitr::opts_chunk$set(echo = FALSE)
 options(tinytex.verbose = TRUE)
+knitr::opts_knit$set(root.dir = '../../')
 ```
 
 This report contains all the information needed to make descisions about your filtering steps.

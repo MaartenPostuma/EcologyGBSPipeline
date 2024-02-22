@@ -24,13 +24,12 @@ rule makeReport:
     output:
         report_out=expand("{path}/report.html",path=config["outputDir"])
     params:
-        outputDir=expand("{path}/filters/",path=config["outputDir"])
+        outputDir=expand("{path}/filters/",path=config["outputDir"]),
     conda:
         "env/R.yaml"
     shell:
         '''
-        R -e "rmarkdown::render('src/filterAndFigures/report.Rmd',output_file='report.html',params=list(args='{params.outputDir}'))"
-        mv src/filterAndFigures/report.html {output.report_out}
+        R -e "rmarkdown::render('src/filterAndFigures/report.Rmd',output_file='{output.report_out}.html',params=list(args='{params.outputDir}'))"
         '''
 
 #So this does a lot of things 
