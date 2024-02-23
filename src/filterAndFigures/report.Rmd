@@ -94,5 +94,5 @@ for(i in 1:nrow(df)) {
   cat(df$vardesc[i], "\n")
   cat("\n")
 }
-
+```
 ```
