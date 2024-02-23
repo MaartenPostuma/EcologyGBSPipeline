@@ -31,6 +31,7 @@ max_missingString<-splittedPath[grep("max_missing",splittedPath)]
 pcaPlotFinal$max_missing<-sub("^.*~","",max_missingString)
 mafString<-splittedPath[grep("maf~",splittedPath)]
 pcaPlotFinal$maf<-sub("^.*~","",mafString)
+pcaPlotFinal$nSNPs<-nSNPs
 write.table(pcaPlotFinal,args[4],row.names=F,quote=F)
 
 snpgdsClose(genofile)
