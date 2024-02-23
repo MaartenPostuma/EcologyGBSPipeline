@@ -82,7 +82,7 @@ print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
 
 
 
-```{test}
+```{r test}
 
 varnames <- c("A", "B", "C")
 vardesc <- c("A is this.", "B is this.", "C is this.")
@@ -96,3 +96,4 @@ for(i in 1:nrow(df)) {
 }
 ```
 ```
+
