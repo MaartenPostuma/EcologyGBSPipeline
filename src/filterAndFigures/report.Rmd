@@ -67,7 +67,7 @@ pcaData<-read.table(paste0(params$args[1],"filters/pcaAll.tsv"))
 
 for(maf in unique(pcaData$maf)){
 pcaDataSub<-pcaData[pcaData$max_missing==0.00001&pcaData$maf==maf,]  
-
+print(pcaDataSub)
 print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
   geom_point()+
   geom_text_repel()+
