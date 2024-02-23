@@ -50,8 +50,7 @@ The distribution of individual missingness
 ```{r fig.cap="Fig.1: Histogram of the fraction of missingness across individuals, red line indicates the cutoff used in filtering step 2"}
 indCoverage<-read.table(paste0(params$args[1],"filters/missingIndvs.imiss"),h=T)
 cutOff<-as.numeric(system("cat config.yaml | grep 'individual_missingness'| cut -f2 -d :"),intern=T)
-numberOfIndividuals<-system(paste0("cat ",params$args[1],"/stackFiles/popmapFiltered.tsv"),intern=T)
-print(indCoverage)
+numberOfIndividuals<-system(paste0("cat ",params$args[1],"/stacksFiles/popmapFiltered.tsv"),intern=T)
 print(cutOff)
 print(numberOfIndividuals)
 ggplot(indCoverage,aes(x=F_MISS))+geom_histogram(col="black",fill="lightblue",binwidth=0.025)+
@@ -60,3 +59,26 @@ ggplot(indCoverage,aes(x=F_MISS))+geom_histogram(col="black",fill="lightblue",bi
 
 ```
 
+
+
+## Max missing 0 {.tabset .tabset-fade .tabset-pills}
+#### PCA
+
+```{r}
+pcaData<-read.table(paste0(params$args[1],"filters/pcaDataAll.tsv"))
+
+for(maf in unique(pcaData$maf)){
+pcaDataSub<-pcaData[pcaData$max_missing==0.00001&pcaData$maf==maf,]  
+
+print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
+  geom_point()+
+  geom_text_repel()+
+  theme_pubclean()+
+  xlab(paste0("PCA 1 (",round(unique(pcaDataSub$PCA1Var),2)*100),"%)")+
+  ylab(paste0("PCA 2 (",round(unique(pcaDataSub$PCA2Var),2)*100),"%)")+
+  ggtitle(paste0("Max missing = 0.001, maf= ",maf,"nSNP="))
+)
+
+
+}
+```
