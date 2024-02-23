@@ -79,3 +79,20 @@ print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
 
 }
 ```
+
+
+
+```{test}
+
+varnames <- c("A", "B", "C")
+vardesc <- c("A is this.", "B is this.", "C is this.")
+df <- data.frame(varnames, vardesc, stringsAsFactors = FALSE)
+
+for(i in 1:nrow(df)) {
+  cat("##", df$varnames[i], "\n")
+  cat("Description:", "\n")
+  cat(df$vardesc[i], "\n")
+  cat("\n")
+}
+
+```
