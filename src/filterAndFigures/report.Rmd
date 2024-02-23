@@ -62,7 +62,7 @@ ggplot(indCoverage,aes(x=F_MISS))+geom_histogram(col="black",fill="lightblue",bi
 ## Max missing 0 {.tabset .tabset-fade .tabset-pills}
 #### PCA
 
-```{r}
+```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("PCA of filter8 max missing =")}
 pcaData<-read.table(paste0(params$args[1],"filters/pcaAll.tsv"))
 
 for(maf in unique(pcaData$maf)){
