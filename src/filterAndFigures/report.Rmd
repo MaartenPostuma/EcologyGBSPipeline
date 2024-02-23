@@ -64,19 +64,26 @@ ggplot(indCoverage,aes(x=F_MISS))+geom_histogram(col="black",fill="lightblue",bi
 
 ```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("PCA of filter8 max missing =")}
 pcaData<-read.table(paste0(params$args[1],"filters/pcaAll.tsv"))
-
-for(maf in unique(pcaData$maf)){
+figList<-list()
+for(i in 1:length(unique(pcaData$maf))){
+maf<-unique(pcaData$maf)[i]
 pcaDataSub<-pcaData[pcaData$max_missing==0.00001&pcaData$maf==maf,]  
-print(pcaDataSub)
-print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
+figList[[i]]<-ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
   geom_point()+
   geom_text_repel()+
   theme_pubclean()+
   xlab(paste0("PCA 1 (",round(unique(pcaDataSub$PCA1Var),2)*100),"%)")+
   ylab(paste0("PCA 2 (",round(unique(pcaDataSub$PCA2Var),2)*100),"%)")+
   ggtitle(paste0("Max missing = 0.001, maf= ",maf,"nSNP="))
-)
+
 
 
 }
+
+
+figList[[1]]
+figList[[2]]
+figList[[3]]
+figList[[4]]
+figList[[5]]
 ```
