@@ -133,7 +133,7 @@ for(var in moltenPopStats$variable){
 print(ggplot(moltenPopStats,aes(x=pop,y=value,fill=metaPop))+
   geom_col()+
   theme_pubr()+
-    theme(axis.text.x = element_text(angle = 45))+
+   theme(axis.text.x = element_text(angle = 45))+
   ggtitle(var)
     )
 }
