@@ -120,18 +120,19 @@ for(i in 1:length(unique(parameters$maf))){
 # cat("\n\n### PopStats {.tabset .tabset-fade .tabset-pills}\n")
 
 
-#for(i in 1:length(unique(parameters$maf))){
-#  maf<-unique(parameters$maf)[i]
-#  cat("\n\n#### maf = ", maf, "\n")
-#
-#popStatsSub<-popStats[popStats$max_missing==max_missing&popStats$maf==maf,]
-#
-#popStatsSub[-1]<-round(popStatsSub[-1],digit=2) 
-#tableList<-list()
-#tableList[[1]]<-datatable(popStats[popStats$max_missing==max_missing&popStats$maf==maf,])
-#
-#print(htmltools::tagList(lapply(tableList,print)))
-#}
+for(i in 1:length(unique(parameters$maf))){
+ maf<-unique(parameters$maf)[i]
+ cat("\n\n#### maf = ", maf, "\n")
+
+popStatsSub<-popStats[popStats$max_missing==max_missing&popStats$maf==maf,]
+moltenPopStats<-melt(popStatsSub,id.vars=c("pop","max_missing","maf"))
+ggplot(moltenPopStats,aes(x=pop,y=value,col=metaPop))+
+  geom_col()+
+  facet_wrap(.~variable,space="free",scales = "free")+
+  theme_pubr()
+
+
+}
 }
 ```
 
@@ -139,6 +140,7 @@ for(i in 1:length(unique(parameters$maf))){
 
 ```{r}
 popStats<-read.table(paste0(params$args[1],"filters/popStatsAll.tsv"),h=T)
-datatable(popStats)
+popStats[-1]<-round(popStats[-1],digit=2)
+datatable(popStats,filter = "top")
 
 ```
