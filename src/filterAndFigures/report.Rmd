@@ -9,13 +9,13 @@ params:
   dir: "vcf/"
   rmd: "report.Rmd"
   args: myargs
----
 
 #### author: `r system("whoami",inter=T)`
 #### date: `r system("date",intern=T)`
-
+---
 
 ```{r setup, include=FALSE}
+
 #setwd("./output")
 chooseCRANmirror(graphics=FALSE, ind=33)
 args <- commandArgs(TRUE)
@@ -65,7 +65,11 @@ ggplot(indCoverage,aes(x=F_MISS))+geom_histogram(col="black",fill="lightblue",bi
 ```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("PCA of filter8 max missing =")}
 pcaData<-read.table(paste0(params$args[1],"filters/pcaAll.tsv"),h=T)
 for(i in 1:length(unique(pcaData$maf))){
+  
 maf<-unique(pcaData$maf)[i]
+cat("\n")
+cat(paste0("##### maf=",maf,"\n")  
+
 pcaDataSub<-pcaData[pcaData$max_missing==0.00001&pcaData$maf==maf,]  
 print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
   geom_point()+
@@ -89,11 +93,10 @@ vardesc <- c("A is this.", "B is this.", "C is this.")
 df <- data.frame(varnames, vardesc, stringsAsFactors = FALSE)
 
 for(i in 1:nrow(df)) {
-  cat("##", df$varnames[i], "\n")
+  cat("\n")
+  cat("#####", df$varnames[i], "\n")
   cat("Description:", "\n")
   cat(df$vardesc[i], "\n")
   cat("\n")
 }
 ```
-```
-
