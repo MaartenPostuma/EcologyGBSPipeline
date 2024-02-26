@@ -41,6 +41,7 @@ mafString<-splittedPath[grep("maf~",splittedPath)]
 treeLabelsFinal$maf<-sub("^.*~","",mafString)
 treeSegments$maf<-sub("^.*~","",mafString)
 treeLabelsFinal$nSNPs<-nSNPs
+treeLabelsFinal<-merge(treeLabelsFinal,dataPop,by="pop")
 write.table(treeLabelsFinal,args[4],row.names=F,quote=F)
 write.table(treeSegments,args[5],row.names=F,quote=F)
 
