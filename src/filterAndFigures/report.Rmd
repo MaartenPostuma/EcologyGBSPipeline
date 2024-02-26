@@ -99,23 +99,25 @@ print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
 
 cat("\n\n### Clusters {.tabset .tabset-fade .tabset-pills}\n")
 
-for(i in 1:length(unique(parameters$maf))){
+#for(i in 1:length(unique(parameters$maf))){
+# maf<-unique(parameters$maf)[i]
+# cat("\n\n#### maf = ", maf, "\n")
+# 
+# treeSegments<-treeSegments[treeSegments$max_missing==max_missing&treeSegments$maf==maf,]
+# treeLabels<-treeLabels[treeLabels$max_missing==max_missing&treeLabels$maf==maf,]
+# 
+# ggplot(treeSegments) + 
+#   geom_segment(aes(x = x, y = y, xend = xend, yend=yend))+
+#   theme_pubr()+coord_cartesian(ylim=c(-3,max(treeSegments$y)*1.15))+
+#   geom_text(data = treeLabels, aes(x, y, label = label,col=metaPop),
+#             hjust = 1, angle = 90, size = 5)+
+#   xlab("")+
+#   ylab("genetic distance")+
+#   ggtitle(paste("number of SNPs =",unique(treeLabels$nSNPs),"\n maxMissing =",max_missing,"\n maf =",maf))
+
   
-maf<-unique(pcaData$maf)[i]
-cat("\n\n#### maf =", maf, "\n")
-
-pcaDataSub<-pcaData[pcaData$max_missing==max_missing&pcaData$maf==maf,]  
-print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
-  geom_point()+
-  geom_text_repel()+
-  theme_pubr()+
-  xlab(paste0("PCA 1 (",round(mean(pcaDataSub$PCA1Var),2)*100,"%)"))+
-  ylab(paste0("PCA 2 (",round(mean(pcaDataSub$PCA2Var),2)*100,"%)"))+
-  ggtitle(paste0("CLUSTER Max missing = ",max_missing," maf= ",maf," nSNP=",pcaData$nSNPs)))
-
-
-
-}
+  
+#}
 }
 ```
 
