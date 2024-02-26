@@ -129,7 +129,7 @@ for(i in 1:length(unique(parameters$maf))){
 
 popStatsSub<-popStats[popStats$max_missing==max_missing&popStats$maf==maf,]
 moltenPopStats<-melt(popStatsSub,id.vars=c("pop","max_missing","maf","metaPop"))
-for(var in moltenPopStats$variable){
+for(var in unique(moltenPopStats$variable)){
 print(ggplot(moltenPopStats,aes(x=pop,y=value,fill=metaPop))+
   geom_col()+
   theme_pubr()+
