@@ -39,7 +39,8 @@ rule step_1:
         vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"]),
         popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
     output:
-        vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"])
+        vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
+        iMissing=expand('{path}/filters/missingIndvs.imiss',path=config["outputDir"])
     conda:
         "env/vcftools.yaml"
     params:
