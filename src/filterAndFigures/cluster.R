@@ -28,7 +28,7 @@ treeSegments$max_missing<-sub("^.*~","",max_missingString)
 mafString<-splittedPath[grep("maf~",splittedPath)]
 treeLabelsFinal$maf<-sub("^.*~","",mafString)
 treeSegmentsl$maf<-sub("^.*~","",mafString)
-
+treeLabelsFinal$nSNPs<-nSNPs
 write.table(treeLabelsFinal,args[4],row.names=F,quote=F)
 write.table(treeSegments,args[5],row.names=F,quote=F)
 

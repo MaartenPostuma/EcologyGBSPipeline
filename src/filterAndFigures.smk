@@ -106,7 +106,7 @@ rule makeTreeData:
     params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
     shell:
-        "Rscript src/filterAndFigures/pca.R {input.popmapSNPFilter} {input.gds} {input.popmap} {output.treeLabels} {output.treeSegments}"
+        "Rscript src/filterAndFigures/cluster.R {input.popmapSNPFilter} {input.gds} {input.popmap} {output.treeLabels} {output.treeSegments}"
 
 rule combineTreeData:
     input:

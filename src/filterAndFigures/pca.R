@@ -19,7 +19,7 @@ pcaPlot <- data.frame(sample.id = pca$sample.id,
                   PCA1Var=pcavar[1],
                   PCA2Var=pcavar[2],
                   PCA3Var=pcavar[3],
-                  nSNPs=nSNps,# the second eigenvector
+                  nSNPs=nSNPs,# the second eigenvector
                   stringsAsFactors = FALSE)
 pcaPlot<-merge(pcaPlot,popmap,by="sample.id")
 
