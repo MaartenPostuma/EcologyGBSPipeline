@@ -126,11 +126,11 @@ for(i in 1:length(unique(parameters$maf))){
 
 popStatsSub<-popStats[popStats$max_missing==max_missing&popStats$maf==maf,]
 moltenPopStats<-melt(popStatsSub,id.vars=c("pop","max_missing","maf"))
-ggplot(moltenPopStats,aes(x=pop,y=value,col=metaPop))+
+print(ggplot(moltenPopStats,aes(x=pop,y=value,col=metaPop))+
   geom_col()+
   facet_wrap(.~variable,scales = "free")+
   theme_pubr()
-
+)
 
 }
 }
