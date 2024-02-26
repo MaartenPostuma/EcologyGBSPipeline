@@ -65,9 +65,9 @@ ggplot(indCoverage,aes(x=F_MISS))+geom_histogram(col="black",fill="lightblue",bi
 ```{r,message=FALSE,results='asis',error=TRUE, fig.cap=paste("PCA of filter8 max missing =")}
 pcaData<-read.table(paste0(params$args[1],"filters/pcaAll.tsv"),h=T)
 for(i in 1:length(unique(pcaData$maf))){
-cat("\n\n#### ", maf, "\n")
   
 maf<-unique(pcaData$maf)[i]
+cat("\n\n#### ", maf, "\n")
 
 pcaDataSub<-pcaData[pcaData$max_missing==0.00001&pcaData$maf==maf,]  
 print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
@@ -89,9 +89,9 @@ print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
 ```{r,message=FALSE,results='asis',error=TRUE, fig.cap=paste("PCA of filter8 max missing =")}
 pcaData<-read.table(paste0(params$args[1],"filters/pcaAll.tsv"),h=T)
 for(i in 1:length(unique(pcaData$maf))){
-cat("\n\n#### ", maf, "\n")
   
 maf<-unique(pcaData$maf)[i]
+cat("\n\n#### ", maf, "\n")
 
 pcaDataSub<-pcaData[pcaData$max_missing==0.00001&pcaData$maf==maf,]  
 print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
