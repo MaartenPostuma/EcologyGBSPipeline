@@ -142,7 +142,7 @@ rule makePopData:
 
 rule combinePopData:
     input:
-        popStats=expand("{path}/filters/{params}/popStats.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+        popStats=expand("{path}/filters/{params}/popStats.tsv",path=config["outputDir"],params=paramspace.instance_patterns)
     output:
         popStats=expand("{path}/filters/popStatsAll.tsv",path=config["outputDir"])
     conda:
