@@ -23,7 +23,9 @@ rule makeReport:
         iMissing=expand('{path}/filters/missingIndvs.imiss',path=config["outputDir"]),
         pcaPlot=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"],params=paramspace.instance_patterns),
         treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
-        treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"]) 
+        treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"]),
+        popStats=expand("{path}/filters/popStatsAll.tsv",path=config["outputDir"])
+ 
     output:
         report_out=expand("{path}/report.html",path=config["outputDir"])
     params:

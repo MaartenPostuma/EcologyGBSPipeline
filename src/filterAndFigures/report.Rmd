@@ -140,7 +140,7 @@ print(ggplot(moltenPopStats,aes(x=pop,y=value,col=metaPop))+
 
 ```{r}
 popStats<-read.table(paste0(params$args[1],"filters/popStatsAll.tsv"),h=T)
-popStats[-1]<-round(popStats[-1],digit=2)
+popStats[-1]<-round(popStats[-c(1,ncol(popStats))],digit=2)
 popStats$maf<-as.factor(popStats$maf)
 popStats$max_missing<-as.factor(popStats$max_missing)
 datatable(popStats,filter = "top")
