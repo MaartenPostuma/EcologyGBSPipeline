@@ -91,7 +91,7 @@ print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
   theme_pubr()+
   xlab(paste0("PCA 1 (",round(mean(pcaDataSub$PCA1Var),2)*100,"%)"))+
   ylab(paste0("PCA 2 (",round(mean(pcaDataSub$PCA2Var),2)*100,"%)"))+
-  ggtitle(paste0("PCA Max missing = ",max_missing," maf= ",maf," nSNP=",pcaData$nSNPs)))
+  ggtitle(paste0("PCA Max missing = ",max_missing," maf= ",maf," nSNP=",pcaDataSub$nSNPs)))
 
 
 
