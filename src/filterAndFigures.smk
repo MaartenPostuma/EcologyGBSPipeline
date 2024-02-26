@@ -20,7 +20,10 @@ rule makeGDS:
 
 rule makeReport:
     input:
-        pcaPlot=expand("{path}/filters/{params}/pcaPlot.tsv",path=config["outputDir"],params=paramspace.instance_patterns), 
+        iMissing=expand('{path}/filters/missingIndvs.imiss',path=config["outputDir"]),
+        pcaPlot=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"],params=paramspace.instance_patterns),
+        treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
+        treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"]) 
     output:
         report_out=expand("{path}/report.html",path=config["outputDir"])
     params:
@@ -115,7 +118,7 @@ rule combineTreeData:
         treeSegments=expand("{path}/filters/{params}/treeSegments.tsv",path=config["outputDir"],params=paramspace.instance_patterns)
     output:
         treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
-        treeSegments=expand("{path}/filters/treeSegments.tsv",path=config["outputDir"])
+        treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"])
     shell:
         """
         cat <(cat {input.treeLabels} | head -n 1) <(cat {input.treeLabels} | grep -v sample.id)  > {output.treeLabels}
