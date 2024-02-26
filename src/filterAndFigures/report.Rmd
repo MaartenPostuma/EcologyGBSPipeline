@@ -130,7 +130,7 @@ popStatsSub[-1]<-round(popStatsSub[-1],digit=2)
 tableList<-list()
 tableList[[1]]<-datatable(popStats[popStats$max_missing==max_missing&popStats$maf==maf,])
 
-htmltools::tagList(lapply(tableList,print))
+print(htmltools::tagList(lapply(tableList,print)))
 }
 }
 ```
