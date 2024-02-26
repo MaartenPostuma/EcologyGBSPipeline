@@ -91,3 +91,32 @@ rule combinePCAData:
         pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"])
     shell:
         "cat <(cat {input.pcaData} | head -n 1) <(cat {input.pcaData} | grep -v sample.id)  > {output.pcaDataAll}"
+
+
+rule makeTreeData:
+    input:
+        gds=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.wildcard_pattern),
+        popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv",path=config["outputDir"]),
+        popmap=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
+    output:
+        treeLabels=expand("{path}/filters/{params}/treeLabels.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern),
+        treeSegments=expand("{path}/filters/{params}/treeSegments.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+    conda:
+        "env/R.yaml"
+    params:
+        outputDir=expand("{path}/filters/",path=config["outputDir"]),
+    shell:
+        "Rscript src/filterAndFigures/pca.R {input.popmapSNPFilter} {input.gds} {input.popmap} {output.treeLabels} {output.treeSegments}"
+
+rule combineTreeData:
+    input:
+        treeLabels=expand("{path}/filters/{params}/treeLabels.tsv",path=config["outputDir"],params=paramspace.instance_patterns),
+        treeSegments=expand("{path}/filters/{params}/treeSegments.tsv",path=config["outputDir"],params=paramspace.instance_patterns)
+    output:
+        treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
+        treeSegments=expand("{path}/filters/treeSegments.tsv",path=config["outputDir"])
+    shell:
+        """
+        cat <(cat {input.treeLabels} | head -n 1) <(cat {input.treeLabels} | grep -v sample.id)  > {output.treeLabels}
+        cat <(cat {input.treeSegments} | head -n 1) <(cat {input.treeSegments} | grep -v sample.id)  > {output.treeSegments}
+        """

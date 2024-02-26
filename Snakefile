@@ -56,6 +56,8 @@ if config["mode"]== "Denovo":
             gds=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.instance_patterns),
             pcaData=expand("{path}/filters/{params}/pcaPlot.tsv",path=config["outputDir"],params=paramspace.instance_patterns),
             pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"]),
+            treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
+            treeSegments=expand("{path}/filters/treeSegments.tsv",path=config["outputDir"]),
             report_out=expand("{path}/report.html",path=config["outputDir"])
 
 
