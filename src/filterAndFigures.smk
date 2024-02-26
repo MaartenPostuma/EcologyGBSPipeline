@@ -137,12 +137,13 @@ rule makePopData:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
     shell:
         """
-        paste <(cat {input.sumstats} | grep -v positions | sed '/Poly/q' | grep -v "Poly" | cut -f1,2,9,15,21,24) <(cat {input.sumstats} | sed -n '/Poly/,$p' | cut -f 3,4,5) | sed 's/#//' > {output.popStats}
+        paste <(cat {input.sumstats} | grep -v positions | sed '/Poly/q' | grep -v "Poly" | cut -f1,2,9,15,21,24) <(cat {input.sumstats} | sed -n '/Poly/,$p' | cut -f 3,4,5) | sed 's/# Pop ID/pop/' > {output.popStats}
         """
 
 rule combinePopData:
     input:
-        popStats=expand("{path}/filters/{params}/popStats.tsv",path=config["outputDir"],params=paramspace.instance_patterns)
+        popStats=expand("{path}/filters/{params}/popStats.tsv",path=config["outputDir"],params=paramspace.instance_patterns),
+        popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv",path=config["outputDir"]),
     output:
         popStats=expand("{path}/filters/popStatsAll.tsv",path=config["outputDir"])
     conda:
@@ -151,5 +152,5 @@ rule combinePopData:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
     shell:
         """
-        Rscript src/filterAndFigures/popData.R {input.popStats} {output.popStats}
+        Rscript src/filterAndFigures/popData.R {output.popStats} {input.popmapSNPFilter} {input.popStats} 
         """

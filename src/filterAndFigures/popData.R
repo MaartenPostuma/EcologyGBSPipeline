@@ -1,7 +1,10 @@
 args = commandArgs(trailingOnly=TRUE)
 
-fileList<-args[-length(args)]
+fileList<-args[-c(1,2)]
 output<-args[length(args)]
+dataPop<-read.table(args[1],h=T)
+output<-args[args[2]]
+
 
 listOfFiles<-list()
 for(i in 1:length(fileList)){
@@ -21,3 +24,4 @@ listOfFiles[[i]]<-read.table(file,h=T)
 }
 
 popStatsAll<-do.call(rbind,listOfFiles)
+write.table(popStatsAll,output,row.names=F)
