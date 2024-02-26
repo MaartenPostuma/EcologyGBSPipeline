@@ -68,7 +68,7 @@ for(i in 1:length(unique(pcaData$maf))){
   
 maf<-unique(pcaData$maf)[i]
 cat("\n")
-cat(paste0("##### maf=",maf,"\n")  
+cat(paste0("##### maf=",maf,"\n"))  
 
 pcaDataSub<-pcaData[pcaData$max_missing==0.00001&pcaData$maf==maf,]  
 print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
@@ -81,22 +81,5 @@ print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
 
 
 
-}
-```
-
-
-
-```{r test}
-
-varnames <- c("A", "B", "C")
-vardesc <- c("A is this.", "B is this.", "C is this.")
-df <- data.frame(varnames, vardesc, stringsAsFactors = FALSE)
-
-for(i in 1:nrow(df)) {
-  cat("\n")
-  cat("#####", df$varnames[i], "\n")
-  cat("Description:", "\n")
-  cat(df$vardesc[i], "\n")
-  cat("\n")
 }
 ```
