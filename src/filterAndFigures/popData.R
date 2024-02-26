@@ -18,7 +18,7 @@ mafString<-splittedPath[grep("maf~",splittedPath)]
 popDataTemp<-read.table(file,h=T)
 popDataTemp$max_missing<-sub("^.*~","",max_missingString)
 popDataTemp$maf<-sub("^.*~","",mafString)
-popDataTemp$percPoly<-(popDataTemp$Polymorphic_Sites/popDataTemp$Variant_sites)*100
+popDataTemp$percPoly<-(popDataTemp$Polymorphic_Sites/popDataTemp$Variant_Sites)*100
 listOfFiles[[i]]<-read.table(file,h=T)
 }
 
