@@ -109,7 +109,7 @@ treeLabels<-treeLabels[treeLabels$max_missing==max_missing&treeLabels$maf==maf,]
 
 ggplot(treeSegments) + 
   geom_segment(aes(x = x, y = y, xend = xend, yend=yend))+
-  theme_pubr()+coord_cartesian(ylim=c(-3,max(dend_data$segment$y)*1.15))+
+  theme_pubr()+coord_cartesian(ylim=c(-3,max(treeSegments$y)*1.15))+
   geom_text(data = treeLabels, aes(x, y, label = label,col=metaPop),
             hjust = 1, angle = 90, size = 5)+
   xlab("")+
