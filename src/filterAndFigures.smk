@@ -121,6 +121,6 @@ rule combineTreeData:
         treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"])
     shell:
         """
-        cat <(cat {input.treeLabels} | head -n 1) <(cat {input.treeLabels} | grep -v sample.id)  > {output.treeLabels}
-        cat <(cat {input.treeSegments} | head -n 1) <(cat {input.treeSegments} | grep -v sample.id)  > {output.treeSegments}
+        cat <(cat {input.treeLabels} | head -n 1) <(cat {input.treeLabels} | grep -v max_missing)  > {output.treeLabels}
+        cat <(cat {input.treeSegments} | head -n 1) <(cat {input.treeSegments} | grep -v max_missing)  > {output.treeSegments}
         """
