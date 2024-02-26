@@ -1,9 +1,8 @@
 args = commandArgs(trailingOnly=TRUE)
 
 fileList<-args[-c(1,2)]
-output<-args[length(args)]
-dataPop<-read.table(args[1],h=T)
-output<-args[args[2]]
+dataPop<-read.table(args[2],h=T)
+output<-args[1]
 
 
 listOfFiles<-list()
