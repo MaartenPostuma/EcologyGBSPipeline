@@ -16,12 +16,12 @@ nSNPs<-length(snp.id)
 diss<-snpgdsDiss(genofile)
 
 #This might have to do to with the practice dataSet will remove for real thing
-checkForbrokenInds<-which(is.na(diss$diss))[1]
-diss$diss<-diss$diss[-checkForbrokenInds,-checkForbrokenInds]
-diss$sample.id<-diss$sample[-checkForbrokenInds]
-checkForBrokenInds2<-which(!complete.cases(diss$diss))
-diss$diss<-diss$diss[-checkForBrokenInds2,-checkForBrokenInds2]
-diss$sample.id<-diss$sample[-checkForBrokenInds2]
+#checkForbrokenInds<-which(is.na(diss$diss))[1]
+#diss$diss<-diss$diss[-checkForbrokenInds,-checkForbrokenInds]
+#diss$sample.id<-diss$sample[-checkForbrokenInds]
+#checkForBrokenInds2<-which(!complete.cases(diss$diss))
+#diss$diss<-diss$diss[-checkForBrokenInds2,-checkForBrokenInds2]
+#diss$sample.id<-diss$sample[-checkForBrokenInds2]
 ########################################
 
 hc<-snpgdsHCluster(diss)
