@@ -124,3 +124,32 @@ rule combineTreeData:
         cat <(cat {input.treeLabels} | head -n 1) <(cat {input.treeLabels} | grep -v max_missing)  > {output.treeLabels}
         cat <(cat {input.treeSegments} | head -n 1) <(cat {input.treeSegments} | grep -v max_missing)  > {output.treeSegments}
         """
+
+
+rule makePopData:
+    input:
+        sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+    output:
+        popStats=expand("{path}/filters/{params}/popStats.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+    conda:
+        "env/R.yaml"
+    params:
+        outputDir=expand("{path}/filters/",path=config["outputDir"]),
+    shell:
+        """
+        paste <(cat {input.sumstats} | grep -v positions | sed '/Poly/q' | grep -v "Poly" | cut -f1,2,9,15,21,24) <(cat {input.sumstats} | sed -n '/Poly/,$p' | cut -f 3,4,5) | sed 's/#//' > {output.popStats}
+        """
+
+rule combinePopData:
+    input:
+        popStats=expand("{path}/filters/{params}/popStats.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+    output:
+        popStats=expand("{path}/filters/popStatsAll.tsv",path=config["outputDir"])
+    conda:
+        "env/R.yaml"
+    params:
+        outputDir=expand("{path}/filters/",path=config["outputDir"]),
+    shell:
+        """
+        Rscript src/filterAndFigures/popData.R {input.popStats} {output.popStats}
+        """
