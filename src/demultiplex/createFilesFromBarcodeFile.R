@@ -4,8 +4,7 @@ rm(list=ls())
 args = commandArgs(trailingOnly=TRUE)
 
 
-barcodes<-read.table(args[1],h=T)
-barcodes<-read.table("data/barcodes.txt",h=T)
+barcodes<-read.table(args[1],h=T,sep="\t")
 barcodes$run<-sub("_R1.fq.gz","",barcodes$rawR1)
 
 barcodeStacks<-data.frame(sample=barcodes$sample,
