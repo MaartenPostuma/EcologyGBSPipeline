@@ -49,14 +49,25 @@ The distribution of individual missingness
 
 ```{r fig.cap="Fig.1: Histogram of the fraction of missingness across individuals, red line indicates the cutoff used in filtering step 2"}
 indCoverage<-read.table(paste0(params$args[1],"filters/missingIndvs.imiss"),h=T)
-cutOff<-as.numeric(system("cat config.yaml | grep 'individual_missingness'| cut -f2 -d :"),intern=T)
-numberOfIndividuals<-system(paste0("cat ",params$args[1],"/stacksFiles/popmapFiltered.tsv"),intern=T)
+cutOff<-as.numeric(system("cat config.yaml | grep 'individual_missingness'| cut -f2 -d :",intern=T))
+if(cutOff==0.0){
+  cutOff<-0.8
+}
+popMapFilter<-read.table(paste0(params$args[1],"/stacksFiles/popmapFiltered.tsv"))
+numberOfIndividuals<-nrow(popMapFilter)
+popmap<-read.table(paste0(params$args[1],"/stacksFiles/popmap.tsv"))
+
 ggplot(indCoverage,aes(x=F_MISS))+geom_histogram(col="black",fill="lightblue",binwidth=0.025)+
-  ggtitle(numberOfIndividuals)+ylab("fraction missing")+
+  ggtitle(paste0(numberOfIndividuals,"out of ",nrow(popmap)))+ylab("fraction missing")+
   theme_light()+geom_vline(xintercept=cutOff,col="red")
 
 ```
 
+Below is a list of the samples that were excluded from the analysis
+```{r}
+popmap$V1[!popmap$V1%in%popMapFilter$V1]
+
+```
 
 ```{r,message=FALSE,results='asis',error=TRUE, fig.cap=paste("")}
 parameters<-read.table("src/filterAndFigures/paramTest.tsv",h=T)
