@@ -60,14 +60,38 @@ ggplot(indCoverage,aes(x=F_MISS))+geom_histogram(col="black",fill="lightblue",bi
 
 
 ## Max missing 0 {.tabset .tabset-fade .tabset-pills}
-#### PCA
+### PCA {.tabset .tabset-fade .tabset-pills}
 
-```{r,message=FALSE,results='hide',error=TRUE, fig.cap=paste("PCA of filter8 max missing =")}
+```{r,message=FALSE,results='asis',error=TRUE, fig.cap=paste("PCA of filter8 max missing =")}
 pcaData<-read.table(paste0(params$args[1],"filters/pcaAll.tsv"),h=T)
 for(i in 1:length(unique(pcaData$maf))){
+cat("\n\n#### ", maf, "\n")
   
 maf<-unique(pcaData$maf)[i]
-cat("\n\n### ", maf, "\n")
+
+pcaDataSub<-pcaData[pcaData$max_missing==0.00001&pcaData$maf==maf,]  
+print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
+  geom_point()+
+  geom_text_repel()+
+  theme_pubr()+
+  xlab(paste0("PCA 1 (",round(mean(pcaDataSub$PCA1Var),2)*100,"%)"))+
+  ylab(paste0("PCA 2 (",round(mean(pcaDataSub$PCA2Var),2)*100,"%)"))+
+  ggtitle(paste0("Max missing = 0.001, maf= ",maf," nSNP=",pcaData$nSNPs)))
+
+
+
+}
+```
+
+
+### Clusters {.tabset .tabset-fade .tabset-pills}
+
+```{r,message=FALSE,results='asis',error=TRUE, fig.cap=paste("PCA of filter8 max missing =")}
+pcaData<-read.table(paste0(params$args[1],"filters/pcaAll.tsv"),h=T)
+for(i in 1:length(unique(pcaData$maf))){
+cat("\n\n#### ", maf, "\n")
+  
+maf<-unique(pcaData$maf)[i]
 
 pcaDataSub<-pcaData[pcaData$max_missing==0.00001&pcaData$maf==maf,]  
 print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
