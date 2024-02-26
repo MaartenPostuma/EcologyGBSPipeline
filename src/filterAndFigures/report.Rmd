@@ -127,8 +127,8 @@ for(i in 1:length(unique(parameters$maf))){
 popStatsSub<-popStats[popStats$max_missing==max_missing&popStats$maf==maf,]
 
 popStatsSub[-1]<-round(popStatsSub[-1],digit=2) 
-print(popStatsSub)
-print(datatable(popStatsSub))
+
+htmltools::tagList(datatable(popStatsSub))
 }
 }
 ```
