@@ -67,8 +67,7 @@ pcaData<-read.table(paste0(params$args[1],"filters/pcaAll.tsv"),h=T)
 for(i in 1:length(unique(pcaData$maf))){
   
 maf<-unique(pcaData$maf)[i]
-cat("\n")
-cat(paste0("##### maf=",maf,"\n"))  
+cat("\n\n### ", maf, "\n")
 
 pcaDataSub<-pcaData[pcaData$max_missing==0.00001&pcaData$maf==maf,]  
 print(ggplot(pcaDataSub,aes(x=PCA1,y=PCA2,col=metaPop,label=pop))+
