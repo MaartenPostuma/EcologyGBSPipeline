@@ -1,7 +1,7 @@
 args = commandArgs(trailingOnly=TRUE)
 
-fileList<-args[-nrow(args)]
-output<-args[nrow(args)]
+fileList<-args[-length(args)]
+output<-args[length(args)]
 
 listOfFiles<-list()
 for(i in 1:length(fileList)){
