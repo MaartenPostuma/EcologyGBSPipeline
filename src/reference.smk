@@ -10,82 +10,82 @@ rule map_bwa:
     shell:
         "bwa-mem2 mem -t {threads} {input.ref} {input.samplesR1} {input.samplesR2} | samtools view -buS - > {output.bam}"
 
-# rule sort_picard:
-#     input:
-#         bam=expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["outputDir"]),
-#     output:
-#         sortedBam=expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["outputDir"])
-#     conda:
-#         "env/picard.yaml"
-#     shell:
-#         "picard SortSam -I {input.bam} -O {output.bam} -SO coordinate"
+rule sort_picard:
+    input:
+        bam=expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["outputDir"]),
+    output:
+        sortedBam=expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["outputDir"])
+    conda:
+        "env/picard.yaml"
+    shell:
+        "picard SortSam -I {input.bam} -O {output.bam} -SO coordinate"
 
-# rule add_RG:
-#     input:
-#         sortedBam=expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["outputDir"])
-#     output:
-#         RGBam=expand("{path}/refMapping/{{samples}}.bam",path=config["outputDir"])
-#     params:
-#         sample="{{sample}}"
-#     conda:
-#         "env/picard.yaml"
-#     shell:
-#         """
-#         picard AddOrReplaceReadGroups \
-#         I={input.sortedBam}\
-#         O={output.RGBam} \
-#         RGLB={params.sample} \
-#         RGPL=illumina \
-#         RGPU=unit1 \
-#         RGSM={params.sample}
-#         """
+rule add_RG:
+    input:
+        sortedBam=expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["outputDir"])
+    output:
+        RGBam=expand("{path}/refMapping/{{samples}}.bam",path=config["outputDir"])
+    params:
+        sample="{{sample}}"
+    conda:
+        "env/picard.yaml"
+    shell:
+        """
+        picard AddOrReplaceReadGroups \
+        I={input.sortedBam}\
+        O={output.RGBam} \
+        RGLB={params.sample} \
+        RGPL=illumina \
+        RGPU=unit1 \
+        RGSM={params.sample}
+        """
 
-# rule makeBamList:
-#     input:
-#         RGBam=expand("{path}/refMapping/{samples}.bam",path=config["outputDir"],samples=SAMPLES),
-#     output:
-#         bamList=expand("{path}/refMapping/bamList.txt",path=config["outputDir"])
-#     shell:
-#         "ls {input.RGBam} > {output.bamList}"
+rule makeBamList:
+    input:
+        RGBam=expand("{path}/refMapping/{samples}.bam",path=config["outputDir"],samples=SAMPLES),
+    output:
+        bamList=expand("{path}/refMapping/bamList.txt",path=config["outputDir"])
+    shell:
+        "ls {input.RGBam} > {output.bamList}"
   
-# rule indexRef:
-#     input:
-#         ref=expand("{ref}",ref=config["reference"])
-#     output:
-#         refIndex=expand("{ref}.fai",ref=config["reference"])
-#     conda:
-#         "env/samtools.yaml"
-#     shell:
-#         "samtools faidx {input.ref}"
+rule indexRef:
+    input:
+        ref=expand("{ref}",ref=config["reference"])
+    output:
+        refIndex=expand("{ref}.fai",ref=config["reference"])
+    conda:
+        "env/samtools.yaml"
+    shell:
+        "samtools faidx {input.ref}"
 
-# rule indexBam:
-#     input:
-#         RGBam=expand("{path}/refMapping/{{samples}}.bam",path=config["outputDir"]),
-#     output:
-#         RGBamIndex=expand("{path}/refMapping/{{samples}}.bam.bai",path=config["outputDir"]),
-#     conda:
-#         "env/samtools.yaml"
-#     shell:
-#         "samtools index {input.RGBam}"
+rule indexBam:
+    input:
+        RGBam=expand("{path}/refMapping/{{samples}}.bam",path=config["outputDir"]),
+    output:
+        RGBamIndex=expand("{path}/refMapping/{{samples}}.bam.bai",path=config["outputDir"]),
+    conda:
+        "env/samtools.yaml"
+    shell:
+        "samtools index {input.RGBam}"
 
-# rule variantCall:
-#     input:
-#         RGBamIndex=expand("{path}/refMapping/{samples}.bam.bai",path=config["outputDir"],samples=SAMPLES),
-#         refIndex=expand("{ref}.fai",ref=config["reference"]),
-#         ref=expand("{ref}",ref=config["reference"]),
-#         bamList=expand("{path}/refMapping/bamList.txt",path=config["outputDir"])
-#     output:
-#         vcf=expand("{path}/refVCF/output.vcf.gz",path=config["outputDir"])
-#     conda:
-#         "env/freebayes.html"
-#     shell:
-#         """
-#         freebayes-parallel <(fasta_generate_regions.py {input.refIndex} 100000) 6 -f {input.ref}  \
-#             --bam-list {input.bamList} \
-#             --no-partial-observations \
-#             --report-genotype-likelihood-max \
-#             --genotype-qualities \
-#             --min-coverage 0 \
-#             --min-base-quality 1 \
-#             --min-mapping-quality 10 | bgzip -c > {output.vcf}
-#         """   
+rule variantCall:
+    input:
+        RGBamIndex=expand("{path}/refMapping/{samples}.bam.bai",path=config["outputDir"],samples=SAMPLES),
+        refIndex=expand("{ref}.fai",ref=config["reference"]),
+        ref=expand("{ref}",ref=config["reference"]),
+        bamList=expand("{path}/refMapping/bamList.txt",path=config["outputDir"])
+    output:
+        vcf=expand("{path}/refVCF/output.vcf.gz",path=config["outputDir"])
+    conda:
+        "env/freebayes.html"
+    shell:
+        """
+        freebayes-parallel <(fasta_generate_regions.py {input.refIndex} 100000) 6 -f {input.ref}  \
+            --bam-list {input.bamList} \
+            --no-partial-observations \
+            --report-genotype-likelihood-max \
+            --genotype-qualities \
+            --min-coverage 0 \
+            --min-base-quality 1 \
+            --min-mapping-quality 10 | bgzip -c > {output.vcf}
+        """   
