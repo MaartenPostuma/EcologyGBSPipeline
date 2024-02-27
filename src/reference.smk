@@ -6,7 +6,7 @@ rule map_bwa:
     output:
         bam=expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["outputDir"]),
     threads:
-        THREADSPERRUN
+        workflow.cores/5
     conda:
         "env/bwa-mem.yaml"
     shell:
