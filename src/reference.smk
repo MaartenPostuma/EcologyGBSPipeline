@@ -88,7 +88,7 @@ rule variantCall:
     output:
         vcf=expand("{path}/refVCF/output.vcf.gz",path=config["outputDir"])
     conda:
-        "env/freebayes.html"
+        "env/freebayes.yaml"
     shell:
         """
         freebayes-parallel <(fasta_generate_regions.py {input.refIndex} 100000) 6 -f {input.ref}  \
