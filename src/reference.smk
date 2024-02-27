@@ -92,7 +92,7 @@ rule variantCall:
         "env/freebayes.yaml"
     shell:
         """
-        freebayes-parallel <(fasta_generate_regions.py {input.refIndex} 100000) workflow.cores -f {input.ref}  \
+        freebayes-parallel <(fasta_generate_regions.py {input.refIndex} 100000) {threads} -f {input.ref}  \
             --bam-list {input.bamList} \
             --no-partial-observations \
             --report-genotype-likelihood-max \
