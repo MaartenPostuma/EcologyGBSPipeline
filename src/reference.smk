@@ -71,7 +71,7 @@ rule indexBam:
 
 rule variantCall:
     input:
-        RGBamIndex=expand("{path}/refMapping/{{samples}}.bam.bai",path=config["outputDir"]),
+        RGBamIndex=expand("{path}/refMapping/{samples}.bam.bai",path=config["outputDir"],samples=SAMPLES),
         refIndex=expand("{ref}.fai",ref=config["reference"]),
         ref=expand("{ref}",ref=config["reference"]),
         bamList=expand("{path}/refMapping/bamList.txt",path=config["outputDir"])
