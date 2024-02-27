@@ -1,8 +1,19 @@
+rule make_bwa_mem_index:
+    input:
+        ref=expand("{ref}",ref=config["reference"])
+    output:
+        refIndex=expand("{ref}.bwt.2bit.64",ref=config["reference"])
+    conda:
+        "env/bwa-mem.yaml"
+    shell:
+        "bwa-mem2 index {input.ref}"
+
 rule map_bwa:
     input:
         samplesR1=expand("{path}/demultiplex/samples/{{samples}}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
         samplesR2=expand("{path}/demultiplex/samples/{{samples}}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
-        ref=expand("{ref}",ref=config["reference"])
+        ref=expand("{ref}",ref=config["reference"]),
+        refIndex=expand("{ref}.bwt.2bit.64",ref=config["reference"])
     output:
         bam=expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["outputDir"]),
     threads:
