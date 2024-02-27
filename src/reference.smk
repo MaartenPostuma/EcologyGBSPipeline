@@ -49,6 +49,7 @@ rule add_RG:
         RGPL=illumina \
         RGPU=unit1 \
         RGSM={wildcards.samples}
+        RGID={wildcards.samples}
         """
 
 rule makeBamList:
