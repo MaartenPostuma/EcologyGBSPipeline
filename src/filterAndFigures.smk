@@ -79,7 +79,7 @@ if config["mode"]== "Denovo":
 if config["mode"]== "Reference": 
     rule step_1:
         input:
-            vcf=expand("{path}/refVCF/output.vcf.gz",path=config["outputDir"])
+            vcf=expand("{path}/refVCF/output.vcf.gz",path=config["outputDir"]),
             popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
         output:
             vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
