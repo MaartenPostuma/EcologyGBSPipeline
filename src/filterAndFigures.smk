@@ -90,7 +90,8 @@ if config["mode"]== "Reference":
             outputDir=expand("{path}/filters/",path=config["outputDir"]),
             indMissing=individual_missingness,
         shell:
-            """vcftools --gzvcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs
+            """
+            vcftools --gzvcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs
             mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/lowDP.step1.indv
             mawk '$5 < {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/highDP.step1.indv
             cat {input.popmap} | grep -f  {params.outputDir}/highDP.step1.indv > {output.vcf}
