@@ -89,9 +89,9 @@ rule indexRef:
 
 rule indexBam:
     input:
-        RGBam=expand("{path}/refMapping/{{samples}}.bam",path=config["outputDir"]),
+        RGBam=expand("{path}/refBams/{{samples}}.bam",path=config["outputDir"]),
     output:
-        RGBamIndex=expand("{path}/refMapping/{{samples}}.bam.bai",path=config["outputDir"]),
+        RGBamIndex=expand("{path}/refBams/{{samples}}.bam.bai",path=config["outputDir"]),
     conda:
         "env/samtools.yaml"
     shell:
@@ -99,10 +99,10 @@ rule indexBam:
 
 rule variantCall:
     input:
-        RGBamIndex=expand("{path}/refMapping/{samples}.bam.bai",path=config["outputDir"],samples=SAMPLES),
+        RGBamIndex=expand("{path}/refBams/{samples}.bam.bai",path=config["outputDir"],samples=SAMPLES),
         refIndex=expand("{ref}.fai",ref=config["reference"]),
         ref=expand("{ref}",ref=config["reference"]),
-        bamList=expand("{path}/refMapping/bamList.txt",path=config["outputDir"])
+        bamList=expand("{path}/refBams/bamList.txt",path=config["outputDir"])
     output:
         vcf=expand("{path}/refVCF/output.vcf.gz",path=config["outputDir"])
     threads: workflow.cores
