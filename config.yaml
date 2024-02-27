@@ -3,7 +3,7 @@
 #Reference (if your species has a reference genome)
 #Denovo (if your species does not have a reference genome). This will use stacks but if you want to use this correctly (according to Paris 2017/2022) you will first need to run:
 #StacksTest (this generates the plots from the paper to make a decision for which parameters to use in stacks)
-mode: "Denovo"
+mode: "Reference"
 #Input folder #The place where you have the rawReads and the barcode file
 inputDir: "data"
 
@@ -12,6 +12,9 @@ tmpDir: "/scratch/tmp/"
 
 #Output dir, directory where all of the output files will be stored
 outputDir: "results"
+
+#Refrence, the location of the reference
+reference: "/scratch2/maarten/lyrata/ref/ref.fa"
 
 
 #The location of the barcode file 
@@ -29,21 +32,8 @@ barcodeFile: "barcodes.txt"
 #Denovo parameter: The output of the StacksTest run!
 M: 4
 
-#Parameters for the filtering: What are the filtering parameters you want to explore?
- 
-param_filtering:
-  individual_missingness: 0.8
-  max_missing_range: 0.8
-  maf_range: 0.05
-  hwe_range: 0
-  DP_range: 0
-
-hwe_val: 0
-DP_val: 0
-maf_val: 0
-max_missing_val: 0
-
-
+###################
+#Expermt parameters
 
 #Parameters (if you want to do something different) otherwise you can leave these blank
 #Demulitplex parameters: How many oligos are there in your adapters (default = 3)

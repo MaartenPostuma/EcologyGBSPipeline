@@ -62,7 +62,21 @@ if config["mode"]== "Denovo":
             report_out=expand("{path}/report.html",path=config["outputDir"])
 
 
+if config["mode"]== "Reference":
+    include: "src/demultiplex.smk"
+    include: "src/reference/smk"
+    include: "src/filterAndFigures.smk"
 
+
+if config["mode"]== "Reference":
+    rule all:
+        input:
+            DeDuplR1=expand("{path}/demultiplex/clone_filter/{run}_R1.1.fq.gz",path=config["outputDir"],run=RUN),
+            DeDuplR2=expand("{path}/demultiplex/clone_filter/{run}_R2.2.fq.gz",path=config["outputDir"],run=RUN),
+            perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN),
+            samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
+            samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
+            bam=expand("{path}/refMapping/{samples}.bam",path=config["outputDir"],sample=SAMPLES),
 
 
 
