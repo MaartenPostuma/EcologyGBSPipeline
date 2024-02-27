@@ -51,12 +51,29 @@ rule add_RG:
         RGSM={wildcards.samples}
         RGID={wildcards.samples}
         """
-
+rule add_RG2:
+    input:
+        RGBam=expand("{path}/refMapping/{{samples}}.bam",path=config["outputDir"])
+    output:
+        RGBam=expand("{path}/refBams/{{samples}}.bam",path=config["outputDir"])
+    conda:
+        "env/picard.yaml"
+    shell:
+        """
+        picard AddOrReplaceReadGroups \
+        I={input.sortedBam}\
+        O={output.RGBam} \
+        RGLB={wildcards.samples} \
+        RGPL=illumina \
+        RGPU=unit1 \
+        RGSM={wildcards.samples}
+        RGID={wildcards.samples}
+        """
 rule makeBamList:
     input:
-        RGBam=expand("{path}/refMapping/{samples}.bam",path=config["outputDir"],samples=SAMPLES),
+        RGBam=expand("{path}/refBams/{samples}.bam",path=config["outputDir"],samples=SAMPLES),
     output:
-        bamList=expand("{path}/refMapping/bamList.txt",path=config["outputDir"])
+        bamList=expand("{path}/refBams/bamList.txt",path=config["outputDir"])
     shell:
         "ls {input.RGBam} > {output.bamList}"
   
