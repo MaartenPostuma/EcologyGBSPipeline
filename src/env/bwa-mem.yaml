@@ -6,4 +6,5 @@ channels:
   - r
 dependencies: 
   - bwa-mem2
+  - samtools
 prefix: bwa-mem
