@@ -65,7 +65,6 @@ if config["mode"]== "Denovo":
 if config["mode"]== "Reference":
     include: "src/demultiplex.smk"
     include: "src/reference.smk"
-    include: "src/filterAndFigures.smk"
 
 
 if config["mode"]== "Reference":

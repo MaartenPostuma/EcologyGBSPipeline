@@ -43,3 +43,7 @@ param_demultiplex:
 #For the parameter test how many samples do you need. (Default = 20) (See paris et al. 2017 for specifics)
 param_StacksTest:
   nInds: ""
+
+
+param_filtering:
+  individual_missingness: "0.8"

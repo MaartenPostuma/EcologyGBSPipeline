@@ -1,9 +1,7 @@
 configfile: "config.yaml"
 
 
-max_missing_range=config["param_filtering"]["max_missing_range"]
 individual_missingness=config["param_filtering"]["individual_missingness"]
-maf_range=config["param_filtering"]["maf_range"]
 
 
 rule makeGDS:
