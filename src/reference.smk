@@ -78,15 +78,15 @@ rule variantCall:
     output:
         vcf=expand("{path}/refVCF/output.vcf.gz",path=config["outputDir"])
     conda:
-
+        "env/freebayes.html"
     shell:
-    """
-    freebayes-parallel <(fasta_generate_regions.py {input.refIndex} 100000) 6 -f {input.ref}  \
-        --bam-list {input.bamList} \
-        --no-partial-observations \
-        --report-genotype-likelihood-max \
-        --genotype-qualities \
-        --min-coverage 0 \
-        --min-base-quality 1 \
-        --min-mapping-quality 10 | bgzip -c > {output.vcf}
-    """   
+        """
+        freebayes-parallel <(fasta_generate_regions.py {input.refIndex} 100000) 6 -f {input.ref}  \
+            --bam-list {input.bamList} \
+            --no-partial-observations \
+            --report-genotype-likelihood-max \
+            --genotype-qualities \
+            --min-coverage 0 \
+            --min-base-quality 1 \
+            --min-mapping-quality 10 | bgzip -c > {output.vcf}
+        """   
