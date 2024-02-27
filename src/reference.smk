@@ -43,7 +43,7 @@ rule add_RG:
 
 rule makeBamList:
     input:
-        RGBam=expand("{path}/refMapping/{samples}.bam",path=config["outputDir"],sample=SAMPLES),
+        RGBam=expand("{path}/refMapping/{samples}.bam",path=config["outputDir"],samples=SAMPLES),
     output:
         bamList=expand("{path}/refMapping/bamList.txt",path=config["outputDir"])
     shell:
