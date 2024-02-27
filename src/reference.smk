@@ -33,25 +33,25 @@ rule sort_picard:
     shell:
         "picard SortSam -I {input.bam} -O {output.sortedBam} -SO coordinate"
 
-# rule add_RG:
-#     input:
-#         sortedBam=expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["outputDir"])
-#     output:
-#         RGBam=expand("{path}/refMapping/{{samples}}.bam",path=config["outputDir"])
-#     params:
-#         sample="{{sample}}"
-#     conda:
-#         "env/picard.yaml"
-#     shell:
-#         """
-#         picard AddOrReplaceReadGroups \
-#         I={input.sortedBam}\
-#         O={output.RGBam} \
-#         RGLB={params.sample} \
-#         RGPL=illumina \
-#         RGPU=unit1 \
-#         RGSM={params.sample}
-#         """
+rule add_RG:
+    input:
+        sortedBam=expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["outputDir"])
+    output:
+        RGBam=expand("{path}/refMapping/{{samples}}.bam",path=config["outputDir"])
+    params:
+        sample="{{sample}}"
+    conda:
+        "env/picard.yaml"
+    shell:
+        """
+        picard AddOrReplaceReadGroups \
+        I={input.sortedBam}\
+        O={output.RGBam} \
+        RGLB={params.sample} \
+        RGPL=illumina \
+        RGPU=unit1 \
+        RGSM={params.sample}
+        """
 
 # rule makeBamList:
 #     input:
