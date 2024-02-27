@@ -76,12 +76,12 @@ if config["mode"]== "Reference":
             samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
             samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
             bam=expand("{path}/refMapping/firstBam/{samples}.bam",path=config["outputDir"],samples=SAMPLES),
-            vcf=expand("{path}/refVCF/output.vcf.gz",path=config["outputDir"]),
-            pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"]),
-            treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
-            treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"]),
-            popStats=expand("{path}/filters/popStatsAll.tsv",path=config["outputDir"]),
-            report_out=expand("{path}/report.html",path=config["outputDir"])
+            #vcf=expand("{path}/refVCF/output.vcf.gz",path=config["outputDir"]),
+            #pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"]),
+            #treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
+            #treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"]),
+            #popStats=expand("{path}/filters/popStatsAll.tsv",path=config["outputDir"]),
+            #report_out=expand("{path}/report.html",path=config["outputDir"])
 
 
 
