@@ -75,7 +75,7 @@ if config["mode"]== "Reference":
             perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN),
             samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
             samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
-            bam=expand("{path}/refMapping/{samples}.bam",path=config["outputDir"],sample=SAMPLES),
+            bam=expand("{path}/refMapping/{samples}.bam",path=config["outputDir"],samples=SAMPLES),
 
 
 
