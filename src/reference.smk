@@ -39,7 +39,7 @@ rule add_RG:
     output:
         RGBam=expand("{path}/refMapping/{{samples}}.bam",path=config["outputDir"])
     params:
-        sample="{{sample}}"
+        sample="{sample}"
     conda:
         "env/picard.yaml"
     shell:
