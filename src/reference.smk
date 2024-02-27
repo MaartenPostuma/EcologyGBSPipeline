@@ -1,7 +1,7 @@
 rule map_bwa:
     input:
-        samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
-        samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
+        samplesR1=expand("{path}/demultiplex/samples/{{samples}}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
+        samplesR2=expand("{path}/demultiplex/samples/{{samples}}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
         ref=expand("{ref}",ref=config["reference"])
     output:
         bam=expand("{path}/refMapping/firstBam/{samples}.bam",path=config["outputDir"],samples=SAMPLES),
