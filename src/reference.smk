@@ -37,7 +37,7 @@ rule add_RG:
     input:
         sortedBam=expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["outputDir"])
     output:
-        RGBam=expand("{path}/refMapping/{{samples}}.bam",path=config["outputDir"])
+        RGBam=expand("{path}/refMapping/finalBams/{{samples}}.bam",path=config["outputDir"])
     conda:
         "env/picard.yaml"
     shell:
