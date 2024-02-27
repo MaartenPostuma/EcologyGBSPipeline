@@ -51,9 +51,10 @@ rule add_RG:
         RGSM={wildcards.samples}
         RGID={wildcards.samples}
         """
+
 rule add_RG2:
     input:
-        RGBam=expand("{path}/refMapping/{{samples}}.bam",path=config["outputDir"])
+        sortedBam=expand("{path}/refMapping/{{samples}}.bam",path=config["outputDir"])
     output:
         RGBam=expand("{path}/refBams/{{samples}}.bam",path=config["outputDir"])
     conda:
