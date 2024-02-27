@@ -45,10 +45,10 @@ rule add_RG:
         picard AddOrReplaceReadGroups \
         I={input.sortedBam}\
         O={output.RGBam} \
-        RGLB={wildcards.sample} \
+        RGLB={wildcards.samples} \
         RGPL=illumina \
         RGPU=unit1 \
-        RGSM={wildcards.sample}
+        RGSM={wildcards.samples}
         """
 
 # rule makeBamList:
