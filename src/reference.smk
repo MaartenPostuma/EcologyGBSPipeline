@@ -15,7 +15,7 @@ rule map_bwa:
         ref=expand("{ref}",ref=config["reference"]),
         refIndex=expand("{ref}.bwt.2bit.64",ref=config["reference"])
     output:
-        bam=expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["outputDir"]),
+        bam=temp(expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["tmpDir"])),
     threads:
         workflow.cores/5
     conda:
@@ -25,9 +25,9 @@ rule map_bwa:
 
 rule sort_picard:
     input:
-        bam=expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["outputDir"]),
+        bam=expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["tmpDir"]),
     output:
-        sortedBam=expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["outputDir"])
+        sortedBam=temp(expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["tmpDir"]))
     conda:
         "env/picard.yaml"
     shell:
@@ -35,9 +35,9 @@ rule sort_picard:
 
 rule add_RG:
     input:
-        sortedBam=expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["outputDir"])
+        sortedBam=expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["tmpDir"])
     output:
-        RGBam=expand("{path}/refMapping/finalBams/{{samples}}.bam",path=config["outputDir"])
+        RGBam=expand("{path}/refMapping/{{samples}}.bam",path=config["outputDir"])
     conda:
         "env/picard.yaml"
     shell:
