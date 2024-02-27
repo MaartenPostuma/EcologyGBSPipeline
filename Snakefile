@@ -12,7 +12,7 @@ RAWREADSR1 = df.rawR1.str.replace(".fq.gz","",regex=False).unique()
 RAWREADSR2 = df.rawR2.str.replace(".fq.gz","",regex=False).unique()
 RUN = df.rawR1.str.replace("_R1.fq.gz","",regex=False).unique()
 THREADSPERRUN=workflow.cores/RUN.size
-
+MODE=config["mode"]
 from snakemake.utils import Paramspace
 paramspace = Paramspace(pd.read_csv("src/filterAndFigures/paramTest.tsv", sep="\t"))
 
@@ -59,7 +59,7 @@ if config["mode"]== "Denovo":
             treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
             treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"]),
             popStats=expand("{path}/filters/popStatsAll.tsv",path=config["outputDir"]),
-            report_out=expand("{path}/report.html",path=config["outputDir"])
+            report_out=expand("{path}/report{mode}.html",path=config["outputDir"],mode=MODE)
 
 
 if config["mode"]== "Reference":
@@ -82,6 +82,6 @@ if config["mode"]== "Reference":
             treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
             treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"]),
             popStats=expand("{path}/filters/popStatsAll.tsv",path=config["outputDir"]),
-            report_out=expand("{path}/report.html",path=config["outputDir"])
+            report_out=expand("{path}/report{mode}.html",path=config["outputDir"],mode=MODE)
 
 

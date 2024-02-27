@@ -87,11 +87,12 @@ rule variantCall:
         bamList=expand("{path}/refMapping/bamList.txt",path=config["outputDir"])
     output:
         vcf=expand("{path}/refVCF/output.vcf.gz",path=config["outputDir"])
+    threads: workflow.cores
     conda:
         "env/freebayes.yaml"
     shell:
         """
-        freebayes-parallel <(fasta_generate_regions.py {input.refIndex} 100000) 6 -f {input.ref}  \
+        freebayes-parallel <(fasta_generate_regions.py {input.refIndex} 100000) workflow.cores -f {input.ref}  \
             --bam-list {input.bamList} \
             --no-partial-observations \
             --report-genotype-likelihood-max \

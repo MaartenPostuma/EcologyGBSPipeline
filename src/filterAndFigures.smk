@@ -25,7 +25,7 @@ rule makeReport:
         popStats=expand("{path}/filters/popStatsAll.tsv",path=config["outputDir"])
  
     output:
-        report_out=expand("{path}/report.html",path=config["outputDir"])
+        report_out=expand("{path}/report{mode}.html",path=config["outputDir"],mode=MODE)
     params:
         outputDir=expand("{path}/",path=config["outputDir"]),
     conda:
@@ -55,7 +55,6 @@ if config["mode"]== "Denovo":
             mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/lowDP.step1.indv
             mawk '$5 < {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/highDP.step1.indv
             cat {input.popmap} | grep -f  {params.outputDir}/highDP.step1.indv > {output.vcf}
-            mkdir -p {params.outputDir}/finalVCF/
             """
 
 if config["mode"]== "Denovo":
