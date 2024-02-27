@@ -4,7 +4,7 @@ rule map_bwa:
         samplesR2=expand("{path}/demultiplex/samples/{{samples}}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
         ref=expand("{ref}",ref=config["reference"])
     output:
-        bam=expand("{path}/refMapping/firstBam/{samples}.bam",path=config["outputDir"],samples=SAMPLES),
+        bam=expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["outputDir"]),
     conda:
         "env/bwa-mem.yaml"
     shell:
