@@ -7,7 +7,6 @@ rule map_bwa:
         bam=expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["outputDir"]),
     conda:
         "env/bwa-mem.yaml"
-    threads: THREADSPERRUN
     shell:
         """bwa-mem2 mem -t {threads} {input.ref} {input.samplesR1} {input.samplesR2} | samtools view -buS - > {output.bam}"""
 
