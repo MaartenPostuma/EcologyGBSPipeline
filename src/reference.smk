@@ -4,7 +4,7 @@ rule map_bwa:
         samplesR2=expand("{path}/demultiplex/samples/{{samples}}.2.fq.gz",path=config["outputDir"]),
         ref=expand("{ref}",ref=config["reference"])
     output:
-        bam=temp(expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["outputDir"])),
+        bam=expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["outputDir"]),
     conda:
         "env/bwa-mem.yaml"
     threads: THREADSPERRUN
@@ -15,7 +15,7 @@ rule sort_picard:
     input:
         bam=expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["outputDir"]),
     output:
-        sortedBam=temp(expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["outputDir"]))
+        sortedBam=expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["outputDir"])
     conda:
         "env/picard.yaml"
     shell:
