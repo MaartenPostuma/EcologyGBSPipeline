@@ -1,0 +1,9 @@
+name: stacks2.6
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - r
+dependencies: 
+  - picard
+prefix: picard

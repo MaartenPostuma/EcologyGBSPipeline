@@ -36,43 +36,87 @@ rule makeReport:
         mv src/filterAndFigures/report.html {output.report_out}
         '''
 
-#So this does a lot of things 
-rule step_1:
-    input:
-        vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"]),
-        popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
-    output:
-        vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
-        iMissing=expand('{path}/filters/missingIndvs.imiss',path=config["outputDir"])
-    conda:
-        "env/vcftools.yaml"
-    params:
-        outputDir=expand("{path}/filters/",path=config["outputDir"]),
-        indMissing=individual_missingness,
-    shell:
-        """vcftools --vcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs
-        mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/lowDP.step1.indv
-        mawk '$5 < {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/highDP.step1.indv
-        cat {input.popmap} | grep -f  {params.outputDir}/highDP.step1.indv > {output.vcf}
-        mkdir -p {params.outputDir}/finalVCF/
-        """
+#So this does a lot of things
+if config["mode"]== "Denovo": 
+    rule step_1:
+        input:
+            vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"]),
+            popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+        output:
+            vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
+            iMissing=expand('{path}/filters/missingIndvs.imiss',path=config["outputDir"])
+        conda:
+            "env/vcftools.yaml"
+        params:
+            outputDir=expand("{path}/filters/",path=config["outputDir"]),
+            indMissing=individual_missingness,
+        shell:
+            """vcftools --vcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs
+            mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/lowDP.step1.indv
+            mawk '$5 < {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/highDP.step1.indv
+            cat {input.popmap} | grep -f  {params.outputDir}/highDP.step1.indv > {output.vcf}
+            mkdir -p {params.outputDir}/finalVCF/
+            """
 
-rule filter:
-    input:
-        vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"])
-    output:
-        vcf=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
-        sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
-    params:
-        outputDir=expand("{path}",path=config["outputDir"]),
-        parDir=expand("{path}/filters/{params}",path=config["outputDir"],params=paramspace.wildcard_pattern),
-        maf=str(paramspace.wildcard_pattern).split("/")[1].split("~")[1]
-    threads:
-        THREADSPERRUN//1
-    conda:
-        "env/stacks.yaml"
-    shell:
-        "populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --threads {threads}"    
+if config["mode"]== "Denovo":
+    rule filter:
+        input:
+            vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"])
+        output:
+            vcf=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
+            sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+        params:
+            outputDir=expand("{path}",path=config["outputDir"]),
+            parDir=expand("{path}/filters/{params}",path=config["outputDir"],params=paramspace.wildcard_pattern),
+            maf=str(paramspace.wildcard_pattern).split("/")[1].split("~")[1]
+        threads:
+            THREADSPERRUN//1
+        conda:
+            "env/stacks.yaml"
+        shell:
+            "populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --threads {threads}"    
+
+if config["mode"]== "Reference": 
+    rule step_1:
+        input:
+            vcf=expand("{path}/refVCF/output.vcf.gz",path=config["outputDir"])
+            popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+        output:
+            vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
+            iMissing=expand('{path}/filters/missingIndvs.imiss',path=config["outputDir"])
+        conda:
+            "env/vcftools.yaml"
+        params:
+            outputDir=expand("{path}/filters/",path=config["outputDir"]),
+            indMissing=individual_missingness,
+        shell:
+            """vcftools --gzvcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs
+            mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/lowDP.step1.indv
+            mawk '$5 < {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/highDP.step1.indv
+            cat {input.popmap} | grep -f  {params.outputDir}/highDP.step1.indv > {output.vcf}
+            mkdir -p {params.outputDir}/finalVCF/
+            """
+
+
+if config["mode"]== "Reference":
+    rule filter:
+        input:
+            popmap=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
+            vcf=expand("{path}/refVCF/output.vcf.gz",path=config["outputDir"])
+        output:
+            vcf=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
+            sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+        params:
+            outputDir=expand("{path}",path=config["outputDir"]),
+            parDir=expand("{path}/filters/{params}",path=config["outputDir"],params=paramspace.wildcard_pattern),
+            maf=str(paramspace.wildcard_pattern).split("/")[1].split("~")[1]
+        threads:
+            THREADSPERRUN//1
+        conda:
+            "env/stacks.yaml"
+        shell:
+            "populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -V {input.vcf} -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --threads {threads}"    
+
 
 rule makePCAData:
     input:
