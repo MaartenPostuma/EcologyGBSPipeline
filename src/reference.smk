@@ -31,7 +31,7 @@ rule sort_picard:
     conda:
         "env/picard.yaml"
     shell:
-        "picard SortSam -I {input.bam} -O {output.bam} -SO coordinate"
+        "picard SortSam -I {input.bam} -O {output.sortedBam} -SO coordinate"
 
 # rule add_RG:
 #     input:
