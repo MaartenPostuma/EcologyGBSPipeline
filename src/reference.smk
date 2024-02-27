@@ -23,15 +23,15 @@ rule map_bwa:
     shell:
         "bwa-mem2 mem -t {threads} {input.ref} {input.samplesR1} {input.samplesR2} | samtools view -buS - > {output.bam}"
 
-# rule sort_picard:
-#     input:
-#         bam=expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["outputDir"]),
-#     output:
-#         sortedBam=expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["outputDir"])
-#     conda:
-#         "env/picard.yaml"
-#     shell:
-#         "picard SortSam -I {input.bam} -O {output.bam} -SO coordinate"
+rule sort_picard:
+    input:
+        bam=expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["outputDir"]),
+    output:
+        sortedBam=expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["outputDir"])
+    conda:
+        "env/picard.yaml"
+    shell:
+        "picard SortSam -I {input.bam} -O {output.bam} -SO coordinate"
 
 # rule add_RG:
 #     input:
