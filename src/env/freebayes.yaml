@@ -5,5 +5,5 @@ channels:
   - defaults
   - r
 dependencies: 
-  - freebayes=1.3.6
+  - freebayes=1.3.5
 prefix: freebayes
