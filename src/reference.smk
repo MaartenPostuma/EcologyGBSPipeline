@@ -62,8 +62,6 @@ rule merge_sort_bam:
     threads: workflow.cores
     shell:
         "samtools merge - {input.alignmentCalmd} | samtools sort -@ {threads} > {output.mergedBam}"
-
-bamList}"
   
 rule indexRef:
     input:
