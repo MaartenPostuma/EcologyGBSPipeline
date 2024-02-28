@@ -37,7 +37,7 @@ rule add_RG:
     input:
         sortedBam=expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["tmpDir"])
     output:
-        RGBam=expand("{path}/refMapping/{{samples}}.bam",path=config["outputDir"])
+        RGBam=expand("{path}/refMapping/RGBams/{{samples}}.bam",path=config["tmpDir"])
     conda:
         "env/picard.yaml"
     shell:
@@ -52,13 +52,18 @@ rule add_RG:
         RGID={wildcards.samples}
         """
 
-rule makeBamList:
+rule merge_sort_bam:
     input:
-        RGBam=expand("{path}/refMapping/{samples}.bam",path=config["outputDir"],samples=SAMPLES),
+        RGBam=expand("{path}/refMapping/RGBams/{samples}.bam",path=config["tmpDir"],samples=SAMPLES)
     output:
-        bamList=expand("{path}/refMapping/bamList.txt",path=config["outputDir"])
+        mergedBam=expand("{path}/refOut/merged.bam",path=config["outputDir"])
+    conda:
+        "../env/samtools.yaml"
+    threads: workflow.cores
     shell:
-        "ls {input.RGBam} > {output.bamList}"
+        "samtools merge - {input.alignmentCalmd} | samtools sort -@ {threads} > {output.mergedBam}"
+
+bamList}"
   
 rule indexRef:
     input:
@@ -72,9 +77,9 @@ rule indexRef:
 
 rule indexBam:
     input:
-        RGBam=expand("{path}/refMapping/{{samples}}.bam",path=config["outputDir"]),
+        RGBam=expand("{path}/refOut/merged.bam",path=config["outputDir"]),
     output:
-        RGBamIndex=expand("{path}/refMapping/{{samples}}.bam.bai",path=config["outputDir"]),
+        RGBamIndex=expand("{path}/refOut/merged.bam.bai",path=config["outputDir"]),
     conda:
         "env/samtools.yaml"
     shell:
@@ -82,16 +87,16 @@ rule indexBam:
 
 rule variantCall:
     input:
-        RGBamIndex=expand("{path}/refMapping/{samples}.bam.bai",path=config["outputDir"],samples=SAMPLES),
+        RGBamIndex=expand("{path}/refOut/merged.bam.bai",path=config["outputDir"],samples=SAMPLES),
         refIndex=expand("{ref}.fai",ref=config["reference"]),
         ref=expand("{ref}",ref=config["reference"]),
-        bamList=expand("{path}/refMapping/bamList.txt",path=config["outputDir"])
+        bam=expand("{path}/refOut/merged.bam",path=config["outputDir"])
     output:
         vcf=expand("{path}/refVCF/output.vcf.gz",path=config["outputDir"])
-    threads: max(workflow.cores,4096/(len(SAMPLES)*2)-4)
+    threads: min(workflow.cores,4096/(len(SAMPLES)*2)-4)
     conda:
         "env/freebayes.yaml"
     shell:
         """
-        freebayes-parallel <(fasta_generate_regions.py {input.refIndex} 100000) {threads} -f {input.ref} --bam-list {input.bamList} --no-partial-observations --report-genotype-likelihood-max --genotype-qualities --min-coverage 0 --min-base-quality 1 --min-mapping-quality 10 | bgzip -c > {output.vcf}
+        freebayes-parallel <(fasta_generate_regions.py {input.refIndex} 100000) {threads} -f {input.ref} {input.bam} --no-partial-observations --report-genotype-likelihood-max --genotype-qualities --min-coverage 0 --min-base-quality 1 --min-mapping-quality 10 | bgzip -c > {output.vcf}
         """   

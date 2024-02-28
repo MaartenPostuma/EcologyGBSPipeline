@@ -85,3 +85,27 @@ if config["mode"]== "Reference":
             report_out=expand("{path}/report{mode}.html",path=config["outputDir"],mode=MODE)
 
 
+if config["mode"]== "ReportReference":
+    rule all:
+        input:
+            vcf=expand("{path}/refVCF/output.vcf.gz",path=config["outputDir"]),
+            pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"]),
+            treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
+            treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"]),
+            popStats=expand("{path}/filters/popStatsAll.tsv",path=config["outputDir"]),
+            report_out=expand("{path}/report{mode}.html",path=config["outputDir"],mode=MODE)
+
+
+if config["mode"]== "ReportDenovo":
+    rule all:
+        input:
+            vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"]),
+            vcfFilt=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.instance_patterns),
+            sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.instance_patterns),
+            gds=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.instance_patterns),
+            pcaData=expand("{path}/filters/{params}/pcaPlot.tsv",path=config["outputDir"],params=paramspace.instance_patterns),
+            pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"]),
+            treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
+            treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"]),
+            popStats=expand("{path}/filters/popStatsAll.tsv",path=config["outputDir"]),
+            report_out=expand("{path}/report{mode}.html",path=config["outputDir"],mode=MODE)
