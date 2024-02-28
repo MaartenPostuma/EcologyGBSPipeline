@@ -48,7 +48,7 @@ rule add_RG:
         RGLB={wildcards.samples} \
         RGPL=illumina \
         RGPU=unit1 \
-        RGSM={wildcards.samples}
+        RGSM={wildcards.samples} \
         RGID={wildcards.samples}
         """
 
