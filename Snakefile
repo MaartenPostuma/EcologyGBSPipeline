@@ -4,9 +4,9 @@ import os
 import random
 projectName=random.randint(1,1000000) #To ensure non overlapping tmp directories
 
-df = pd.read_csv(os.path.join("data/barcodes.txt"), sep='\t', dtype="object").set_index('sample')
+#df = pd.read_csv(os.path.join("data/barcodes.txt"), sep='\t', dtype="object").set_index('sample')
 
-#df = pd.read_csv(os.path.join(config["inputDir"],config["barcodeFile"]), sep='\t', dtype="object").set_index('sample')
+df = pd.read_csv(os.path.join(config["inputDir"],config["barcodeFile"]), sep='\t', dtype="object").set_index('sample')
 SAMPLES = df.index
 RAWREADSR1 = df.rawR1.str.replace(".fq.gz","",regex=False).unique()
 RAWREADSR2 = df.rawR2.str.replace(".fq.gz","",regex=False).unique()

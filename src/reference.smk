@@ -88,7 +88,7 @@ rule variantCall:
         bamList=expand("{path}/refMapping/bamList.txt",path=config["outputDir"])
     output:
         vcf=expand("{path}/refVCF/output.vcf.gz",path=config["outputDir"])
-    threads: max(workflow.cores,4096/(len(SAMPLES)*2))
+    threads: max(workflow.cores,4096/(len(SAMPLES)*2)-4)
     conda:
         "env/freebayes.yaml"
     shell:
