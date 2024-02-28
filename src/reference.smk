@@ -58,7 +58,7 @@ rule merge_sort_bam:
     output:
         mergedBam=expand("{path}/refOut/merged.bam",path=config["outputDir"])
     conda:
-        "../env/samtools.yaml"
+        "env/samtools.yaml"
     threads: workflow.cores
     shell:
         "samtools merge - {input.RGBam} | samtools sort -@ {threads} > {output.mergedBam}"
