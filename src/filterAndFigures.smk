@@ -78,7 +78,7 @@ if config["mode"]== "Denovo":
 if config["mode"]== "Reference": 
     rule step_1:
         input:
-            vcf=expand("{path}/refOut/output.vcf.gz",path=config["outputDir"]),
+            vcf=expand("{path}/refOut/populations.vcf.gz",path=config["outputDir"]),
             popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
         output:
             vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
@@ -102,7 +102,7 @@ if config["mode"]== "Reference":
     rule filter:
         input:
             popmap=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
-            vcf=expand("{path}/refOut/output.vcf.gz",path=config["outputDir"])
+            vcf=expand("{path}/refOut/populations.vcf.gz",path=config["outputDir"])
         output:
             vcf=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
             sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
