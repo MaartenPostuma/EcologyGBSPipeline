@@ -90,7 +90,7 @@ rule variantCall:
         ref=expand("{ref}",ref=config["reference"]),
         bam=expand("{path}/refOut/merged.bam",path=config["outputDir"])
     output:
-        vcf=expand("{path}/refVCF/output.vcf.gz",path=config["outputDir"])
+        vcf=expand("{path}/refOut/populations.vcf.gz",path=config["outputDir"])
     threads: min(workflow.cores,4096/(len(SAMPLES)*2)-4)
     conda:
         "env/freebayes.yaml"
