@@ -10,7 +10,7 @@ colnames(popmap)<-c("sample.id","pop")
 
 snp.id<-read.gdsn(index.gdsn(genofile,"snp.id"))
 nSNPs<-length(snp.id)
-pca <- snpgdsPCA(genofile, snp.id=snp.id)
+pca <- snpgdsPCA(genofile, snp.id=snp.id,autosome.only=F)
 pcavar<-pca$varpro/sum(pca$varpro,na.rm=T)
 pcaPlot <- data.frame(sample.id = pca$sample.id,
                   PCA1 = pca$eigenvect[,1],    # the first eigenvector

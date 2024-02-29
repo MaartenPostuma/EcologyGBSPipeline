@@ -13,7 +13,7 @@ colnames(popmap)<-c("sample.id","pop")
 
 snp.id<-read.gdsn(index.gdsn(genofile,"snp.id"))
 nSNPs<-length(snp.id)
-diss<-snpgdsDiss(genofile)
+diss<-snpgdsDiss(genofile,autosome.only=F)
 
 #This might have to do to with the practice dataSet will remove for real thing
 #checkForbrokenInds<-which(is.na(diss$diss))[1]
