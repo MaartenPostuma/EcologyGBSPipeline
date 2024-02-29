@@ -50,7 +50,9 @@ The distribution of individual missingness
 
 ```{r fig.cap="Fig.1: Histogram of the fraction of missingness across individuals, red line indicates the cutoff used in filtering step 2"}
 indCoverage<-read.table(paste0(params$args[1],"filters/missingIndvs.imiss"),h=T)
-cutOff<-as.numeric(system("cat config.yaml | grep 'individual_missingness'| cut -f2 -d :",intern=T))
+rawCutOff<-system("cat config.yaml | grep 'individual_missingness'| cut -f2 -d :",intern=T)
+
+cutOff<-as.numeric(gsub("[^0-9.-]", "", rawCutOff))
 if(cutOff==0.0){
   cutOff<-0.8
 }
