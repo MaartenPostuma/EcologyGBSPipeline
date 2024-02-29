@@ -69,7 +69,7 @@ if config["mode"]== "Denovo":
             parDir=expand("{path}/filters/{params}",path=config["outputDir"],params=paramspace.wildcard_pattern),
             maf=str(paramspace.wildcard_pattern).split("/")[1].split("~")[1]
         threads:
-            THREADSPERRUN//1
+            4
         conda:
             "env/stacks.yaml"
         shell:
@@ -111,7 +111,7 @@ if config["mode"]== "Reference":
             parDir=expand("{path}/filters/{params}",path=config["outputDir"],params=paramspace.wildcard_pattern),
             maf=str(paramspace.wildcard_pattern).split("/")[1].split("~")[1]
         threads:
-            THREADSPERRUN//1
+            4
         conda:
             "env/stacks.yaml"
         shell:
