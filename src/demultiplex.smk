@@ -77,7 +77,7 @@ rule moveDemultiplexFiles:
         inputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"]),
         outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"]),
         log=expand("{path}/logs/",path=config["outputDir"])
-        params=expand("{{sample}}")
+        params="{samples}"
     output:
         samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
         samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES)
