@@ -16,8 +16,8 @@ def getParam_oligo(param_oligo):
 rule clone_filter:
     input:
         barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"]),
-        R1=expand("{path}/{{run}}_R1.fq.gz",path=config["inputDir"],R1=RUN),
-        R2=expand("{path}/{{run}}_R2.fq.gz",path=config["inputDir"],R2=RUN)
+        R1=expand("{path}/{{run}}_R1.fq.gz",path=config["inputDir"]),
+        R2=expand("{path}/{{run}}_R2.fq.gz",path=config["inputDir"])
     params:
         outputdir=expand("{path}/demultiplex", path=config["outputDir"]),
         param_oligo=getParam_oligo(param_oligo)
@@ -77,6 +77,7 @@ rule moveDemultiplexFiles:
         inputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"]),
         outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"]),
         log=expand("{path}/logs/",path=config["outputDir"])
+        params=expand("{{sample}}")
     output:
         samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
         samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES)
