@@ -58,29 +58,39 @@ rule process_radtags:
     input:
         barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"], bar=config["barcodeFile"]),
         R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
-        R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"])
+        R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
     params:
-        outputDir=expand("{path}/demultiplex/logs/{{run}}/",path=config["outputDir"])
+        outputDir=expand("{path}/demultiplex/logs/{{run}}/",path=config["outputDir"]),
+        f=lambda w: expand("{sample}.fastq.gz", sample=LANES[w.lane])
+
     conda:
         "env/stacks.yaml"
     threads: THREADSPERRUN//1
     output:
-        log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.clone_filter.log",path=config["outputDir"])
+        log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.clone_filter.log",path=config["outputDir"]),
+        direct=directory(expand("{path}/demultiplex/logs/{{run}}/",path=config["outputDir"]))
+
     shell:
         "process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads}"
 
 #This moves all samples into the demultiplex/samples directory
-rule moveDemultiplexFiles:
-    input:
-        log=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN)
-    params:
-        inputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"]),
-        outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"]),
-        log=expand("{path}/logs/",path=config["outputDir"])
-    output:
-        samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
-        samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES)
-    shell:
-        """
-        mv {params.inputDir}/*/*.fq.gz {params.outputDir}/
-        """
+if DUPES==False:
+    rule moveDemultiplexFiles:
+        input:
+            log=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN)
+        params:
+            inputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"]),
+            outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"]),
+            log=expand("{path}/logs/",path=config["outputDir"])
+        output:
+            samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
+            samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES)
+        shell:
+            """
+            mv {params.inputDir}/*/*.fq.gz {params.outputDir}/
+            """
+
+if DUPES==TRUE:
+    rule moveDemultiplexFiles:
+        input:
+            lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
