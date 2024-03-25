@@ -90,7 +90,12 @@ if DUPES==False:
             mv {params.inputDir}/*/*.fq.gz {params.outputDir}/
             """
 
-if DUPES==TRUE:
+if DUPES==True:
     rule moveDemultiplexFiles:
         input:
-            lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
+            lambda w: f"{path}/demultiplex/logs/{LANESAMPLE[w.sample]}",
+        output:
+            samplesR1=expand("{path}/demultiplex/samples/{sample}.1.fq.gz",path=config["outputDir"]),
+            samplesR2=expand("{path}/demultiplex/samples/{sample}.2.fq.gz",path=config["outputDir"])
+        shell:
+            "cat {input}/{wildcards.sample}"
