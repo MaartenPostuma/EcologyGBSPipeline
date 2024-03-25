@@ -59,7 +59,7 @@ rule extractInfoLargeM:
     input:
         outLog=expand("{dir}/stacksTest/M{largeM}/denovo_map.log",largeM=LARGEM,dir=config["outputDir"])
     output:
-        MparameterTSV=expand("{dir}/stacksTest/stacksTestparameter.tsv",dir=config["outputDir"])
+        MparameterTSV=expand("{dir}/stacksTest/stacksTest/parameter.tsv",dir=config["outputDir"])
     params:
         dir=config["outputDir"]
     shell:
