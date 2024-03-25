@@ -80,4 +80,4 @@ rule makePlotLargeM:
     conda:
         "env/R.yaml"
     shell:
-        "Rscript ../src/stacksTest/parameterTest.R {params.dir}"
+        "Rscript src/StacksTest/parameterTest.R {params.dir}"
