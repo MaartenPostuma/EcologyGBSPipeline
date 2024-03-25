@@ -21,6 +21,10 @@ grouped = df.groupby("run")["sample"].apply(set)
 LANESAMPLE = grouped.to_dict()
 DUPES=df['sample'].duplicated().any()
 
+#TODO get this to work, make a seperate unique sample list use that to cat all samples with the same name together?
+#For loop? or snakemake weird shit?
+#TODO fix one lane!
+#
 if config["mode"]== "StacksTest":
     rule all:
         input:
