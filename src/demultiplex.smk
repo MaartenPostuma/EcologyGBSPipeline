@@ -61,8 +61,6 @@ rule process_radtags:
         R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
     params:
         outputDir=expand("{path}/demultiplex/logs/{{run}}/",path=config["outputDir"]),
-        f=lambda w: expand("{sample}.fastq.gz", sample=LANES[w.lane])
-
     conda:
         "env/stacks.yaml"
     threads: THREADSPERRUN//1
