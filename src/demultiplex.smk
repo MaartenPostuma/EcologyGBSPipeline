@@ -61,18 +61,22 @@ rule process_radtags:
         R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
         barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"], bar=config["barcodeFile"])
     output:
-        directory(temp("demux_tmp_{run}"))
+        hackDir=directory(temp("demux_tmp_{run}")),
+        log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.clone_filter.log",path=config["outputDir"])
     params:
         outputDir=expand("{path}/demultiplex/logs/{{run}}/",path=config["outputDir"]),
         f=lambda w: expand("{sample}.fastq.gz", sample=LANESAMPLE[w.run]),
     conda:
         "env/stacks.yaml"
     shell:
-        "process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads}"
-
+        """
+        process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads}
+        mkdir {output.hackDir}
+    	"""
 if DUPES==False:
     rule move_samples:
         input:
+
             lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
         output:
             samplesR1=expand("{path}/demultiplex/samples/{{sample}}.1.fq.gz",path=config["outputDir"]),
