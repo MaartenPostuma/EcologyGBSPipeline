@@ -61,7 +61,7 @@ rule demux:
         R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
         barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"], bar=config["barcodeFile"])
     output:
-        directory(temp("{path}/demux_tmp_{{run}}",path=config["tmpDir"]))
+        directory(temp(expand("{path}/demux_tmp_{{run}}",path=config["tmpDir"])))
     params:
         f=lambda w: expand("{sample}.fastq.gz", sample=LANESAMPLE[w.lane]),
     shell:
