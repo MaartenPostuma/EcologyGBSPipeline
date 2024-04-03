@@ -76,7 +76,6 @@ rule process_radtags:
 if DUPES==False:
     rule move_samples:
         input:
-
             lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
         output:
             samplesR1=expand("{path}/demultiplex/samples/{{sample}}.1.fq.gz",path=config["outputDir"]),
