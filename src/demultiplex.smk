@@ -63,7 +63,7 @@ rule demux:
     output:
         directory(temp("demux_tmp_{run}"))
     params:
-        f=lambda w: expand("{sample}.fastq.gz", sample=LANESAMPLE[w.lane]),
+        f=lambda w: expand("{sample}.fastq.gz", sample=LANESAMPLE[w.run]),
     shell:
         "process_radtags -1 {input.R1} -2 {input.R2} -o {output} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads}"
 
