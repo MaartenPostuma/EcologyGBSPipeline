@@ -54,7 +54,11 @@ rule make_stacks_files:
 
 
 
-# We than run each proces_radtags for each demultiplexing instance. in the parameter part there is a wildcard generation 
+# We than run each proces_radtags for each demultiplexing instance. The output is the process_radtags logs and a temporrary "hack directory".
+# The first is a fail safe to ensure that there is actually demutliplexed data. The latter is used to generate the wild cards that are necessary for the moving/catting of the samples
+# TODO the hack directory should not be necesarry but I do not know how to include something from the config in lines (84 and 102): lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
+
+
 rule process_radtags:
     input:
         R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
@@ -72,6 +76,8 @@ rule process_radtags:
         process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads}
         mkdir {output.hackDir}
     	"""
+#If there are no duplicates we simply move the read files from the demultiplex/logs/ directory to the demultiplex/samples folder.
+
 if DUPES==False:
     rule move_samples:
         input:
@@ -86,6 +92,10 @@ if DUPES==False:
             mv {params.outputDir}/*/{wildcards.sample}.1.fq.gz {output.samplesR1}
             mv {params.outputDir}/*/{wildcards.sample}.2.fq.gz {output.samplesR2}
             """
+#If there are duplicates in the log file we cannot move the files. As two files with the same name in different runs should be catted
+#For whatever reason snakemake selects only one combination of run/sample from the dictionary if there are two or more? So by including the logs files as inputs we ensure all
+#instances of process_radtags are actually done running.
+#When they are done all samples with the same name are catted together and the files in the logs directory are removed.
 if DUPES==True:
     rule cat_samples:
         input:
@@ -100,49 +110,5 @@ if DUPES==True:
             """
             cat {params.outputDir}*/{wildcards.sample}.1.fq.gz > {output.samplesR1}
             cat {params.outputDir}*/{wildcards.sample}.2.fq.gz > {output.samplesR2}
+            rm {params.outputDir}*/{wildcards.sample}*.fq.gz
             """
-
-
-# rule process_radtags:
-#     input:
-#         barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"], bar=config["barcodeFile"]),
-#         R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
-#         R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
-#     params:
-#         outputDir=expand("{path}/demultiplex/logs/{{run}}/",path=config["outputDir"]),
-#     conda:
-#         "env/stacks.yaml"
-#     threads: THREADSPERRUN//1
-#     output:
-#         log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.clone_filter.log",path=config["outputDir"]),
-#         direct=directory(expand("{path}/demultiplex/logs/{{run}}/",path=config["outputDir"]))
-
-#     shell:
-#         "process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads}"
-
-# #This moves all samples into the demultiplex/samples directory
-# if DUPES==False:
-#     rule moveDemultiplexFiles:
-#         input:
-#             log=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN)
-#         params:
-#             inputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"]),
-#             outputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"]),
-#             log=expand("{path}/logs/",path=config["outputDir"])
-#         output:
-#             samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
-#             samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES)
-#         shell:
-#             """
-#             mv {params.inputDir}/*/*.fq.gz {params.outputDir}/
-#             """
-
-# if DUPES==True:
-#     rule moveDemultiplexFiles:
-#         input:
-#             lambda w: f"{path}/demultiplex/logs/{LANESAMPLE[w.sample]}",
-#         output:
-#             samplesR1=expand("{path}/demultiplex/samples/{sample}.1.fq.gz",path=config["outputDir"]),
-#             samplesR2=expand("{path}/demultiplex/samples/{sample}.2.fq.gz",path=config["outputDir"])
-#         shell:
-#             "cat {input}/{wildcards.sample}"
