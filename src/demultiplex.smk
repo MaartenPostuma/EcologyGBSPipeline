@@ -61,16 +61,16 @@ rule demux:
         R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
         barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"], bar=config["barcodeFile"])
     output:
-        directory(temp("demux_tmp_{run}"))
+        directory(temp("{path}/demux_tmp_{{run}}",path=config["tmpDir"])))
     params:
-        f=lambda w: expand("{sample}.fastq.gz", sample=LANESAMPLE[w.run]),
+        f=lambda w: expand("{sample}.fastq.gz", sample=LANESAMPLE[w.lane]),
     shell:
-        "process_radtags -1 {input.R1} -2 {input.R2} -o {output} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads}"
+        "process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads}"
 
 
 rule demux_files:
     input:
-        lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
+        lambda w: expand(f"{path}/demux_tmp_{SAMPLES[w.sample]}",path=config["tmpDir"])
     output:
         samplesR1=expand("{path}/demultiplex/samples/{{sample}}.1.fq.gz",path=config["outputDir"]),
         samplesR2=expand("{path}/demultiplex/samples/{{sample}}.2.fq.gz",path=config["outputDir"])
