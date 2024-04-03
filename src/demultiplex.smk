@@ -68,7 +68,7 @@ rule process_radtags:
     shell:
         "process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads}"
 
-if DUPES=False:
+if DUPES==False:
     rule move_samples:
         input:
             lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
@@ -82,7 +82,7 @@ if DUPES=False:
             mv {params.outputDir}/*/{wildcards.sample}.1.fq.gz {output.samplesR1}
             mv {params.outputDir}/*{wildcards.sample}.2.fq.gz {output.samplesR2}
             """
-if DUPES=True:
+if DUPES==True:
     rule move_samples:
         input:
             lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
