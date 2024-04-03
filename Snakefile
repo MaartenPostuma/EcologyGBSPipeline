@@ -59,6 +59,9 @@ if config["mode"]== "StacksTest":
     include: "src/demultiplex.smk"
     include: "src/stacksParameterTest.smk"
 
+if config["mode"]== "Demulti":
+    include: "src/demultiplex.smk"
+
 
 if config["mode"]== "Denovo":
     include: "src/demultiplex.smk"
