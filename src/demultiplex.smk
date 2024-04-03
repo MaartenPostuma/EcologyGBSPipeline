@@ -65,7 +65,7 @@ rule process_radtags:
     params:
         outputDir=expand("{path}/demultiplex/logs/{{run}}/",path=config["outputDir"]),
         f=lambda w: expand("{sample}.fastq.gz", sample=LANESAMPLE[w.run]),
-     conda:
+    conda:
         "env/stacks.yaml"
     shell:
         "process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads}"
