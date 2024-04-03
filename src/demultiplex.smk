@@ -70,7 +70,7 @@ rule demux:
 
 rule demux_files:
     input:
-        lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
+        lambda w: expand("demux_tmp_{{SAMPLES[w.sample]}}")
     output:
         samplesR1=expand("{path}/demultiplex/samples/{{sample}}.1.fq.gz",path=config["outputDir"]),
         samplesR2=expand("{path}/demultiplex/samples/{{sample}}.2.fq.gz",path=config["outputDir"])
