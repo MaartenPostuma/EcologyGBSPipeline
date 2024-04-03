@@ -72,8 +72,8 @@ rule demux_files:
     input:
         lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
     output:
-        samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
-        samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES)
+        samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"]),
+        samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"])
     shell:
         """
         mv {input}/{wildcards.sample}.R1.fq.gz {output.samplesR1}
