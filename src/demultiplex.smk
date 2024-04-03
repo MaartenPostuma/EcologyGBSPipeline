@@ -55,7 +55,7 @@ rule make_stacks_files:
 #TODO make this less janky... so we do not do weird shit with the logs...
 #Figure out what happesn if this breaks.
 
-rule demux:
+rule process_radtags:
     input:
         R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
         R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
@@ -63,22 +63,39 @@ rule demux:
     output:
         directory(temp("demux_tmp_{run}"))
     params:
+        outputDir=expand("{path}/demultiplex/logs/{{run}}/",path=config["outputDir"]),
         f=lambda w: expand("{sample}.fastq.gz", sample=LANESAMPLE[w.run]),
     shell:
-        "process_radtags -1 {input.R1} -2 {input.R2} -o {output} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads}"
+        "process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads}"
 
-
-rule demux_files:
-    input:
-        lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
-    output:
-        samplesR1=expand("{path}/demultiplex/samples/{{sample}}.1.fq.gz",path=config["outputDir"]),
-        samplesR2=expand("{path}/demultiplex/samples/{{sample}}.2.fq.gz",path=config["outputDir"])
-    shell:
-        """
-        mv {input}/{wildcards.sample}.R1.fq.gz {output.samplesR1}
-        mv {input}/{wildcards.sample}.R2.fq.gz {output.samplesR2}
-        """
+if DUPES=False:
+    rule move_samples:
+        input:
+            lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
+        output:
+            samplesR1=expand("{path}/demultiplex/samples/{{sample}}.1.fq.gz",path=config["outputDir"]),
+            samplesR2=expand("{path}/demultiplex/samples/{{sample}}.2.fq.gz",path=config["outputDir"])
+        params:
+            outputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"]),
+        shell:
+            """
+            mv {params.outputDir}/*/{wildcards.sample}.1.fq.gz {output.samplesR1}
+            mv {params.outputDir}/*{wildcards.sample}.2.fq.gz {output.samplesR2}
+            """
+if DUPES=True
+    rule move_samples:
+        input:
+            lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
+        output:
+            samplesR1=expand("{path}/demultiplex/samples/{{sample}}.1.fq.gz",path=config["outputDir"]),
+            samplesR2=expand("{path}/demultiplex/samples/{{sample}}.2.fq.gz",path=config["outputDir"])
+        params:
+            outputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"])
+        shell:
+            """
+            cat {params.outputDir}*/{wildcards.sample}.1.fq.gz > {output.samplesR1}
+            cat {params.outputDir}*/{wildcards.sample}.2.fq.gz > {output.samplesR2}
+            """
 
 
 # rule process_radtags:
