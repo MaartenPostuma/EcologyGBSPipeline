@@ -21,10 +21,27 @@ grouped = df.groupby("run")["sample"].apply(set)
 LANESAMPLE = grouped.to_dict()
 DUPES=df['sample'].duplicated().any()
 
+SAMPLES = {}
+for lane, samples in LANES.items():
+    for sample in samples:
+        SAMPLES[sample] = lane
+
+
 #TODO get this to work, make a seperate unique sample list use that to cat all samples with the same name together?
 #For loop? or snakemake weird shit?
 #TODO fix one lane!
 #
+if config["mode"]== "Demulti":
+    rule all:
+        input:
+            DeDuplR1=expand("{path}/demultiplex/clone_filter/{run}_R1.1.fq.gz",path=config["outputDir"],run=RUN),
+            DeDuplR2=expand("{path}/demultiplex/clone_filter/{run}_R2.2.fq.gz",path=config["outputDir"],run=RUN),
+            popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+            popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv", path=config["outputDir"]),
+            samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
+            samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES)
+
+
 if config["mode"]== "StacksTest":
     rule all:
         input:
