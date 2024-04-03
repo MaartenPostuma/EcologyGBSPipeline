@@ -82,7 +82,7 @@ if DUPES=False:
             mv {params.outputDir}/*/{wildcards.sample}.1.fq.gz {output.samplesR1}
             mv {params.outputDir}/*{wildcards.sample}.2.fq.gz {output.samplesR2}
             """
-if DUPES=True
+if DUPES=True:
     rule move_samples:
         input:
             lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
