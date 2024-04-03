@@ -49,12 +49,12 @@ rule make_stacks_files:
         "Rscript src/demultiplex/createFilesFromBarcodeFile.R {input.barcodes} {params.outputDir}"
 
 #We then do some snakemake magic to run process radtags for each run.
-#This outputs 2 files per sample (the R1 and R2) 
-#TODO figure out to have this not be completely dependent on the process_radtags.log file being generated.
-#Howver this is complicated due to the samples needing to be split up per file...
-#TODO make this less janky... so we do not do weird shit with the logs...
-#Figure out what happesn if this breaks.
+#https://stackoverflow.com/questions/41135801/snakemake-best-practice-for-demultiplexing <- based on this
+# A lot of this happens in the Snakefile where a dictonary is created from the barcode file specifying in which run each sample is located.
 
+
+
+# We than run each proces_radtags for each demultiplexing instance. in the parameter part there is a wildcard generation 
 rule process_radtags:
     input:
         R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
@@ -65,7 +65,6 @@ rule process_radtags:
         log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.clone_filter.log",path=config["outputDir"])
     params:
         outputDir=expand("{path}/demultiplex/logs/{{run}}/",path=config["outputDir"]),
-        f=lambda w: expand("{sample}.fastq.gz", sample=LANESAMPLE[w.run]),
     conda:
         "env/stacks.yaml"
     shell:

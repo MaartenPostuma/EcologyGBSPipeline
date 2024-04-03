@@ -6,7 +6,9 @@ projectName=random.randint(1,1000000) #To ensure non overlapping tmp directories
 
 #df = pd.read_csv(os.path.join("data/barcodes.txt"), sep='\t', dtype="object").set_index('sample')
 
+
 df = pd.read_csv(os.path.join(config["inputDir"],config["barcodeFile"]), sep='\t', dtype="object").set_index('sample')
+#Read the barcode file and do some management to create all of the info we need (sample file / seprate into runs / make a dictionary of the both of them etc.)
 df['run'] = df['rawR1'].str.replace("_R1.fq.gz","",regex=False)
 df['sample']=df.index
 SAMPLES = df.index
@@ -21,16 +23,12 @@ grouped = df.groupby("run")["sample"].apply(set)
 LANESAMPLE = grouped.to_dict()
 DUPES=df['sample'].duplicated().any()
 
-SAMPLES = {}
+SAMPLES = {}   #Create a dictonary for the demultiplexing #see src/demultiplexing.smk
 for lane, samples in LANESAMPLE.items():
     for sample in samples:
         SAMPLES[sample] = lane
 
 
-#TODO get this to work, make a seperate unique sample list use that to cat all samples with the same name together?
-#For loop? or snakemake weird shit?
-#TODO fix one lane!
-#
 if config["mode"]== "Demulti":
     rule all:
         input:
