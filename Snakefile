@@ -22,7 +22,7 @@ LANESAMPLE = grouped.to_dict()
 DUPES=df['sample'].duplicated().any()
 
 SAMPLES = {}
-for lane, samples in RUN.items():
+for lane, samples in LANESAMPLE.items():
     for sample in samples:
         SAMPLES[sample] = lane
 
