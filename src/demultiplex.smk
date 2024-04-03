@@ -85,12 +85,13 @@ if DUPES==False:
         shell:
             """
             mv {params.outputDir}/*/{wildcards.sample}.1.fq.gz {output.samplesR1}
-            mv {params.outputDir}/*{wildcards.sample}.2.fq.gz {output.samplesR2}
+            mv {params.outputDir}/*/{wildcards.sample}.2.fq.gz {output.samplesR2}
             """
 if DUPES==True:
     rule cat_samples:
         input:
             lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
+            log=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN)
         output:
             samplesR1=expand("{path}/demultiplex/samples/{{sample}}.1.fq.gz",path=config["outputDir"]),
             samplesR2=expand("{path}/demultiplex/samples/{{sample}}.2.fq.gz",path=config["outputDir"])
