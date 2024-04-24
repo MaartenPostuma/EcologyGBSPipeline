@@ -83,12 +83,30 @@ rule indexBam:
     shell:
         "samtools index {input.RGBam}"
 
+rule makeRegions:
+    input:
+        RGBamIndex=expand("{path}/refOut/merged.bam.bai",path=config["outputDir"]),
+        RGBam=expand("{path}/refOut/merged.bam",path=config["outputDir"]),
+    output:
+        targetRegions=expand("{path}/refOut/targets.regions",path=config["outputDir"]),
+        coverage=expand("{path}/refOut/aln.bam.coverage.gz",path=config["outputDir"])
+    conda:
+        "env/sambabamba.yaml"
+    shell:
+        """
+        sambamba depth base --combined {input.RGBam} | cut -f 1-3 | pv -l | pigz > {output.coverage}
+        base_cov=\$(zcat {output.coverage} | awk "NR>1 {{ x += \$3; }} END {{ print x }}")
+        nchunks=1000; zcat {output.coverage} | head -100000000 | awk "BEGIN {{ bin="\$base_cov" / "\$nchunks" }} NR==1 {{ next }} NR==2 {{ chr=\$1; pos=\$2; last=\$2; }} (\$1==chr && sum < bin) {{sum += \$3; last=\$2 }} (\$1!=chr || sum > bin) {{ print chr":"pos"-"last; sum = \$3; chr=\$1; pos=\$2; last=\$2; }} END {{ print chr":"pos"-"last; }} " > {output.targetRegions}
+        """
+
+
 rule variantCall:
     input:
         RGBamIndex=expand("{path}/refOut/merged.bam.bai",path=config["outputDir"],samples=SAMPLES),
         refIndex=expand("{ref}.fai",ref=config["reference"]),
         ref=expand("{ref}",ref=config["reference"]),
-        bam=expand("{path}/refOut/merged.bam",path=config["outputDir"])
+        bam=expand("{path}/refOut/merged.bam",path=config["outputDir"]),
+        targetRegions=expand("{path}/refOut/targets.regions",path=config["outputDir"]),
     output:
         vcf=expand("{path}/refOut/populations.vcf.gz",path=config["outputDir"])
     threads: min(workflow.cores,4096/(len(SAMPLES)*2)-4)
@@ -96,5 +114,5 @@ rule variantCall:
         "env/freebayes.yaml"
     shell:
         """
-        freebayes-parallel <(fasta_generate_regions.py {input.refIndex} 100000) {threads} -f {input.ref} {input.bam} --no-partial-observations --report-genotype-likelihood-max --genotype-qualities --min-coverage 0 --min-base-quality 1 --min-mapping-quality 10 | bgzip -c > {output.vcf}
-        """   
+        freebayes-parallel {input.targetRegions} {threads} -f {input.ref} {input.bam} --no-partial-observations --report-genotype-likelihood-max --genotype-qualities --min-coverage 1 --min-base-quality 1 --min-mapping-quality 10 --use-best-n-alleles 7 | bgzip -c > {output.vcf}
+        """
