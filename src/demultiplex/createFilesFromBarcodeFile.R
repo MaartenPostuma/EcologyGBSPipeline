@@ -23,7 +23,7 @@ for(run in barcodes$run){
 }
 
 
-popmapStacks<-data.frame(sample=barcodes$sample,pop=barcodes$pop)
+popmapStacks<-data.frame(sample=barcodes$sample[duplicated(barcodes$sample)==F],pop=barcodes$pop[duplicated(barcodes$sample)==F])
 write.table(popmapStacks,paste0(args[2],"/popmap.tsv"),row.names = F,col.names = F,quote=F,sep="\t")
 
 

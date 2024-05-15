@@ -124,5 +124,9 @@ if DUPES==True:
 			"""
 			cat {params.outputDir}*/{wildcards.sample}.1.fq.gz > {output.samplesR1}
 			cat {params.outputDir}*/{wildcards.sample}.2.fq.gz > {output.samplesR2}
-			rm {params.outputDir}*/{wildcards.sample}*.fq.gz
+			rm {params.outputDir}*/{wildcards.sample}.1.fq.gz
+			rm {params.outputDir}*/{wildcards.sample}.2.fq.gz
+			rm {params.outputDir}*/{wildcards.sample}.rem.1.fq.gz
+			rm {params.outputDir}*/{wildcards.sample}.rem.2.fq.gz
+
 			"""
