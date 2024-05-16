@@ -87,7 +87,7 @@ rule process_radtags:
 	threads: THREADSPERRUN
 	shell:
 		"""
-		process_radtags -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads} --len-limit 140 --threads {threads}
+		process_radtags --paired -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads} --len-limit 140 --threads {threads}
 		mkdir {output.hackDir}
 		"""
 #If there are no duplicates we simply move the read files from the demultiplex/logs/ directory to the demultiplex/samples folder.
@@ -128,5 +128,4 @@ if DUPES==True:
 			rm {params.outputDir}*/{wildcards.sample}.2.fq.gz
 			rm {params.outputDir}*/{wildcards.sample}.rem.1.fq.gz
 			rm {params.outputDir}*/{wildcards.sample}.rem.2.fq.gz
-
 			"""
