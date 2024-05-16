@@ -28,6 +28,7 @@ reference: "/scratch2/maarten/lyrata/ref/ref.fa"
 #rawR1 is the file name of the rawReads_R1 file in which the samples are (if there are multiple illumina indices used)
 #rawR2 is the file name of the rawReads_R2 file 
 barcodeFile: "barcodes.txt"
+truncateLength: 100
 
 #Denovo parameter: The output of the StacksTest run!
 M: 4
@@ -47,3 +48,4 @@ param_StacksTest:
 
 param_filtering:
   individual_missingness: "0.8"
+
