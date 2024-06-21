@@ -1,17 +1,54 @@
+param_nInds=config["param_StacksTest"]["nInds"]
+def getParam_nInds(param_nInds):
+    if param_nInds == "default" or param_oligo == "":
+        id = 40
+    else:
+        id = param_nInds
+    return id
 
-rule denovo_map:
-    input: 
-        samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
-        samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
-        popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
-    params:
-        M=config["M"],
-        outputDir=expand("{path}/stacks/",path=config["outputDir"]),
-        inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
-    output:
-        vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"])
-    conda:
-        "env/stacks.yaml"
-    threads:workflow.cores
-    shell:
-        "denovo_map.pl --samples {params.inputDir} --popmap {input.popmap} -T  {threads}       -o {params.outputDir} -n {params.M} -m {params.M} -X 'populations: --vcf'"
+if config["mode"]=="Denovo"
+    rule denovo_map:
+        input: 
+            samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
+            samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
+            popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+        params:
+            M=config["M"],
+            outputDir=expand("{path}/stacks/",path=config["outputDir"]),
+            inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
+        output:
+            vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"])
+        conda:
+            "env/stacks.yaml"
+        threads:workflow.cores
+        shell:
+            "denovo_map.pl --samples {params.inputDir} --popmap {input.popmap} -T  {threads}       -o {params.outputDir} -n {params.M} -m {params.M} -X 'populations: --vcf'"
+
+if config["mode"]=="DenovoSub"
+    rule subset_popmap:
+        input:
+            popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+        output:
+            expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"])
+        params:
+            getParam_nInds(param_nInds)
+        shell:
+            "paste <(shuf -n {params} {input.popmap} | cut -f1) <(yes opt | head -n {params}) > {output}"
+    
+    rule denovo_map:
+        input:
+            popmap_sub=expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"])
+            samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
+            samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
+            popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+        params:
+            M=config["M"],
+            outputDir=expand("{path}/stacks/",path=config["outputDir"]),
+            inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
+        output:
+            vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"])
+        conda:
+            "env/stacks.yaml"
+        threads:workflow.cores
+        shell:
+            "denovo_map.pl --samples {params.inputDir} --popmap {input.popmap} -T  {threads} --catalog-popmap {input.popmap_sub}       -o {params.outputDir} -n {params.M} -m {params.M} -X 'populations: --vcf'"
