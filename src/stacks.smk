@@ -20,7 +20,7 @@ if config["mode"]=="Denovo":
             threads:workflow.cores
             shell:
                 "denovo_map.pl --samples {params.inputDir} --popmap {input.popmap} -T  {threads}       -o {params.outputDir} -n {params.M} -m {params.M} -X 'populations: --vcf'"
-                
+
     if len(df.index) > 100: 
         rule subset_popmap:
             input:
@@ -34,7 +34,7 @@ if config["mode"]=="Denovo":
         
         rule denovo_map:
             input:
-                popmap_sub=expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"])
+                popmap_sub=expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"]),
                 samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
                 samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
                 popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
