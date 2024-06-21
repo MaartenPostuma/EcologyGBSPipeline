@@ -1,9 +1,5 @@
-param_nInds=config["param_StacksTest"]["nInds"]
 def getParam_nInds(param_nInds):
-    if param_nInds == "default" or param_oligo == "":
-        id = 40
-    else:
-        id = param_nInds
+    id = 100
     return id
 
 if config["mode"]=="Denovo"
@@ -24,7 +20,7 @@ if config["mode"]=="Denovo"
         shell:
             "denovo_map.pl --samples {params.inputDir} --popmap {input.popmap} -T  {threads}       -o {params.outputDir} -n {params.M} -m {params.M} -X 'populations: --vcf'"
 
-if config["mode"]=="DenovoSub"
+if len(df.index) > 100: 
     rule subset_popmap:
         input:
             popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
