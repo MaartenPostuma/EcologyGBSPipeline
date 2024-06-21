@@ -63,7 +63,7 @@ if config["mode"]== "Demulti":
     include: "src/demultiplex.smk"
 
 
-if config["mode"]== "Denovo":
+if config["mode"]== "Denovo" | config["mode"]== "DenovoSub":
     include: "src/demultiplex.smk"
     include: "src/stacks.smk"
     include: "src/filterAndFigures.smk"
