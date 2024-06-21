@@ -1,6 +1,3 @@
-def getParam_nInds(param_nInds):
-    id = 100
-    return id
 
 if config["mode"]=="Denovo":
     if len(df.index)<101:
@@ -28,7 +25,7 @@ if config["mode"]=="Denovo":
             output:
                 expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"])
             params:
-                getParam_nInds(param_nInds)
+                100
             shell:
                 "paste <(shuf -n {params} {input.popmap} | cut -f1) <(yes opt | head -n {params}) > {output}"
         
