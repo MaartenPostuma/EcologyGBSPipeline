@@ -45,7 +45,7 @@ param_demultiplex:
 param_StacksTest:
   nInds: ""
 
-
+#Per indiviual missingness allowed (when filtered for SNPs that are present in 50% of individuals )
 param_filtering:
   individual_missingness: "0.8"
 

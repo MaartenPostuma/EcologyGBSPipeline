@@ -37,6 +37,7 @@ rule makeReport:
         '''
 
 #So this does a lot of things
+#It determines the % missingness at 80% max-missing per SNP and uses this to filter!
 if config["mode"]== "Denovo": 
     rule step_1:
         input:
@@ -51,7 +52,7 @@ if config["mode"]== "Denovo":
             outputDir=expand("{path}/filters/",path=config["outputDir"]),
             indMissing=individual_missingness,
         shell:
-            """vcftools --vcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs
+            """vcftools --vcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs --max-missing 0.5
             mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/lowDP.step1.indv
             mawk '$5 < {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/highDP.step1.indv
             cat {input.popmap} | grep -f  {params.outputDir}/highDP.step1.indv > {output.vcf}
@@ -90,7 +91,7 @@ if config["mode"]== "Reference":
             indMissing=individual_missingness,
         shell:
             """
-            vcftools --gzvcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs
+            vcftools --gzvcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs --max-missing 0.5
             mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/lowDP.step1.indv
             mawk '$5 < {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/highDP.step1.indv
             cat {input.popmap} | grep -f  {params.outputDir}/highDP.step1.indv > {output.vcf}
