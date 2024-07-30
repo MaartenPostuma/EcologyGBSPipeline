@@ -37,11 +37,12 @@ rule makeReport:
         '''
 
 #So this does a lot of things
+#It determines the % missingness at 80% max-missing per SNP and uses this to filter!
 if config["mode"]== "Denovo": 
     rule step_1:
         input:
             vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"]),
-            popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+            popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"]),
         output:
             vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
             iMissing=expand('{path}/filters/missingIndvs.imiss',path=config["outputDir"])
@@ -51,7 +52,7 @@ if config["mode"]== "Denovo":
             outputDir=expand("{path}/filters/",path=config["outputDir"]),
             indMissing=individual_missingness,
         shell:
-            """vcftools --vcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs
+            """vcftools --vcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs --max-missing 0.5
             mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/lowDP.step1.indv
             mawk '$5 < {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/highDP.step1.indv
             cat {input.popmap} | grep -f  {params.outputDir}/highDP.step1.indv > {output.vcf}
@@ -79,7 +80,7 @@ if config["mode"]== "Reference":
     rule step_1:
         input:
             vcf=expand("{path}/refOut/populations.vcf.gz",path=config["outputDir"]),
-            popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+            popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"]),
         output:
             vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
             iMissing=expand('{path}/filters/missingIndvs.imiss',path=config["outputDir"])
@@ -90,7 +91,7 @@ if config["mode"]== "Reference":
             indMissing=individual_missingness,
         shell:
             """
-            vcftools --gzvcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs
+            vcftools --gzvcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs --max-missing 0.5
             mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/lowDP.step1.indv
             mawk '$5 < {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/highDP.step1.indv
             cat {input.popmap} | grep -f  {params.outputDir}/highDP.step1.indv > {output.vcf}
@@ -116,7 +117,7 @@ if config["mode"]== "Reference":
             "env/stacks.yaml"
         shell:
             """
-            populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -V {input.vcf} -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --threads {threads}
+            populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -V {input.vcf} -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --threads {threads} --fstats
             mv {params.parDir}/populations.p.snps.vcf {params.parDir}/populations.snps.vcf
             mv {params.parDir}/populations.p.sumstats_summary.tsv {params.parDir}/populations.sumstats_summary.tsv
             """    

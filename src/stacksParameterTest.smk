@@ -59,25 +59,25 @@ rule extractInfoLargeM:
     input:
         outLog=expand("{dir}/stacksTest/M{largeM}/denovo_map.log",largeM=LARGEM,dir=config["outputDir"])
     output:
-        MparameterTSV=expand("{dir}/stacksTest/stacksTestparameter.tsv",dir=config["outputDir"])
+        MparameterTSV=expand("{dir}/stacksTest/parameter.tsv",dir=config["outputDir"])
     params:
         dir=config["outputDir"]
     shell:
         """
-        paste <(cat {params.dir}/stacksTest*/denovo_map.log | grep "Kept" | cut -f2,14 -d " ") \
-        <(cat {params.dir}/stacksTest*/denovo_map.log | grep "per-sample coverage" | cut -f2 -d "=" | cut -f1 -d "x") \
-        <(cat {params.dir}/stacksTest*/denovo_map.log | grep "\-M" | grep "denovo_map.pl" | cut -f 13 -d " ") >\
-        {params.dir}/stacksTestparameter.tsv
+        paste <(cat {params.dir}/stacksTest/*/denovo_map.log | grep "Kept" | cut -f2,14 -d " ") \
+        <(cat {params.dir}/stacksTest/*/denovo_map.log | grep "per-sample coverage" | cut -f2 -d "=" | cut -f1 -d "x") \
+        <(cat {params.dir}/stacksTest/*/denovo_map.log | grep "\-M" | grep "denovo_map.pl" | cut -f 13 -d " ") >\
+        {params.dir}/stacksTest/parameter.tsv
         """
 
 rule makePlotLargeM:
     input:
-        MparameterTSV=expand("{dir}/stacksTest/stacksTestparameter.tsv",dir=config["outputDir"])
+        MparameterTSV=expand("{dir}/stacksTest/parameter.tsv",dir=config["outputDir"])
     output:
-        MparameterPNG=expand("{dir}/stacksTest/stacksTestparameter.png",dir=config["outputDir"])
+        MparameterPNG=expand("{dir}/stacksTest/parameter.png",dir=config["outputDir"])
     params:
         dir=expand("{dir}/stacksTest/",dir=config["outputDir"])
     conda:
         "env/R.yaml"
     shell:
-        "Rscript src/stacksTest/parameterTest.R {params.dir}"
+        "Rscript src/StacksTest/parameterTest.R {params.dir}"

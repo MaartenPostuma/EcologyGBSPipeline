@@ -6,7 +6,11 @@ projectName=random.randint(1,1000000) #To ensure non overlapping tmp directories
 
 #df = pd.read_csv(os.path.join("data/barcodes.txt"), sep='\t', dtype="object").set_index('sample')
 
+
 df = pd.read_csv(os.path.join(config["inputDir"],config["barcodeFile"]), sep='\t', dtype="object").set_index('sample')
+#Read the barcode file and do some management to create all of the info we need (sample file / seprate into runs / make a dictionary of the both of them etc.)
+df['run'] = df['rawR1'].str.replace("_R1.fq.gz","",regex=False)
+df['sample']=df.index
 SAMPLES = df.index
 RAWREADSR1 = df.rawR1.str.replace(".fq.gz","",regex=False).unique()
 RAWREADSR2 = df.rawR2.str.replace(".fq.gz","",regex=False).unique()
@@ -15,6 +19,28 @@ THREADSPERRUN=workflow.cores/RUN.size
 MODE=config["mode"]
 from snakemake.utils import Paramspace
 paramspace = Paramspace(pd.read_csv("src/filterAndFigures/paramTest.tsv", sep="\t"))
+grouped = df.groupby("run")["sample"].apply(set)
+LANESAMPLE = grouped.to_dict()
+DUPES=df['sample'].duplicated().any()
+
+SAMPLES = {}   #Create a dictonary for the demultiplexing #see src/demultiplexing.smk
+for lane, samples in LANESAMPLE.items():
+    for sample in samples:
+        SAMPLES[sample] = lane
+
+
+if config["mode"]== "Demulti":
+    rule all:
+        input:
+            DeDuplR1=expand("{path}/demultiplex/clone_filter/{run}_R1.1.fq.gz",path=config["outputDir"],run=RUN),
+            DeDuplR2=expand("{path}/demultiplex/clone_filter/{run}_R2.2.fq.gz",path=config["outputDir"],run=RUN),
+            popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+            popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv", path=config["outputDir"]),
+            samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
+            samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
+            log=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN)
+
+
 
 if config["mode"]== "StacksTest":
     rule all:
@@ -26,12 +52,15 @@ if config["mode"]== "StacksTest":
             perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN),
             samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
             samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
-            MparameterPNG=expand("{dir}/stacksTest/stacksTestparameter.png",dir=config["outputDir"])
+            MparameterPNG=expand("{dir}/stacksTest/parameter.png",dir=config["outputDir"])
 
 
 if config["mode"]== "StacksTest":
     include: "src/demultiplex.smk"
     include: "src/stacksParameterTest.smk"
+
+if config["mode"]== "Demulti":
+    include: "src/demultiplex.smk"
 
 
 if config["mode"]== "Denovo":

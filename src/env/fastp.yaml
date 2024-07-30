@@ -1,0 +1,8 @@
+name: fastp
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - r
+dependencies: 
+  - fastp
