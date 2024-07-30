@@ -125,7 +125,7 @@ rule filter_popmap:
 
 rule combinePerRunPopmap:
 	input:
-		popmap=expand("{path}/stacksFiles/popmap{{run}}Filt.tsv", path=config["outputDir"])
+		popmap=expand("{path}/stacksFiles/popmap{run}Filt.tsv", path=config["outputDir"],run=RUN)
 	output:
 		popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"])
 	shell:
