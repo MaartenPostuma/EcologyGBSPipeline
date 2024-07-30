@@ -53,7 +53,8 @@ rule make_stacks_files:
 	output:
 		popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
 		popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv",path=config["outputDir"]),
-		barcodes=expand("{path}/stacksFiles/barcodeStacks{run}.tsv", path=config["outputDir"], bar=config["barcodeFile"],run=RUN)
+		barcodes=expand("{path}/stacksFiles/barcodeStacks{run}.tsv", path=config["outputDir"], bar=config["barcodeFile"],run=RUN),
+		popmapSep=expand("{path}/stacksFiles/popmap{run}.tsv", path=config["outputDir"], bar=config["barcodeFile"],run=RUN)
 	params:
 		outputDir=expand("{path}/stacksFiles",path=config["outputDir"])
 	conda:
@@ -92,6 +93,44 @@ rule process_radtags:
 		mkdir {output.hackDir}
 		"""
 #If there are no duplicates we simply move the read files from the demultiplex/logs/ directory to the demultiplex/samples folder.
+
+#The next four rules remove individuals to which < 1000 reads were assigned to ensure the pipeline keeps running after 
+#Demultiplexing
+rule process_logs:
+	input:
+		log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.clone_filter.log",path=config["outputDir"])
+	output:
+		log=expand("{path}/demultiplex/logs/{{run}}/perInd.tsv",path=config["outputDir"])
+	conda:
+		"env/stacks.yaml"
+	shell:
+		"stacks-dist-extract {input.log} per_barcode_raw_read_counts > {output.log}"
+
+rule combine_logs:
+	input:
+		log=expand("{path}/demultiplex/logs/{{run}}/perInd.tsv",path=config["outputDir"])
+	output:
+		log=expand("{path}/demultiplex/logs/{{run}}/removeInds.tsv",path=config["outputDir"])
+	shell:
+		"cat {input.log} | awk '$6<1000 {print $1}' > {output.log}"
+
+rule filter_popmap:
+	input:
+        popmap=expand("{path}/stacksFiles/popmap{{run}}.tsv", path=config["outputDir"]),
+		removeIndv=expand("{path}/demultiplex/logs/{{run}}/removeInds.tsv",path=config["outputDir"])
+	output:
+		popmap=expand("{path}/stacksFiles/popmap{{run}}Filt.tsv", path=config["outputDir"])
+	shell:
+		"cat {input.popmap} | grep -f demultiplex/logs/VBB-3/removeInds.tsv -v	> {output.popmap}"
+
+rule combinePerRunPopmap:
+	input:
+		popmap=expand("{path}/stacksFiles/popmap{{run}}Filt.tsv", path=config["outputDir"])
+	output:
+		popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"])
+	shell:
+		"cat {input.popmap} > {output.popmap}"
+
 
 if DUPES==False:
 	rule move_samples:

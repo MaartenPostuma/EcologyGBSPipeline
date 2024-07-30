@@ -42,7 +42,7 @@ if config["mode"]== "Denovo":
     rule step_1:
         input:
             vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"]),
-            popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+            popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"]),
         output:
             vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
             iMissing=expand('{path}/filters/missingIndvs.imiss',path=config["outputDir"])
@@ -80,7 +80,7 @@ if config["mode"]== "Reference":
     rule step_1:
         input:
             vcf=expand("{path}/refOut/populations.vcf.gz",path=config["outputDir"]),
-            popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+            popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"]),
         output:
             vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
             iMissing=expand('{path}/filters/missingIndvs.imiss',path=config["outputDir"])

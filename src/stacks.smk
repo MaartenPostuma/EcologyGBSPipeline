@@ -5,7 +5,7 @@ if config["mode"]=="Denovo":
             input: 
                 samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
                 samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
-                popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+                popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"]),
             params:
                 M=config["M"],
                 outputDir=expand("{path}/stacks/",path=config["outputDir"]),
@@ -21,7 +21,7 @@ if config["mode"]=="Denovo":
     if len(df.index) > 100: 
         rule subset_popmap:
             input:
-                popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+                popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"]),
             output:
                 expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"])
             params:
@@ -34,7 +34,7 @@ if config["mode"]=="Denovo":
                 popmap_sub=expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"]),
                 samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
                 samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
-                popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+                popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"]),
             params:
                 M=config["M"],
                 outputDir=expand("{path}/stacks/",path=config["outputDir"]),
