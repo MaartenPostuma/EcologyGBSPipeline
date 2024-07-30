@@ -112,7 +112,7 @@ rule combine_logs:
 	output:
 		log=expand("{path}/demultiplex/logs/{{run}}/removeInds.tsv",path=config["outputDir"])
 	shell:
-		"cat {input.log} | awk '$6<1000 {print $1}' > {output.log}"
+		"""cat {input.log} | awk '$6<1000 {{print $1}}' > {output.log}"""
 
 rule filter_popmap:
 	input:
