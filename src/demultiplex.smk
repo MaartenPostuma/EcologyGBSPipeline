@@ -121,7 +121,7 @@ rule filter_popmap:
 	output:
 		popmap=expand("{path}/stacksFiles/popmap{{run}}Filt.tsv", path=config["outputDir"])
 	shell:
-		"cat {input.popmap} | grep -f demultiplex/logs/VBB-3/removeInds.tsv -v	> {output.popmap}"
+		"cat {input.popmap} | grep -f {input.removeIndv} -v	> {output.popmap}"
 
 rule combinePerRunPopmap:
 	input:
