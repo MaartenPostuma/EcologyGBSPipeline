@@ -116,20 +116,20 @@ rule combine_logs:
 
 rule filter_popmap:
 	input:
-        popmap=expand("{path}/stacksFiles/popmap{{run}}.tsv", path=config["outputDir"]),
+        popmapIn=expand("{path}/stacksFiles/popmap{{run}}.tsv", path=config["outputDir"]),
 		removeIndv=expand("{path}/demultiplex/logs/{{run}}/removeInds.tsv",path=config["outputDir"])
 	output:
 		popmap=expand("{path}/stacksFiles/popmap{{run}}Filt.tsv", path=config["outputDir"])
 	shell:
-		"cat {input.popmap} | grep -f demultiplex/logs/VBB-3/removeInds.tsv -v	> {output.popmap}"
+		"cat {input.popmapIn} | grep -f demultiplex/logs/VBB-3/removeInds.tsv -v	> {output.popmap}"
 
 rule combinePerRunPopmap:
 	input:
-		popmap=expand("{path}/stacksFiles/popmap{{run}}Filt.tsv", path=config["outputDir"])
+		popmapIn=expand("{path}/stacksFiles/popmap{{run}}Filt.tsv", path=config["outputDir"])
 	output:
 		popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"])
 	shell:
-		"cat {input.popmap} > {output.popmap}"
+		"cat {input.popmapIn} > {output.popmap}"
 
 
 if DUPES==False:
