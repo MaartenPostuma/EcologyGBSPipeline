@@ -22,8 +22,9 @@ rule makeReport:
         pcaPlot=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"],params=paramspace.instance_patterns),
         treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
         treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"]),
-        popStats=expand("{path}/filters/popStatsAll.tsv",path=config["outputDir"])
- 
+        popStats=expand("{path}/filters/popStatsAll.tsv",path=config["outputDir"]),
+        fstStats=expand("{path}/filters/fstStatsAll.tsv",path=config["outputDir"]),
+		barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"])
     output:
         report_out=expand("{path}/report{mode}.html",path=config["outputDir"],mode=MODE)
     params:
@@ -32,7 +33,7 @@ rule makeReport:
         "env/R.yaml"
     shell:
         '''
-        R -e "rmarkdown::render('src/filterAndFigures/report.Rmd',output_file='report.html',params=list(args='{params.outputDir}'))"
+        R -e "rmarkdown::render('src/filterAndFigures/report.Rmd',output_file='report.html',params=list(args=c('{params.outputDir}','{input.barcodes}')))"
         mv src/filterAndFigures/report.html {output.report_out}
         '''
 
