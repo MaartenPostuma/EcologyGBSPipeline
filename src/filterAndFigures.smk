@@ -64,7 +64,8 @@ if config["mode"]== "Denovo":
             vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"])
         output:
             vcf=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
-            sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+            sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern),
+            FstSumstats=expand("{path}/filters/{params}/populations.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
         params:
             outputDir=expand("{path}",path=config["outputDir"]),
             parDir=expand("{path}/filters/{params}",path=config["outputDir"],params=paramspace.wildcard_pattern),
@@ -106,7 +107,8 @@ if config["mode"]== "Reference":
             vcf=expand("{path}/refOut/populations.vcf.gz",path=config["outputDir"])
         output:
             vcf=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
-            sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+            sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspa0ce.wildcard_pattern),
+            FstSumstats=expand("{path}/filters/{params}/populations.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
         params:
             outputDir=expand("{path}",path=config["outputDir"]),
             parDir=expand("{path}/filters/{params}",path=config["outputDir"],params=paramspace.wildcard_pattern),
@@ -203,3 +205,17 @@ rule combinePopData:
         """
         Rscript src/filterAndFigures/popData.R {output.popStats} {input.popmapSNPFilter} {input.popStats} 
         """
+
+rule combineFSTData:
+    input:
+        FstSumstats=expand("{path}/filters/{params}/populations.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+		barcodes=expand("{path}/stacksFiles/barcodeStacks{run}.tsv", path=config["outputDir"], bar=config["barcodeFile"],run=RUN),
+    output:
+        fstStats=expand("{path}/filters/fstStatsAll.tsv",path=config["outputDir"])
+    conda:
+        "env/R.yaml"
+    shell:
+        """
+        Rscript src/filterAndFigures/fst.R {output.popStats} {input.popmapSNPFilter} {input.popStats} 
+        """
+
