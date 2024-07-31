@@ -19,7 +19,7 @@ for(run in barcodes$run){
                             sample=barcodesSub$sample)
   barcodeStacks$sample[duplicated(barcodeStacks$sample)]<-paste0(barcodeStacks$sample[duplicated(barcodeStacks$sample)],"DUP")
   write.table(barcodeStacks,paste0(args[2],"/barcodeStacks",run,".tsv"),row.names = F,col.names = F,quote=F,sep="\t")
-  popmapStacksSub<-data.frame(sample=barcodes$sample[duplicated(barcodes$sample)==F],pop=barcodes$pop[duplicated(barcodes$sample)==F])
+  popmapStacksSub<-data.frame(sample=barcodesSub$sample[duplicated(barcodesSub$sample)==F],pop=barcodesSub$pop[duplicated(barcodesSub$sample)==F])
   write.table(popmapStacksSub,paste0(args[2],"/popmap",run,".tsv"),row.names = F,col.names = F,quote=F,sep="\t")    
 }
 
