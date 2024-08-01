@@ -210,13 +210,13 @@ rule combinePopData:
 rule combineFSTData:
     input:
         FstSumstats=expand("{path}/filters/{params}/populations.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
-        barcodes=expand("{path}/stacksFiles/barcodeStacks{run}.tsv", path=config["outputDir"], bar=config["barcodeFile"],run=RUN)
+        barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"])
     output:
         fstStats=expand("{path}/filters/fstStatsAll.tsv",path=config["outputDir"])
     conda:
         "env/R.yaml"
     shell:
         """
-        Rscript src/filterAndFigures/fst.R {output.popStats} {input.popmapSNPFilter} {input.popStats} 
+        Rscript src/filterAndFigures/fst.R {output.fstStats} {input.barcodes} {input.FstSumstats} 
         """
 
