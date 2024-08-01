@@ -129,7 +129,7 @@ rule combinePerRunPopmap:
 	output:
 		popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"])
 	shell:
-		"cat {input.popmap} > {output.popmap}"
+		"cat {input.popmap} | sort | uniq > {output.popmap}"
 
 
 if DUPES==False:

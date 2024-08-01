@@ -25,7 +25,7 @@ if config["mode"]=="Denovo":
             output:
                 expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"])
             params:
-                100
+                90
             shell:
                 "paste <(shuf -n {params} {input.popmap} | cut -f1) <(yes opt | head -n {params}) > {output}"
         
