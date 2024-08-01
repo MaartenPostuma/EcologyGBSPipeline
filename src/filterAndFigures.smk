@@ -209,7 +209,7 @@ rule combinePopData:
 
 rule combineFSTData:
     input:
-        FstSumstats=expand("{path}/filters/{params}/populations.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+        FstSumstats=expand("{path}/filters/{params}/populations.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern),
         barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"])
     output:
         fstStats=expand("{path}/filters/fstStatsAll.tsv",path=config["outputDir"])
