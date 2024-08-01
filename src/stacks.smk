@@ -16,7 +16,7 @@ if config["mode"]=="Denovo":
                 "env/stacks.yaml"
             threads:workflow.cores
             shell:
-                "denovo_map.pl --samples {params.inputDir} --popmap {input.popmap} -T  {threads}       -o {params.outputDir} -n {params.M} -m {params.M} -X 'populations: --vcf'"
+                "denovo_map.pl --samples {params.inputDir} --popmap {input.popmap} -T  {threads}  --paired     -o {params.outputDir} -n {params.M} -m {params.M} -X 'populations: --vcf'"
 
     if len(df.index) > 100: 
         rule subset_popmap:
