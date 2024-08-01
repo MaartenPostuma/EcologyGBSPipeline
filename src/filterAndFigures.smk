@@ -24,7 +24,7 @@ rule makeReport:
         treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"]),
         popStats=expand("{path}/filters/popStatsAll.tsv",path=config["outputDir"]),
         fstStats=expand("{path}/filters/fstStatsAll.tsv",path=config["outputDir"]),
-		barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"])
+        barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"])
     output:
         report_out=expand("{path}/report{mode}.html",path=config["outputDir"],mode=MODE)
     params:
