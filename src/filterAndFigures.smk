@@ -210,7 +210,7 @@ rule combinePopData:
 rule combineFSTData:
     input:
         FstSumstats=expand("{path}/filters/{params}/populations.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
-		barcodes=expand("{path}/stacksFiles/barcodeStacks{run}.tsv", path=config["outputDir"], bar=config["barcodeFile"],run=RUN),
+        barcodes=expand("{path}/stacksFiles/barcodeStacks{run}.tsv", path=config["outputDir"], bar=config["barcodeFile"],run=RUN),
     output:
         fstStats=expand("{path}/filters/fstStatsAll.tsv",path=config["outputDir"])
     conda:
