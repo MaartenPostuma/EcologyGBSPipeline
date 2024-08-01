@@ -45,4 +45,4 @@ if config["mode"]=="Denovo":
                 "env/stacks.yaml"
             threads:workflow.cores
             shell:
-                "denovo_map.pl --samples {params.inputDir} --popmap {input.popmap} -T  {threads} --catalog-popmap {input.popmap_sub}       -o {params.outputDir} -n {params.M} -m {params.M} -X 'populations: --vcf'"
+                "denovo_map.pl --samples {params.inputDir} --popmap {input.popmap} -T  {threads} --catalog-popmap {input.popmap_sub} --paired      -o {params.outputDir} -n {params.M} -m {params.M} -X 'populations: --vcf'"
