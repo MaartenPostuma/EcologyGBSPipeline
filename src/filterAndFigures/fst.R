@@ -27,7 +27,7 @@ for(i in 1:nrow(fstDataTemp)){
 fstDataTemp[lower.tri(fstDataTemp)]<-t(fstDataTemp)[lower.tri(fstDataTemp)]
 fstDataTemp$maf<-sub("^.*~","",mafString)
 fstDataTemp$max_missing<-sub("^.*~","",max_missingString)
-listOfFiles[[i]]<-popDataTemp
+listOfFiles[[i]]<-fstDataTemp
 }
 
 popStatsAll<-do.call(rbind,listOfFiles)
