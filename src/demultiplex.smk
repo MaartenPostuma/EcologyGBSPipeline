@@ -108,6 +108,14 @@ rule process_logs:
 
 rule combine_logs:
 	input:
+		log=expand("{path}/demultiplex/logs/{run}/perInd.tsv",path=config["outputDir"],run=RUN)
+	output:
+		log=expand("{path}/demultiplex/logs/nReadsPerSample.log",path=config["outputDir"])
+	shell:
+		"""cat <(head -n {input.log}) <(cat {input.log} | grep -v "RAD Cutsite Not Found") > {output.log}"""
+
+rule get_low_indvs:
+	input:
 		log=expand("{path}/demultiplex/logs/{{run}}/perInd.tsv",path=config["outputDir"])
 	output:
 		log=expand("{path}/demultiplex/logs/{{run}}/removeInds.tsv",path=config["outputDir"])

@@ -1,6 +1,6 @@
 param_nInds=config["param_StacksTest"]["nInds"]
 def getParam_nInds(param_nInds):
-    if param_nInds == "default" or param_oligo == "":
+    if param_nInds == "default" or param_nInds == "":
         id = 20
     else:
         id = param_nInds
