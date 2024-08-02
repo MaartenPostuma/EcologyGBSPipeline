@@ -134,18 +134,19 @@ for(i in 1:length(unique(parameters$maf))){
   
 genDist<-fstStats[fstStats$max_missing==max_missing&fstStats$maf==maf,] 
 genDistUsed<- genDist[!colnames(genDist)%in%c("maf","max_missing")]
+row.names(genDistUsed)<-colnames(genDistUsed)
 gen_dendro <- as.dendrogram(hclust(d = as.dist(genDistUsed)))
 genDistUsed$pop<-colnames(genDistUsed)
 dendro_plot <- ggdendrogram(data = gen_dendro, rotate = TRUE) + 
   theme(axis.text.y = element_text(size = 6))
 
-gen_long <-melt(genDist)
+gen_long <-melt(genDistUsed)
 gen_order <- order.dendrogram(gen_dendro)
 gen_long$pop <- factor(x = gen_long$pop,
-                       levels = colnames(genDist)[gen_order], 
+                       levels = colnames(genDistUsed)[gen_order], 
                        ordered = TRUE)
 gen_long$variable <- factor(x = gen_long$variable,
-                            levels = colnames(genDist)[gen_order], 
+                            levels = colnames(genDistUsed)[gen_order], 
                             ordered = TRUE)
 
 
@@ -156,19 +157,19 @@ heatmap_plot<-ggplot(data = gen_long, aes(x = variable, y = pop)) +
   theme(axis.text.y = element_blank(),
         axis.title.y = element_blank(),
         axis.ticks.y = element_blank(),
-        legend.position = "top")
+        legend.position = "top")+
+      ggtitle(paste("mean fst =",mean(gen_long$value,na.rm=T)))
 
 
 
 grid.newpage()
 print(heatmap_plot, 
-      vp = viewport(x = 0.4, y = 0.5, width = 0.8, height = 1.0))+
-      ggitle(paste("mean fst =",mean(gen_long)))
+      vp = viewport(x = 0.4, y = 0.5, width = 0.8, height = 1.0))
 print(dendro_plot, 
       vp = viewport(x = 0.90, y = 0.43, width = 0.2, height = 0.90))
 
 }
-
+barcodes<-read.table(params$args[2])
 if(sum(colnames(barcodes)=="lat")&sum(colnames(barcodes)=="lon")){
 cat("\n\n### Isolation by distance {.tabset .tabset-fade .tabset-pills}\n")
 
@@ -177,9 +178,9 @@ for(i in 1:length(unique(parameters$maf))){
   cat("\n\n#### maf = ", maf, "\n")
   genDist<-fstStats[fstStats$max_missing==max_missing&fstStats$maf==maf,] 
   genDistUsed<- genDist[!colnames(genDist)%in%c("maf","max_missing")]
+  row.names(genDistUsed)<-colnames(genDistUsed)
 
 
-  barcodes<-read.table(params$args[2])
   geoDistanceDF<-unique(barcodes[,c("pop","lat","lon")])
   row.names(geoDistanceDF)<-geoDistanceDF$pop
   unAvPops<-geoDistanceDF$pop[is.na(geoDistanceDF$lat)|is.na(geoDistanceDF$lon)]
@@ -191,14 +192,14 @@ for(i in 1:length(unique(parameters$maf))){
   print(ggplot(distanceDF,aes(x=geographicalDist,y=geneticDist))+
     geom_point()+
     geom_smooth(method = "lm", formula = formula, se = F) +
-    stat_poly_eq(aes(label = paste(..rr.label..)), 
+    stat_poly_eq(aes(label = paste(after_stat(rr.label))), 
                  label.x = mean(distanceDF$geographicalDist),
                  label.y= mean(distanceDF$geneticDist)-0.5*sd(distanceDF$geneticDist),
                  formula = formula, parse = TRUE, size = 5)+
     stat_fit_glance(method = 'lm',
                     method.args = list(formula = formula),
                     geom = 'text',
-                    aes(label = paste("P-value = ", signif(..p.value.., digits = 4), sep = "")),
+                    aes(label = paste("P-value = ", signif(after_stat(p.value), digits = 4), sep = "")),
                     label.x = mean(distanceDF$geographicalDist)+
                       0.5*sd(distanceDF$geographicalDist), 
                     label.y = mean(distanceDF$geneticDist)-1*sd(distanceDF$geneticDist),
