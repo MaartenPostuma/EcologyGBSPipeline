@@ -76,7 +76,7 @@ if config["mode"]== "Denovo":
         conda:
             "env/stacks.yaml"
         shell:
-            "populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --threads {threads}"    
+            "populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --fstats --threads {threads}"    
 
 if config["mode"]== "Reference": 
     rule step_1:
