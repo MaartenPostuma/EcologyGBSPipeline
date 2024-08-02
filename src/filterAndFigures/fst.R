@@ -2,14 +2,13 @@ args = commandArgs(trailingOnly=TRUE)
 
 fileList<-args[-c(1,2)]
 output<-args[1] #First arg = output
-dataFst<-read.table(args[2],h=T) #2nd arg is fst
 dataBarcode<-read.table(args[3],h=T) #3rd arg is barcode file
 listOfFiles<-list()
 
 for(i in 1:length(fileList)){
 file<-fileList[i]
 
-fstDataTemp<-read.table(file,h=T)
+fstDataTemp<-read.table(file,h=T,fill=T)
 
 splittedPath<-strsplit(file,split="/")[[1]]
 max_missingString<-splittedPath[grep("max_missing",splittedPath)]
