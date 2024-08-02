@@ -181,7 +181,7 @@ for(i in 1:length(unique(parameters$maf))){
   row.names(genDistUsed)<-colnames(genDistUsed)
 
 
-  geoDistanceDF<-unique(barcodes[,c("pop","lat","lon")])
+  geoDistanceDF<-unique(fstStats[,c("pop","lat","lon")])
   row.names(geoDistanceDF)<-geoDistanceDF$pop
   unAvPops<-geoDistanceDF$pop[is.na(geoDistanceDF$lat)|is.na(geoDistanceDF$lon)]
   genDistMantel<-as.dist(genDistUsed[!row.names(genDistUsed)%in%unAvPops,!colnames(genDistUsed)%in%c(unAvPops,"pop")])
