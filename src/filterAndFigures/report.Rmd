@@ -133,7 +133,7 @@ for(i in 1:length(unique(parameters$maf))){
  cat("\n\n#### maf = ", maf, "\n")
   
 genDist<-fstStats[fstStats$max_missing==max_missing&fstStats$maf==maf,] 
-genDistUsed<- genDist[!colnames(genDist)%in%c("maf","max_missing")]
+genDistUsed<- genDist[!colnames(genDist)%in%c("maf","max_missing","pop","lat","lon")]
 row.names(genDistUsed)<-colnames(genDistUsed)
 gen_dendro <- as.dendrogram(hclust(d = as.dist(genDistUsed)))
 genDistUsed$pop<-colnames(genDistUsed)
