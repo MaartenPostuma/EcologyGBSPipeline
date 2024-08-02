@@ -152,13 +152,14 @@ gen_long$variable <- factor(x = gen_long$variable,
 
 heatmap_plot<-ggplot(data = gen_long, aes(x = variable, y = pop)) +
   geom_tile(aes(fill = value)) +
+  theme_pubr()+
   geom_text(aes(label=round(value,2)))+
   scale_fill_gradient2(low = "#fec44f",mid="#fff7bc",high="#dd1c77")+
   theme(axis.text.y = element_blank(),
         axis.title.y = element_blank(),
         axis.ticks.y = element_blank(),
         legend.position = "top")+
-      ggtitle(paste("mean fst =",mean(gen_long$value,na.rm=T)))
+      ggtitle(paste("mean fst =",round(mean(gen_long$value,na.rm=T),2)))
 
 
 
@@ -205,7 +206,8 @@ for(i in 1:length(unique(parameters$maf))){
                     label.y = mean(distanceDF$geneticDist)-1*sd(distanceDF$geneticDist),
                     size = 5)+
     ylab("Fst")+
-    xlab("geographical distance (km)"))
+    xlab("geographical distance (km)"))+
+    theme_pubr()
 }
 }
 
