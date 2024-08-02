@@ -21,7 +21,7 @@ rule subset_popmap:
     params:
         getParam_nInds(param_nInds)
     shell:
-        "paste <(shuf -n {params} {input} | cut -f1) <(yes opt | head -n {params}) > {output}"
+        "paste <(cat {input} | sort | uniq | shuf -n {params} | cut -f1) <(yes opt | head -n {params}) > {output}"
 
 rule mkdirLargeM:
     input:
