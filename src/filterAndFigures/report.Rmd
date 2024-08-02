@@ -124,10 +124,18 @@ for(i in 1:length(unique(parameters$maf))){
    ylab("genetic distance")+
    ggtitle(paste("number of SNPs =",unique(treeLabelsSub$nSNPs),"\n maxMissing =",max_missing,"\n maf =",maf)))
 }
+
+
+
 cat("\n\n### Fst {.tabset .tabset-fade .tabset-pills}\n")
-genDist<-fstStats[fstStats$max_missing==max_missing&fstStats$maf==maf,]  
-gen_dendro <- as.dendrogram(hclust(d = as.dist(genDist)))
-genDist$pop<-colnames(genDist)
+for(i in 1:length(unique(parameters$maf))){
+ maf<-unique(parameters$maf)[i]
+ cat("\n\n#### maf = ", maf, "\n")
+  
+genDist<-fstStats[fstStats$max_missing==max_missing&fstStats$maf==maf,] 
+genDistUsed<- genDist[!colnames(genDist)%in%c("maf","max_missing")]
+gen_dendro <- as.dendrogram(hclust(d = as.dist(genDistUsed)))
+genDistUsed$pop<-colnames(genDistUsed)
 dendro_plot <- ggdendrogram(data = gen_dendro, rotate = TRUE) + 
   theme(axis.text.y = element_text(size = 6))
 
@@ -159,14 +167,23 @@ print(heatmap_plot,
 print(dendro_plot, 
       vp = viewport(x = 0.90, y = 0.43, width = 0.2, height = 0.90))
 
-barcodes<-read.table(params$args[2])
+}
+
 if(sum(colnames(barcodes)=="lat")&sum(colnames(barcodes)=="lon")){
 cat("\n\n### Isolation by distance {.tabset .tabset-fade .tabset-pills}\n")
- 
+
+for(i in 1:length(unique(parameters$maf))){
+  maf<-unique(parameters$maf)[i]
+  cat("\n\n#### maf = ", maf, "\n")
+  genDist<-fstStats[fstStats$max_missing==max_missing&fstStats$maf==maf,] 
+  genDistUsed<- genDist[!colnames(genDist)%in%c("maf","max_missing")]
+
+
+  barcodes<-read.table(params$args[2])
   geoDistanceDF<-unique(barcodes[,c("pop","lat","lon")])
   row.names(geoDistanceDF)<-geoDistanceDF$pop
   unAvPops<-geoDistanceDF$pop[is.na(geoDistanceDF$lat)|is.na(geoDistanceDF$lon)]
-  genDistMantel<-as.dist(genDist[!row.names(genDist)%in%unAvPops,!colnames(genDist)%in%c(unAvPops,"pop")])
+  genDistMantel<-as.dist(genDistUsed[!row.names(genDistUsed)%in%unAvPops,!colnames(genDistUsed)%in%c(unAvPops,"pop")])
   geoDistMantel<-distm(geoDistanceDF[!geoDistanceDF$pop%in%unAvPops,c("lon","lat")],fun = distHaversine)/1000
   distanceDF<-data.frame(geographicalDist=c(as.dist(geoDistMantel)),geneticDist=c(genDistMantel))
   formula <- y ~ x    
@@ -189,7 +206,7 @@ cat("\n\n### Isolation by distance {.tabset .tabset-fade .tabset-pills}\n")
     ylab("Fst")+
     xlab("geographical distance (km)"))
 }
-
+}
 
 cat("\n\n### PopStats {.tabset .tabset-fade .tabset-pills}\n")
 
