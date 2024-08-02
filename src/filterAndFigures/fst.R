@@ -30,4 +30,8 @@ listOfFiles[[i]]<-fstDataTemp
 }
 
 popStatsAll<-do.call(rbind,listOfFiles)
+if(sum(colnames(barcodes)=="lat")&sum(colnames(barcodes)=="lon")){
+popStatsAll<-merge(unique(barcodes[,c("lat","lon","pop")]),popStatsAll,by="pop")
+
+}
 write.table(popStatsAll,output,row.names=F)

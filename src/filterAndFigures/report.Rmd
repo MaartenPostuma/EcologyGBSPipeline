@@ -169,8 +169,8 @@ print(dendro_plot,
       vp = viewport(x = 0.90, y = 0.43, width = 0.2, height = 0.90))
 
 }
-barcodes<-read.table(params$args[2])
-if(sum(colnames(barcodes)=="lat")&sum(colnames(barcodes)=="lon")){
+
+if(sum(colnames(fstStats)=="lat")&sum(colnames(fstStats)=="lon")){
 cat("\n\n### Isolation by distance {.tabset .tabset-fade .tabset-pills}\n")
 
 for(i in 1:length(unique(parameters$maf))){
