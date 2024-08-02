@@ -24,6 +24,7 @@ for(j in 1:nrow(fstDataTemp)){
 
 
 fstDataTemp[lower.tri(fstDataTemp)]<-t(fstDataTemp)[lower.tri(fstDataTemp)]
+fstDataTemp$pop<-colnames(fstDataTemp$pop)
 fstDataTemp$maf<-sub("^.*~","",mafString)
 fstDataTemp$max_missing<-sub("^.*~","",max_missingString)
 listOfFiles[[i]]<-fstDataTemp
