@@ -1,5 +1,4 @@
 args = commandArgs(trailingOnly=TRUE)
-
 fileList<-args[-c(1,2)]
 output<-args[1] #First arg = output
 dataBarcode<-read.table(args[2],h=T) #3rd arg is barcode file
@@ -19,8 +18,8 @@ fstDataTemp[,1]<-NA
 fstDataTemp[ncol(fstDataTemp),]<-NA
 row.names(fstDataTemp)[ncol(fstDataTemp)]<-colnames(fstDataTemp)[ncol(fstDataTemp)]
 
-for(i in 1:nrow(fstDataTemp)){
-  fstDataTemp[i,1:ncol(fstDataTemp)]<-c(rep(NA,times=i-1),fstDataTemp[i,1:(ncol(fstDataTemp)-(i-1))])
+for(j in 1:nrow(fstDataTemp)){
+  fstDataTemp[j,1:ncol(fstDataTemp)]<-c(rep(NA,times=j-1),fstDataTemp[j,1:(ncol(fstDataTemp)-(j-1))])
 }
 
 

@@ -125,7 +125,7 @@ for(i in 1:length(unique(parameters$maf))){
    ggtitle(paste("number of SNPs =",unique(treeLabelsSub$nSNPs),"\n maxMissing =",max_missing,"\n maf =",maf)))
 }
 cat("\n\n### Fst {.tabset .tabset-fade .tabset-pills}\n")
-genDist<-fstStats[fstStats$max_missing==fstStats&pcaData$maf==maf,]  
+genDist<-fstStats[fstStats$max_missing==max_missing&fstStats$maf==maf,]  
 gen_dendro <- as.dendrogram(hclust(d = as.dist(genDist)))
 genDist$pop<-colnames(genDist)
 dendro_plot <- ggdendrogram(data = gen_dendro, rotate = TRUE) + 
