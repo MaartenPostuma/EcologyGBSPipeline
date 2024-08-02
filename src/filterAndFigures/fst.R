@@ -2,7 +2,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 fileList<-args[-c(1,2)]
 output<-args[1] #First arg = output
-dataBarcode<-read.table(args[3],h=T) #3rd arg is barcode file
+dataBarcode<-read.table(args[2],h=T) #3rd arg is barcode file
 listOfFiles<-list()
 
 for(i in 1:length(fileList)){
