@@ -154,7 +154,8 @@ heatmap_plot<-ggplot(data = gen_long, aes(x = variable, y = pop)) +
 
 grid.newpage()
 print(heatmap_plot, 
-      vp = viewport(x = 0.4, y = 0.5, width = 0.8, height = 1.0))
+      vp = viewport(x = 0.4, y = 0.5, width = 0.8, height = 1.0))+
+      ggitle(paste("mean fst =",mean(gen_long)))
 print(dendro_plot, 
       vp = viewport(x = 0.90, y = 0.43, width = 0.2, height = 0.90))
 
