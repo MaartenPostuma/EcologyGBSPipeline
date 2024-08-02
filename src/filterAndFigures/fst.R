@@ -31,5 +31,4 @@ listOfFiles[[i]]<-fstDataTemp
 }
 
 popStatsAll<-do.call(rbind,listOfFiles)
-popStatsAll<-merge(popStatsAll,unique(dataBarcode[,c("pop","metaPop")]),by="pop")
 write.table(popStatsAll,output,row.names=F)
