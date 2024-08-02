@@ -1,4 +1,8 @@
 args = commandArgs(trailingOnly=TRUE)
+#args= c("resultsFraaiHersthooi/filters/fstStatsAll.tsv",
+#        "/scratch2/maarten/rawData/peperboompje/2022/fraaiHertshooi/fraaiHersthooi.txt", 
+#        "resultsFraaiHersthooi/filters/max_missing~1e-05/maf~1e-05/populations.fst_summary.tsv",
+#        "resultsFraaiHersthooi/filters/max_missing~1e-05/maf~0.01/populations.fst_summary.tsv")
 fileList<-args[-c(1,2)]
 output<-args[1] #First arg = output
 barcodes<-read.table(args[2],h=T) #3rd arg is barcode file
@@ -24,7 +28,7 @@ for(j in 1:nrow(fstDataTemp)){
 
 
 fstDataTemp[lower.tri(fstDataTemp)]<-t(fstDataTemp)[lower.tri(fstDataTemp)]
-fstDataTemp$pop<-colnames(fstDataTemp$pop)
+fstDataTemp$pop<-row.names(fstDataTemp)
 fstDataTemp$maf<-sub("^.*~","",mafString)
 fstDataTemp$max_missing<-sub("^.*~","",max_missingString)
 listOfFiles[[i]]<-fstDataTemp
