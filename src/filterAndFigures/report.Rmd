@@ -16,7 +16,8 @@ params:
 
 ```{r setup, include=FALSE}
 
-#setwd("./output")
+#This is the setup. 
+#It includes all the packages that are necessary and installs them if they are not yet there.
 chooseCRANmirror(graphics=FALSE, ind=33)
 args <- commandArgs(TRUE)
 usePackage <- function(p) 
@@ -53,6 +54,7 @@ This report contains all the information needed to make descisions about your fi
 The distribution of individual missingness
 
 ```{r fig.cap="Fig.1: Histogram of the fraction of missingness across individuals, red line indicates the cutoff used in filtering step 2"}
+#Import the individual missingness and makes a histogram with a line to show the cutoff from the config file.
 indCoverage<-read.table(paste0(params$args[1],"filters/missingIndvs.imiss"),h=T)
 rawCutOff<-system("cat config.yaml | grep 'individual_missingness'| cut -f2 -d :",intern=T)
 
@@ -66,17 +68,20 @@ popmap<-read.table(paste0(params$args[1],"/stacksFiles/popmap.tsv"))
 
 ggplot(indCoverage,aes(x=F_MISS))+geom_histogram(col="black",fill="lightblue",binwidth=0.025)+
   ggtitle(paste0(numberOfIndividuals,"out of ",nrow(popmap)))+ylab("fraction missing")+
-  theme_light()+geom_vline(xintercept=cutOff,col="red")
+  theme_pubr()+geom_vline(xintercept=cutOff,col="red")
 
 ```
 
 Below is a list of the samples that were excluded from the analysis
 ```{r}
+#Shows samples that were filtered. Either due to having less then 100 reads or not passing the SNP filtering
 popmap$V1[!popmap$V1%in%popMapFilter$V1]
 
 ```
 
 ```{r,message=FALSE,results='asis',error=TRUE, fig.cap=paste("")}
+
+#Big thing that makes all the analysis 
 parameters<-read.table("src/filterAndFigures/paramTest.tsv",h=T)
 pcaData<-read.table(paste0(params$args[1],"filters/pcaAll.tsv"),h=T)
 treeSegments<-read.table(paste0(params$args[1],"filters/treeSegmentsAll.tsv"),h=T)
