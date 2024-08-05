@@ -38,6 +38,8 @@ usePackage("grid")
 usePackage("geosphere")
 usePackage("ggpmisc")
 usePackage("tidyr")
+usePackage("ade4")
+
 options(stringsAsFactors = FALSE)
 
 knitr::opts_chunk$set(echo = FALSE)
@@ -194,7 +196,8 @@ for(i in 1:length(unique(parameters$maf))){
   geoDistMantel<-distm(geoDistanceDF[!geoDistanceDF$pop%in%unAvPops,c("lon","lat")],fun = distHaversine)/1000
   distanceDF<-data.frame(geographicalDist=c(as.dist(geoDistMantel)),geneticDist=c(genDistMantel))
   formula <- y ~ x    
-  
+  test<-  mantel.randtest((genDistMantel),as.dist(geoDistMantel))
+
   print(ggplot(distanceDF,aes(x=geographicalDist,y=geneticDist))+
     geom_point()+
     geom_smooth(method = "lm", formula = formula, se = F) +
@@ -212,7 +215,12 @@ for(i in 1:length(unique(parameters$maf))){
                     size = 5)+
     ylab("Fst")+
     xlab("geographical distance (km)"))+
-    theme_pubr()
+    theme_pubr()+
+    geom_text(x=mean(distanceDF$geographicalDist)-
+                0.5*sd(distanceDF$geographicalDist),
+              y=mean(distanceDF$geneticDist)-1*sd(distanceDF$geneticDist),
+              label=paste("Mantel test p-value = ",test$pvalue),size=5)
+
 }
 }
 
