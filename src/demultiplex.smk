@@ -22,7 +22,7 @@ rule polyG:
 		R2=temp(expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"]))
 	resources:
 		mem_mb= 10000,
-		runtime= 1,20,
+		runtime= 120,
 		cpus_per_task= 6
 	threads: 6
 	conda:
@@ -103,7 +103,7 @@ rule process_radtags:
 	threads: THREADSPERRUN
 	resources:
 		mem_mb= 10000,
-		runtime= 6:00:00,
+		runtime= 6*60,
 		cpus_per_task= THREADSPERRUN
 	shell:
 		"""
@@ -186,7 +186,7 @@ if DUPES==False:
 			outputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"]),
 		resources:
 			mem_mb= 100,
-			runtime= 1,0:00,
+			runtime= 1,
 			cpus_per_task= 1
 
 		shell:
@@ -210,7 +210,7 @@ if DUPES==True:
 			outputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"])
 		resources:
 			mem_mb= 100,
-			runtime= 1,0:00,
+			runtime= 1,
 			cpus_per_task= 1
 		shell:
 			"""
