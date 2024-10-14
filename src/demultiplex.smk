@@ -46,7 +46,7 @@ rule clone_filter:
 		"env/stacks.yaml"
 	threads: 1
 	resources:
-		mem_mb=lambda wc, input 0.5 * input.R1.size_mb,
+		mem_mb=lambda wc, input: (0.5 * input.R1.size_mb)
 		runtime= 6:00:00,
 		cpus_per_task= 1:00,
 

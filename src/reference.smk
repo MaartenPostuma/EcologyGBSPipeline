@@ -7,7 +7,7 @@ rule make_bwa_mem_index:
         "env/bwa-mem.yaml"
     threads: 1
     resources:
-        mem_mb: 1000
+        mem_mb= 1000
     shell:
         "bwa-mem2 index {input.ref}"
 
@@ -24,7 +24,7 @@ rule map_bwa:
     conda:
         "env/bwa-mem.yaml"
     resources:
-        mem_mb: 10000
+        mem_mb= 10000
     shell:
         "bwa-mem2 mem -t {threads} {input.ref} {input.samplesR1} {input.samplesR2} | samtools view -buS - > {output.bam}"
 
@@ -35,7 +35,7 @@ rule sort_picard:
         sortedBam=temp(expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["tmpDir"]))
     threads: 1
     resources:
-        mem_mb: 10000
+        mem_mb= 10000
     conda:
         "env/picard.yaml"
     shell:
@@ -48,7 +48,7 @@ rule add_RG:
         RGBam=expand("{path}/refMapping/RGBams/{{samples}}.bam",path=config["tmpDir"])
     threads: 1
     resources:
-        mem_mb: 10000
+        mem_mb= 10000
     conda:
         "env/picard.yaml"
     shell:
