@@ -13,8 +13,8 @@ rule makeGDS:
         "env/R.yaml"
      resources:
      		mem_mb=lambda wc, input.vcf.size_mb,        
-             runtime: 15:00,
-             cpus_per_task: 1
+            runtime= 15:00,
+            cpus_per_task= 1
      shell:
         '''
         R -e "SNPRelate::snpgdsVCF2GDS('{input.vcf}','{output.gds_out}')"
@@ -35,8 +35,8 @@ rule makeReport:
         outputDir=expand("{path}/",path=config["outputDir"]),
      resources:
 		mem_mb=lambda wc, input.vcf.size_mb,        
-        runtime: 15:00,
-         cpus_per_task: 1
+       runtime= 15:00,
+        cpus_per_task= 1
      conda:
         "env/R.yaml"
      shell:
@@ -62,8 +62,8 @@ if config["mode"]== "Denovo":
              indMissing=individual_missingness,
           resources:
      		mem_mb=lambda wc, input.vcf.size_mb,        
-             runtime: 30:00,
-             cpus_per_task: 1
+            runtime= 30:00,
+            cpus_per_task= 1
         shell:
              """vcftools --vcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs --max-missing 0.5
              mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/lowDP.step1.indv
@@ -105,8 +105,8 @@ if config["mode"]== "Reference":
              indMissing=individual_missingness,
           resources:
      		mem_mb=lambda wc, input.vcf.size_mb,        
-             runtime: 30:00,
-             cpus_per_task: 4
+            runtime= 30:00,
+            cpus_per_task= 4
      
         shell:
              """
@@ -135,8 +135,8 @@ if config["mode"]== "Reference":
              4
              resources:
      		mem_mb=lambda wc, input.vcf.size_mb,        
-             runtime: 30:00,
-             cpus_per_task: 4
+            runtime= 30:00,
+            cpus_per_task= 4
 
         conda:
              "env/stacks.yaml"
@@ -159,8 +159,8 @@ rule makePCAData:
         "env/R.yaml"
         resources:
 		mem_mb=lambda wc, input.gds.size_mb,        
-        runtime: 10:00,
-        cpus_per_task: 1     
+        runtime= 10:00,
+        cpus_per_task= 1     
      params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
      shell:
@@ -172,9 +172,9 @@ rule combinePCAData:
      output:
         pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"])
      resources:
-		mem_mb: 100,
-        runtime: 10:00,
-        cpus_per_task: 1
+		mem_mb= 100,
+       runtime= 10:00,
+       cpus_per_task= 1
      
      shell:
         "cat <(cat {input.pcaData} | head -n 1) <(cat {input.pcaData} | grep -v sample.id)  > {output.pcaDataAll}"
@@ -192,8 +192,8 @@ rule makeTreeData:
         "env/R.yaml"
     resources:
 		mem_mb=lambda wc, input.gds.size_mb    ,    
-        runtime: 10:00,
-        cpus_per_task: 1
+       runtime= 10:00,
+       cpus_per_task= 1
      params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
      shell:
@@ -207,9 +207,9 @@ rule combineTreeData:
         treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
         treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"])
       resources:
-		mem_mb: 100,
-        runtime: 10:00,
-        cpus_per_task: 1
+		mem_mb= 100,
+       runtime= 10:00,
+       cpus_per_task= 1
 
      shell:
         """
@@ -226,9 +226,9 @@ rule makePopData:
      params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
       resources:
-		mem_mb: 100,
-        runtime: 10:00,
-        cpus_per_task: 1
+		mem_mb= 100,
+       runtime= 10:00,
+       cpus_per_task= 1
 
      shell:
         """
@@ -246,9 +246,9 @@ rule combinePopData:
      params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
     resources:
-		mem_mb: 100,
-        runtime: 10:00,
-        cpus_per_task: 1
+		mem_mb= 100,
+       runtime= 10:00,
+       cpus_per_task= 1
 
      shell:
         """
@@ -264,9 +264,9 @@ rule combineFSTData:
      conda:
         "env/R.yaml"
       resources:
-		mem_mb: 100,
-        runtime: 10:00,
-        cpus_per_task: 1
+		mem_mb= 100,
+       runtime= 10:00,
+       cpus_per_task= 1
      shell:
         """
         Rscript src/filterAndFigures/fst.R {output.fstStats} {input.barcodes} {input.FstSumstats} 

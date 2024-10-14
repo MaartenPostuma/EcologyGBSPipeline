@@ -21,9 +21,9 @@ rule polyG:
 		R1=temp(expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"])),
 		R2=temp(expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"]))
 	resources:
-		mem_mb: 10000,
-		runtime: 120,
-		cpus_per_task: 6
+		mem_mb= 10000,
+		runtime= 120,
+		cpus_per_task= 6
 	threads: 6
 	conda:
 		"env/fastp.yaml"
@@ -47,8 +47,8 @@ rule clone_filter:
 	threads: 1
 	resources:
 		mem_mb=lambda wc, input 0.5 * input.R1.size_mb,
-		runtime: 6:00:00,
-		cpus_per_task: 1:00,
+		runtime= 6:00:00,
+		cpus_per_task= 1:00,
 
 	shell: 
 		"clone_filter -1 {input.R1} -2 {input.R2} -o {params.outputdir}/clone_filter/ --oligo_len_1 {params.param_oligo} --oligo_len_2 {params.param_oligo} --inline_inline -i gzfastq"
@@ -68,9 +68,9 @@ rule make_stacks_files:
 	params:
 		outputDir=expand("{path}/stacksFiles",path=config["outputDir"])
 	resources:
-		mem_mb: 100,
-		runtime: 1:00,
-		cpus_per_task: 1
+		mem_mb= 100,
+		runtime= 1:00,
+		cpus_per_task= 1
 	conda:
 		"env/R.yaml"
 	shell:
@@ -102,9 +102,9 @@ rule process_radtags:
 		"env/stacks.yaml"
 	threads: THREADSPERRUN
 	resources:
-		mem_mb: 10000,
-		runtime: 6:00:00,
-		cpus_per_task: THREADSPERRUN
+		mem_mb= 10000,
+		runtime= 6:00:00,
+		cpus_per_task= THREADSPERRUN
 	shell:
 		"""
 		process_radtags  -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads} -t {params.truncateLength} --threads {threads}
@@ -122,9 +122,9 @@ rule process_logs:
 	conda:
 		"env/stacks.yaml"
 	resources:
-		mem_mb: 100,
-		runtime: 1:00,
-		cpus_per_task: 1
+		mem_mb= 100,
+		runtime= 1:00,
+		cpus_per_task= 1
 	shell:
 		"stacks-dist-extract {input.log} per_barcode_raw_read_counts > {output.log}"
 
@@ -142,9 +142,9 @@ rule get_low_indvs:
 	output:
 		log=expand("{path}/demultiplex/logs/{{run}}/removeInds.tsv",path=config["outputDir"])
 	resources:
-		mem_mb: 100,
-		runtime: 1:00,
-		cpus_per_task: 1
+		mem_mb= 100,
+		runtime= 1:00,
+		cpus_per_task= 1
 	shell:
 		"""cat {input.log} | awk '$8<1000 {{print $2}}' > {output.log}"""
 
@@ -155,9 +155,9 @@ rule filter_popmap:
 	output:
 		popmap=expand("{path}/stacksFiles/popmap{{run}}Filt.tsv", path=config["outputDir"])
 	resources:
-		mem_mb: 100,
-		runtime: 1:00,
-		cpus_per_task: 1
+		mem_mb= 100,
+		runtime= 1:00,
+		cpus_per_task= 1
 	shell:
 		"cat {input.popmap} | grep -f {input.removeIndv} -v	> {output.popmap}"
 
@@ -167,9 +167,9 @@ rule combinePerRunPopmap:
 	output:
 		popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"])
 	resources:
-		mem_mb: 100,
-		runtime: 1:00,
-		cpus_per_task: 1
+		mem_mb= 100,
+		runtime= 1:00,
+		cpus_per_task= 1
 
 	shell:
 		"cat {input.popmap} | sort | uniq > {output.popmap}"
@@ -185,9 +185,9 @@ if DUPES==False:
 		params:
 			outputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"]),
 		resources:
-			mem_mb: 100,
-			runtime: 10:00,
-			cpus_per_task: 1
+			mem_mb= 100,
+			runtime= 10:00,
+			cpus_per_task= 1
 
 		shell:
 			"""
@@ -209,9 +209,9 @@ if DUPES==True:
 		params:
 			outputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"])
 		resources:
-			mem_mb: 100,
-			runtime: 10:00,
-			cpus_per_task: 1
+			mem_mb= 100,
+			runtime= 10:00,
+			cpus_per_task= 1
 		shell:
 			"""
 			cat {params.outputDir}*/{wildcards.sample}.1.fq.gz > {output.samplesR1}
