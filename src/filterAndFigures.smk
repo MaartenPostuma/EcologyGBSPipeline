@@ -191,7 +191,7 @@ rule makeTreeData:
      conda:
         "env/R.yaml"
     resources:
-	    mem_mb=lambda wc, input: (0.5 * input.gds.size_mb),
+        mem_mb=lambda wc, input: (0.5 * input.gds.size_mb),
         runtime= 10,
         cpus_per_task= 1
      params:

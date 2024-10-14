@@ -16,7 +16,7 @@ if config["mode"]=="Denovo":
                 "env/stacks.yaml"
              threads:workflow.cores
              resources:
-         	    mem_mb= 30000,
+                mem_mb= 30000,
                 runtime= 24*60,
                 cpus_per_task= workflow.cores
 
@@ -31,8 +31,8 @@ if config["mode"]=="Denovo":
                 expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"])
              params:
                 90
-                resources:
-         		mem_mb= 100,
+            resources:
+                mem_mb= 100,
                 runtime= 5,
                 cpus_per_task= 1
              shell:
@@ -54,7 +54,7 @@ if config["mode"]=="Denovo":
                 "env/stacks.yaml"
              threads:workflow.cores
              resources:
-         		mem_mb= 30000,
+                mem_mb= 30000,
                 runtime= 24*60,
                 cpus_per_task= workflow.cores
              shell:
