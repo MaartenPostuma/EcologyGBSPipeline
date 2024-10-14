@@ -190,7 +190,7 @@ rule makeTreeData:
         treeSegments=expand("{path}/filters/{params}/treeSegments.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
      conda:
         "env/R.yaml"
-    resources:
+     resources:
         mem_mb=lambda wc, input: (0.5 * input.gds.size_mb),
         runtime= 10,
         cpus_per_task= 1
@@ -206,7 +206,7 @@ rule combineTreeData:
      output:
         treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
         treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"])
-      resources:
+     resources:
         mem_mb= 100,
         runtime= 10,
         cpus_per_task= 1
@@ -225,11 +225,10 @@ rule makePopData:
         popStats=expand("{path}/filters/{params}/popStats.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
      params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
-      resources:
+     resources:
         mem_mb= 100,
         runtime= 10,
         cpus_per_task= 1
-
      shell:
         """
         paste <(cat {input.sumstats} | grep -v positions | sed '/Poly/q' | grep -v "Poly" | cut -f1,2,9,15,21,24) <(cat {input.sumstats} | sed -n '/Poly/,$p' | cut -f 3,4,5) | sed 's/# Pop ID/pop/' > {output.popStats}
@@ -245,7 +244,7 @@ rule combinePopData:
         "env/R.yaml"
      params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
-    resources:
+     resources:
         mem_mb= 100,
         runtime= 10,
         cpus_per_task= 1
@@ -263,7 +262,7 @@ rule combineFSTData:
         fstStats=expand("{path}/filters/fstStatsAll.tsv",path=config["outputDir"])
      conda:
         "env/R.yaml"
-      resources:
+     resources:
         mem_mb= 100,
         runtime= 10,
         cpus_per_task= 1
