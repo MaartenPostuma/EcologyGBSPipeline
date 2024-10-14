@@ -28,7 +28,7 @@ rule polyG:
     conda:
         "env/fastp.yaml"
     shell:
-        "fastp -i {input.R1} -I {input.R2} -o {output.R1} -O {output.R2} --trim_poly_g"
+        """fastp -i {input.R1} -I {input.R2} -o {output.R1} -O {output.R2} --trim_poly_g""" 
 
 
 rule clone_filter:
