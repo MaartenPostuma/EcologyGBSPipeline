@@ -31,7 +31,7 @@ if config["mode"]=="Denovo":
                 expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"])
              params:
                 90
-            resources:
+             resources:
                 mem_mb= 100,
                 runtime= 5,
                 cpus_per_task= 1
