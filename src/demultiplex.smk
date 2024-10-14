@@ -46,10 +46,9 @@ rule clone_filter:
 		"env/stacks.yaml"
 	threads: 1
 	resources:
-		mem_mb=lambda wc, input: (0.5 * input.R1.size_mb),
+		mem_mb=50000,
 		runtime=6:00:00,
 		cpus_per_task=1:00,
-
 	shell: 
 		"clone_filter -1 {input.R1} -2 {input.R2} -o {params.outputdir}/clone_filter/ --oligo_len_1 {params.param_oligo} --oligo_len_2 {params.param_oligo} --inline_inline -i gzfastq"
 
