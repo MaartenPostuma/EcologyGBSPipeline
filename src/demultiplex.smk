@@ -46,9 +46,10 @@ rule clone_filter:
 		"env/stacks.yaml"
 	threads: 1
 	resources:
-		mem_mb=50000,
-		runtime=6:00:00,
-		cpus_per_task=1:00,
+		mem_mb=lambda wc, input: (0.5 * input.R1.size_mb),
+		runtime= 6*60,
+		cpus_per_task= 1,
+
 	shell: 
 		"clone_filter -1 {input.R1} -2 {input.R2} -o {params.outputdir}/clone_filter/ --oligo_len_1 {params.param_oligo} --oligo_len_2 {params.param_oligo} --inline_inline -i gzfastq"
 
@@ -68,7 +69,7 @@ rule make_stacks_files:
 		outputDir=expand("{path}/stacksFiles",path=config["outputDir"])
 	resources:
 		mem_mb= 100,
-		runtime= 1:00,
+		runtime= 1
 		cpus_per_task= 1
 	conda:
 		"env/R.yaml"
@@ -122,7 +123,7 @@ rule process_logs:
 		"env/stacks.yaml"
 	resources:
 		mem_mb= 100,
-		runtime= 1:00,
+		runtime= 1
 		cpus_per_task= 1
 	shell:
 		"stacks-dist-extract {input.log} per_barcode_raw_read_counts > {output.log}"
@@ -142,7 +143,7 @@ rule get_low_indvs:
 		log=expand("{path}/demultiplex/logs/{{run}}/removeInds.tsv",path=config["outputDir"])
 	resources:
 		mem_mb= 100,
-		runtime= 1:00,
+		runtime= 1
 		cpus_per_task= 1
 	shell:
 		"""cat {input.log} | awk '$8<1000 {{print $2}}' > {output.log}"""
@@ -155,7 +156,7 @@ rule filter_popmap:
 		popmap=expand("{path}/stacksFiles/popmap{{run}}Filt.tsv", path=config["outputDir"])
 	resources:
 		mem_mb= 100,
-		runtime= 1:00,
+		runtime= 1
 		cpus_per_task= 1
 	shell:
 		"cat {input.popmap} | grep -f {input.removeIndv} -v	> {output.popmap}"
@@ -167,7 +168,7 @@ rule combinePerRunPopmap:
 		popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"])
 	resources:
 		mem_mb= 100,
-		runtime= 1:00,
+		runtime= 1
 		cpus_per_task= 1
 
 	shell:
