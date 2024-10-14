@@ -6,14 +6,18 @@ individual_missingness=config["param_filtering"]["individual_missingness"]
 
 rule makeGDS:
     input:
-        vcf_in=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern)
+        vcf=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern)
     output:
         gds_out=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.wildcard_pattern)
     conda:
         "env/R.yaml"
+    resources:
+            mem_mb=lambda wc, input.vcf.size_mb,		
+            runtime: 15:00,
+		    cpus_per_task: 1
     shell:
         '''
-        R -e "SNPRelate::snpgdsVCF2GDS('{input.vcf_in}','{output.gds_out}')"
+        R -e "SNPRelate::snpgdsVCF2GDS('{input.vcf}','{output.gds_out}')"
         '''
 
 rule makeReport:
@@ -29,6 +33,10 @@ rule makeReport:
         report_out=expand("{path}/report{mode}.html",path=config["outputDir"],mode=MODE)
     params:
         outputDir=expand("{path}/",path=config["outputDir"]),
+    resources:
+        mem_mb=lambda wc, input.vcf.size_mb,		
+        runtime: 15:00,
+	    cpus_per_task: 1
     conda:
         "env/R.yaml"
     shell:
@@ -52,6 +60,10 @@ if config["mode"]== "Denovo":
         params:
             outputDir=expand("{path}/filters/",path=config["outputDir"]),
             indMissing=individual_missingness,
+     	resources:
+            mem_mb=lambda wc, input.vcf.size_mb,		
+            runtime: 30:00,
+		    cpus_per_task: 1
         shell:
             """vcftools --vcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs --max-missing 0.5
             mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/lowDP.step1.indv
@@ -91,6 +103,11 @@ if config["mode"]== "Reference":
         params:
             outputDir=expand("{path}/filters/",path=config["outputDir"]),
             indMissing=individual_missingness,
+     	resources:
+            mem_mb=lambda wc, input.vcf.size_mb,		
+            runtime: 30:00,
+		    cpus_per_task: 4
+    
         shell:
             """
             vcftools --gzvcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs --max-missing 0.5
@@ -108,7 +125,7 @@ if config["mode"]== "Reference":
             vcf=expand("{path}/refOut/populations.vcf.gz",path=config["outputDir"])
         output:
             vcf=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
-            sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspa0ce.wildcard_pattern),
+            sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern),
             FstSumstats=expand("{path}/filters/{params}/populations.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
         params:
             outputDir=expand("{path}",path=config["outputDir"]),
@@ -116,6 +133,11 @@ if config["mode"]== "Reference":
             maf=str(paramspace.wildcard_pattern).split("/")[1].split("~")[1]
         threads:
             4
+       	resources:
+            mem_mb=lambda wc, input.vcf.size_mb,		
+            runtime: 30:00,
+		    cpus_per_task: 4
+
         conda:
             "env/stacks.yaml"
         shell:
@@ -135,6 +157,10 @@ rule makePCAData:
         pcaData=expand("{path}/filters/{params}/pcaPlot.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
     conda:
         "env/R.yaml"
+   	resources:
+        mem_mb=lambda wc, input.gds.size_mb,		
+        runtime: 10:00,
+		cpus_per_task: 1    
     params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
     shell:
@@ -145,6 +171,11 @@ rule combinePCAData:
         pcaData=expand("{path}/filters/{params}/pcaPlot.tsv",path=config["outputDir"],params=paramspace.instance_patterns)
     output:
         pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"])
+ 	resources:
+        mem_mb: 100,
+		runtime: 10:00,
+		cpus_per_task: 1
+    
     shell:
         "cat <(cat {input.pcaData} | head -n 1) <(cat {input.pcaData} | grep -v sample.id)  > {output.pcaDataAll}"
 
@@ -159,6 +190,10 @@ rule makeTreeData:
         treeSegments=expand("{path}/filters/{params}/treeSegments.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
     conda:
         "env/R.yaml"
+	resources:
+        mem_mb=lambda wc, input.gds.size_mb	,	
+        runtime: 10:00,
+		cpus_per_task: 1
     params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
     shell:
@@ -171,6 +206,11 @@ rule combineTreeData:
     output:
         treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
         treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"])
+  	resources:
+        mem_mb: 100,
+		runtime: 10:00,
+		cpus_per_task: 1
+
     shell:
         """
         cat <(cat {input.treeLabels} | head -n 1) <(cat {input.treeLabels} | grep -v max_missing)  > {output.treeLabels}
@@ -183,10 +223,13 @@ rule makePopData:
         sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
     output:
         popStats=expand("{path}/filters/{params}/popStats.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
-    conda:
-        "env/R.yaml"
     params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
+  	resources:
+        mem_mb: 100,
+		runtime: 10:00,
+		cpus_per_task: 1
+
     shell:
         """
         paste <(cat {input.sumstats} | grep -v positions | sed '/Poly/q' | grep -v "Poly" | cut -f1,2,9,15,21,24) <(cat {input.sumstats} | sed -n '/Poly/,$p' | cut -f 3,4,5) | sed 's/# Pop ID/pop/' > {output.popStats}
@@ -202,6 +245,11 @@ rule combinePopData:
         "env/R.yaml"
     params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
+	resources:
+        mem_mb: 100,
+		runtime: 10:00,
+		cpus_per_task: 1
+
     shell:
         """
         Rscript src/filterAndFigures/popData.R {output.popStats} {input.popmapSNPFilter} {input.popStats} 
@@ -215,6 +263,10 @@ rule combineFSTData:
         fstStats=expand("{path}/filters/fstStatsAll.tsv",path=config["outputDir"])
     conda:
         "env/R.yaml"
+  	resources:
+        mem_mb: 100,
+		runtime: 10:00,
+		cpus_per_task: 1
     shell:
         """
         Rscript src/filterAndFigures/fst.R {output.fstStats} {input.barcodes} {input.FstSumstats} 

@@ -20,6 +20,11 @@ rule polyG:
 	output:
 		R1=temp(expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"])),
 		R2=temp(expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"]))
+	resources:
+        mem_mb: 10000
+		runtime: 120
+		cpus_per_task: 6
+	threads: 6
 	conda:
 		"env/fastp.yaml"
 	shell:
@@ -40,6 +45,11 @@ rule clone_filter:
 	conda:
 		"env/stacks.yaml"
 	threads: 1
+	resources:
+		mem_mb=lambda wc, input 0.5 * input.R1.size_mb,
+		runtime: 6:00:00,
+		cpus_per_task: 1:00,
+
 	shell: 
 		"clone_filter -1 {input.R1} -2 {input.R2} -o {params.outputdir}/clone_filter/ --oligo_len_1 {params.param_oligo} --oligo_len_2 {params.param_oligo} --inline_inline -i gzfastq"
 
@@ -57,13 +67,17 @@ rule make_stacks_files:
 		popmapSep=expand("{path}/stacksFiles/popmap{run}.tsv", path=config["outputDir"], bar=config["barcodeFile"],run=RUN)
 	params:
 		outputDir=expand("{path}/stacksFiles",path=config["outputDir"])
+	resources:
+        mem_mb: 100,
+		runtime: 1:00,
+		cpus_per_task: 1
 	conda:
 		"env/R.yaml"
 	shell:
 		"Rscript src/demultiplex/createFilesFromBarcodeFile.R {input.barcodes} {params.outputDir}"
 
 #We then do some snakemake magic to run process radtags for each run.
-#https://stackoverflow.com/questions/41135801/snakemake-best-practice-for-demultiplexing <- based on this
+#https://stackoverflow.com/questions/4113581/snakemake-best-practice-for-demultiplexing <- based on this
 # A lot of this happens in the Snakefile where a dictonary is created from the barcode file specifying in which run each sample is located.
 
 
@@ -87,6 +101,10 @@ rule process_radtags:
 	conda:
 		"env/stacks.yaml"
 	threads: THREADSPERRUN
+	resources:
+        mem_mb: 10000,
+		runtime: 6:00:00,
+		cpus_per_task: THREADSPERRUN
 	shell:
 		"""
 		process_radtags  -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads} -t {params.truncateLength} --threads {threads}
@@ -103,6 +121,10 @@ rule process_logs:
 		log=expand("{path}/demultiplex/logs/{{run}}/perInd.tsv",path=config["outputDir"])
 	conda:
 		"env/stacks.yaml"
+	resources:
+        mem_mb: 100,
+		runtime: 1:00,
+		cpus_per_task: 1
 	shell:
 		"stacks-dist-extract {input.log} per_barcode_raw_read_counts > {output.log}"
 
@@ -119,6 +141,10 @@ rule get_low_indvs:
 		log=expand("{path}/demultiplex/logs/{{run}}/perInd.tsv",path=config["outputDir"])
 	output:
 		log=expand("{path}/demultiplex/logs/{{run}}/removeInds.tsv",path=config["outputDir"])
+	resources:
+        mem_mb: 100,
+		runtime: 1:00,
+		cpus_per_task: 1
 	shell:
 		"""cat {input.log} | awk '$8<1000 {{print $2}}' > {output.log}"""
 
@@ -128,6 +154,10 @@ rule filter_popmap:
 		removeIndv=expand("{path}/demultiplex/logs/{{run}}/removeInds.tsv",path=config["outputDir"])
 	output:
 		popmap=expand("{path}/stacksFiles/popmap{{run}}Filt.tsv", path=config["outputDir"])
+	resources:
+        mem_mb: 100,
+		runtime: 1:00,
+		cpus_per_task: 1
 	shell:
 		"cat {input.popmap} | grep -f {input.removeIndv} -v	> {output.popmap}"
 
@@ -136,6 +166,11 @@ rule combinePerRunPopmap:
 		popmap=expand("{path}/stacksFiles/popmap{run}Filt.tsv", path=config["outputDir"],run=RUN)
 	output:
 		popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"])
+	resources:
+        mem_mb: 100,
+		runtime: 1:00,
+		cpus_per_task: 1
+
 	shell:
 		"cat {input.popmap} | sort | uniq > {output.popmap}"
 
@@ -149,6 +184,11 @@ if DUPES==False:
 			samplesR2=expand("{path}/demultiplex/samples/{{sample}}.2.fq.gz",path=config["outputDir"])
 		params:
 			outputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"]),
+		resources:
+	        mem_mb: 100,
+			runtime: 10:00,
+			cpus_per_task: 1
+
 		shell:
 			"""
 			mv {params.outputDir}/*/{wildcards.sample}.1.fq.gz {output.samplesR1}
@@ -168,6 +208,10 @@ if DUPES==True:
 			samplesR2=expand("{path}/demultiplex/samples/{{sample}}.2.fq.gz",path=config["outputDir"])
 		params:
 			outputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"])
+		resources:
+	        mem_mb: 100,
+			runtime: 10:00,
+			cpus_per_task: 1
 		shell:
 			"""
 			cat {params.outputDir}*/{wildcards.sample}.1.fq.gz > {output.samplesR1}
