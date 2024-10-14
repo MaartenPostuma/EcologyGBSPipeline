@@ -104,7 +104,7 @@ rule process_radtags:
 	resources:
 		mem_mb= 10000,
 		runtime= 6*60,
-		cpus_per_task= THREADSPERRUN
+		cpus_per_task= 6
 	shell:
 		"""
 		process_radtags  -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads} -t {params.truncateLength} --threads {threads}
