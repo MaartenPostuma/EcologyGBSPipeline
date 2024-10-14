@@ -21,8 +21,8 @@ rule polyG:
 		R1=temp(expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"])),
 		R2=temp(expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"]))
 	resources:
-		mem_mb: 10000
-		runtime: 120
+		mem_mb: 10000,
+		runtime: 120,
 		cpus_per_task: 6
 	threads: 6
 	conda:
