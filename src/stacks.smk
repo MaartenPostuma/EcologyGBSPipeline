@@ -17,7 +17,7 @@ if config["mode"]=="Denovo":
              threads:workflow.cores
              resources:
          	    mem_mb= 30000,
-                runtime= 24:00:00,
+                runtime= 24*60,
                 cpus_per_task= workflow.cores
 
              shell:
@@ -33,7 +33,7 @@ if config["mode"]=="Denovo":
                 90
                 resources:
          		mem_mb= 100,
-                runtime= 10:00,
+                runtime= 5,
                 cpus_per_task= 1
              shell:
                 "paste <(shuf -n {params} {input.popmap} | cut -f1) <(yes opt | head -n {params}) > {output}"
@@ -55,7 +55,7 @@ if config["mode"]=="Denovo":
              threads:workflow.cores
              resources:
          		mem_mb= 30000,
-                runtime= 24:00:00,
+                runtime= 24*60,
                 cpus_per_task= workflow.cores
              shell:
                 "denovo_map.pl --samples {params.inputDir} --popmap {input.popmap} -T  {threads} --catalog-popmap {input.popmap_sub} --paired        -o {params.outputDir} -n {params.M} -m {params.M} -X 'populations: --vcf'"

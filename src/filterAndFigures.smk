@@ -12,7 +12,7 @@ rule makeGDS:
      conda:
         "env/R.yaml"
      resources:
-		mem_mb=lambda wc, input: (0.5 * input.vcf.size_mb),
+        mem_mb=lambda wc, input: (0.5 * input.vcf.size_mb),
         runtime= 15,
         cpus_per_task= 1
      shell:
@@ -34,7 +34,7 @@ rule makeReport:
      params:
         outputDir=expand("{path}/",path=config["outputDir"]),
      resources:
-		mem_mb=lambda wc, input: (0.5 * input.vcf.size_mb),
+        mem_mb=lambda wc, input: (0.5 * input.vcf.size_mb),
         runtime= 15,
         cpus_per_task= 1
      conda:
@@ -61,7 +61,7 @@ if config["mode"]== "Denovo":
              outputDir=expand("{path}/filters/",path=config["outputDir"]),
              indMissing=individual_missingness,
         resources:
-		    mem_mb=lambda wc, input: (0.5 * input.vcf.size_mb),
+            mem_mb=lambda wc, input: (0.5 * input.vcf.size_mb),
             runtime= 30,
             cpus_per_task= 1
         shell:
@@ -104,7 +104,7 @@ if config["mode"]== "Reference":
              outputDir=expand("{path}/filters/",path=config["outputDir"]),
              indMissing=individual_missingness,
         resources:
-		    mem_mb=lambda wc, input: (0.5 * input.vcf.size_mb),
+            mem_mb=lambda wc, input: (0.5 * input.vcf.size_mb),
             runtime= 30,
             cpus_per_task= 4
      
@@ -134,7 +134,7 @@ if config["mode"]== "Reference":
         threads:
              4
         resources:
-		    mem_mb=lambda wc, input: (0.5 * input.vcf.size_mb),
+            mem_mb=lambda wc, input: (0.5 * input.vcf.size_mb),
             runtime= 30,
             cpus_per_task= 4
 
@@ -158,7 +158,7 @@ rule makePCAData:
      conda:
         "env/R.yaml"
      resources:
-		mem_mb=lambda wc, input: (0.5 * input.gds.size_mb),
+        mem_mb=lambda wc, input: (0.5 * input.gds.size_mb),
         runtime= 10,
         cpus_per_task= 1     
      params:
@@ -172,7 +172,7 @@ rule combinePCAData:
      output:
         pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"])
      resources:
-		mem_mb= 100,
+        mem_mb= 100,
         runtime= 10,
         cpus_per_task= 1
      
@@ -207,7 +207,7 @@ rule combineTreeData:
         treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
         treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"])
       resources:
-		mem_mb= 100,
+        mem_mb= 100,
         runtime= 10,
         cpus_per_task= 1
 
@@ -226,7 +226,7 @@ rule makePopData:
      params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
       resources:
-		mem_mb= 100,
+        mem_mb= 100,
         runtime= 10,
         cpus_per_task= 1
 
@@ -246,7 +246,7 @@ rule combinePopData:
      params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
     resources:
-		mem_mb= 100,
+        mem_mb= 100,
         runtime= 10,
         cpus_per_task= 1
 
@@ -264,7 +264,7 @@ rule combineFSTData:
      conda:
         "env/R.yaml"
       resources:
-		mem_mb= 100,
+        mem_mb= 100,
         runtime= 10,
         cpus_per_task= 1
      shell:
