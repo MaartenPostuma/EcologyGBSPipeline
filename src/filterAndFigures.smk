@@ -172,7 +172,7 @@ rule combinePCAData:
      output:
         pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"])
      resources:
-        mem_mb= 100,
+        mem_mb= 1000,
         runtime= 10,
         cpus_per_task= 1
      
@@ -207,7 +207,7 @@ rule combineTreeData:
         treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),
         treeSegments=expand("{path}/filters/treeSegmentsAll.tsv",path=config["outputDir"])
      resources:
-        mem_mb= 100,
+        mem_mb= 1000,
         runtime= 10,
         cpus_per_task= 1
 
@@ -226,7 +226,7 @@ rule makePopData:
      params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
      resources:
-        mem_mb= 100,
+        mem_mb= 1000,
         runtime= 10,
         cpus_per_task= 1
      shell:
@@ -245,7 +245,7 @@ rule combinePopData:
      params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
      resources:
-        mem_mb= 100,
+        mem_mb= 1000,
         runtime= 10,
         cpus_per_task= 1
 
@@ -263,7 +263,7 @@ rule combineFSTData:
      conda:
         "env/R.yaml"
      resources:
-        mem_mb= 100,
+        mem_mb= 1000,
         runtime= 10,
         cpus_per_task= 1
      shell:

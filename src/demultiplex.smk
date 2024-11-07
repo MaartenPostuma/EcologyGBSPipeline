@@ -21,7 +21,7 @@ rule polyG:
 		R1=temp(expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"])),
 		R2=temp(expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"]))
 	resources:
-		mem_mb= 10000,
+		mem_mb= 100000,
 		runtime= 120,
 		cpus_per_task= 6
 	threads: 6
@@ -68,7 +68,7 @@ rule make_stacks_files:
 	params:
 		outputDir=expand("{path}/stacksFiles",path=config["outputDir"])
 	resources:
-		mem_mb= 100,
+		mem_mb= 1000,
 		runtime= 1,
 		cpus_per_task= 1
 	conda:
@@ -102,7 +102,7 @@ rule process_radtags:
 		"env/stacks.yaml"
 	threads: THREADSPERRUN
 	resources:
-		mem_mb= 10000,
+		mem_mb= 100000,
 		runtime= 6*60,
 		cpus_per_task= 6
 	shell:
@@ -122,7 +122,7 @@ rule process_logs:
 	conda:
 		"env/stacks.yaml"
 	resources:
-		mem_mb= 100,
+		mem_mb= 1000,
 		runtime= 1,
 		cpus_per_task= 1
 	shell:
@@ -142,7 +142,7 @@ rule get_low_indvs:
 	output:
 		log=expand("{path}/demultiplex/logs/{{run}}/removeInds.tsv",path=config["outputDir"])
 	resources:
-		mem_mb= 100,
+		mem_mb= 1000,
 		runtime= 1,
 		cpus_per_task= 1
 	shell:
@@ -155,7 +155,7 @@ rule filter_popmap:
 	output:
 		popmap=expand("{path}/stacksFiles/popmap{{run}}Filt.tsv", path=config["outputDir"])
 	resources:
-		mem_mb= 100,
+		mem_mb= 1000,
 		runtime= 1,
 		cpus_per_task= 1
 	shell:
@@ -167,7 +167,7 @@ rule combinePerRunPopmap:
 	output:
 		popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"])
 	resources:
-		mem_mb= 100,
+		mem_mb= 1000,
 		runtime= 1,
 		cpus_per_task= 1
 
@@ -185,7 +185,7 @@ if DUPES==False:
 		params:
 			outputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"]),
 		resources:
-			mem_mb= 100,
+			mem_mb= 1000,
 			runtime= 1,
 			cpus_per_task= 1
 
@@ -209,7 +209,7 @@ if DUPES==True:
 		params:
 			outputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"])
 		resources:
-			mem_mb= 100,
+			mem_mb= 1000,
 			runtime= 1,
 			cpus_per_task= 1
 		shell:
