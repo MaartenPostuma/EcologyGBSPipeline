@@ -21,7 +21,7 @@ rule polyG:
 		R1=temp(expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"])),
 		R2=temp(expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"]))
 	resources:
-		mem_mb= 100000,
+		mem_mb= 10000,
 		runtime= 120,
 		cpus_per_task= 6
 	threads: 6
@@ -46,7 +46,7 @@ rule clone_filter:
 		"env/stacks.yaml"
 	threads: 1
 	resources:
-		mem_mb=lambda wc, input: (1.5 * input.size_mb),
+		mem_mb=lambda wc, input: max(2.5 * input.size_mb,2000),
 		runtime= 6*60,
 		cpus_per_task= 1,
 
@@ -102,7 +102,7 @@ rule process_radtags:
 		"env/stacks.yaml"
 	threads: THREADSPERRUN
 	resources:
-		mem_mb= 100000,
+		mem_mb= 10000,
 		runtime= 6*60,
 		cpus_per_task= 6
 	shell:
