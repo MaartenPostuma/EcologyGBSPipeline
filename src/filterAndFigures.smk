@@ -34,7 +34,7 @@ rule makeReport:
      params:
         outputDir=expand("{path}/",path=config["outputDir"]),
      resources:
-        mem_mb=2000
+        mem_mb=2000,
         runtime= 15,
         cpus_per_task= 1
      conda:
@@ -61,7 +61,7 @@ if config["mode"]== "Denovo":
              outputDir=expand("{path}/filters/",path=config["outputDir"]),
              indMissing=individual_missingness,
         resources:
-            mem_mb=2000
+            mem_mb=2000,
             runtime= 30,
             cpus_per_task= 1
         shell:
