@@ -88,9 +88,9 @@ if config["mode"]== "Denovo":
         conda:
              "env/stacks.yaml"
         resources:
-            mem_mb=lambda wc, input: (1 * input.size_mb),
-            runtime= 30,
-            cpus_per_task= 4
+             mem_mb=lambda wc, input: (1 * input.size_mb),
+             runtime= 30,
+             cpus_per_task= 4
         shell:
              "populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --fstats --threads {threads}"     
 
