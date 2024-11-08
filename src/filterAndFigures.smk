@@ -138,7 +138,7 @@ if config["mode"]== "Reference":
         threads:
              4
         resources:
-            mem_mb=lambda wc, input: (1 * input.size_mb),
+            mem_mb=1000
             runtime= 30,
             cpus_per_task= 4
 
