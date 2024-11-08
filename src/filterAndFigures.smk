@@ -12,7 +12,7 @@ rule makeGDS:
      conda:
         "env/R.yaml"
      resources:
-        mem_mb=2000
+        mem_mb=2000,
         runtime= 15,
         cpus_per_task= 1
      shell:
