@@ -106,8 +106,8 @@ rule makeRegions:
     shell:
         """
         sambamba depth base --combined {input.RGBam} | cut -f 1-3 | pv -l | pigz > {output.coverage}
-        base_cov=\$(zcat {output.coverage} | awk "NR>1 {{ x += \$3; }} END {{ print x }}")
-        nchunks=1000; zcat {output.coverage} | head -100000000 | awk "BEGIN {{ bin="\$base_cov" / "\$nchunks" }} NR==1 {{ next }} NR==2 {{ chr=\$1; pos=\$2; last=\$2; }} (\$1==chr && sum < bin) {{sum += \$3; last=\$2 }} (\$1!=chr || sum > bin) {{ print chr":"pos"-"last; sum = \$3; chr=\$1; pos=\$2; last=\$2; }} END {{ print chr":"pos"-"last; }} " > {output.targetRegions}
+        base_cov=$(zcat {output.coverage} | awk "NR>1 {{ x += $3; }} END {{ print x }}")
+        nchunks=1000; zcat {output.coverage} | head -100000000 | awk "BEGIN {{ bin="$base_cov" / "$nchunks" }} NR==1 {{ next }} NR==2 {{ chr=$1; pos=$2; last=$2; }} ($1==chr && sum < bin) {{sum += $3; last=$2 }} ($1!=chr || sum > bin) {{ print chr":"pos"-"last; sum = $3; chr=$1; pos=$2; last=$2; }} END {{ print chr":"pos"-"last; }} " > {output.targetRegions}
         """
 
 
