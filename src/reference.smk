@@ -123,20 +123,20 @@ rule makeRegions:
         }}
         NR == 1 {{ next }} 
         NR == 2 {{ 
-            chr = \$1; 
-            pos = \$2; 
-            last = \$2; 
+            chr = $1; 
+            pos = $2; 
+            last = $2; 
         }} 
         (\$1 == chr && sum < bin) {{ 
-            sum += \$3; 
-            last = \$2; 
+            sum += $3; 
+            last = $2; 
         }} 
         (\$1 != chr || sum > bin) {{ 
             print chr ":" pos "-" last; 
-            sum = \$3; 
-            chr = \$1; 
-            pos = \$2; 
-            last = \$2; 
+            sum = $3; 
+            chr = $1; 
+            pos = $2; 
+            last = $2; 
         }} 
         END {{ print chr ":" pos "-" last; }}
         ' > {output.targetRegions}
