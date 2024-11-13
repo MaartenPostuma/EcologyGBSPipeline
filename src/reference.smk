@@ -116,7 +116,7 @@ rule makeRegions:
         """
         base_cov=$(zcat {input.coverage} | awk "NR>1 {{ x += $3; }} END {{ print x }}")
         nchunks=1000
-        zcat {output.coverage} |
+        zcat {input.coverage} |
         awk -v base_cov="$base_cov" -v nchunks="$nchunks" '
         BEGIN {{ 
             bin = base_cov / nchunks 
