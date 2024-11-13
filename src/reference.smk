@@ -94,18 +94,26 @@ rule indexBam:
     shell:
         "samtools index {input.RGBam}"
 
-rule makeRegions:
+rule makeRegionsInput:
     input:
         RGBamIndex=expand("{path}/refOut/merged.bam.bai",path=config["outputDir"]),
         RGBam=expand("{path}/refOut/merged.bam",path=config["outputDir"]),
     output:
-        targetRegions=expand("{path}/refOut/targets.regions",path=config["outputDir"]),
         coverage=expand("{path}/refOut/aln.bam.coverage.gz",path=config["outputDir"])
     conda:
         "env/sambabamba.yaml"
     shell:
         """
-        sambamba depth base --combined {input.RGBam} | cut -f 1-3 | pv -l | pigz > {output.coverage}
+        sambamba depth base --combined {input.RGBam} | cut -f 1-3 | pv -l | pigz -p 1 >  {output.coverage}
+        """
+
+rule makeRegions:
+    input:
+        coverage=expand("{path}/refOut/aln.bam.coverage.gz",path=config["outputDir"])
+    output:
+        targetRegions=expand("{path}/refOut/targets.regions",path=config["outputDir"]),
+    shell:
+        """
         base_cov=$(zcat {output.coverage} | awk "NR>1 {{ x += $3; }} END {{ print x }}")
         nchunks=1000
         zcat {output.coverage} |
@@ -115,25 +123,24 @@ rule makeRegions:
         }}
         NR == 1 {{ next }} 
         NR == 2 {{ 
-            chr = $1; 
-            pos = $2; 
-            last = $2; 
+            chr = \$1; 
+            pos = \$2; 
+            last = \$2; 
         }} 
-        ($1 == chr && sum < bin) {{ 
-            sum += $3; 
-            last = $2; 
+        (\$1 == chr && sum < bin) {{ 
+            sum += \$3; 
+            last = \$2; 
         }} 
-        ($1 != chr || sum > bin) {{ 
+        (\$1 != chr || sum > bin) {{ 
             print chr ":" pos "-" last; 
-            sum = $3; 
-            chr = $1; 
-            pos = $2; 
-            last = $2; 
+            sum = \$3; 
+            chr = \$1; 
+            pos = \$2; 
+            last = \$2; 
         }} 
         END {{ print chr ":" pos "-" last; }}
         ' > {output.targetRegions}
         """
-
 
 rule variantCall:
     input:
