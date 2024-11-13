@@ -114,7 +114,7 @@ rule makeRegions:
         targetRegions=expand("{path}/refOut/targets.regions",path=config["outputDir"]),
     shell:
         """
-        base_cov=$(zcat {input.coverage} | awk "NR>1 {{ x += \$3; }} END {{ print x }}")
+        base_cov=$(zcat {input.coverage} | awk "NR>1 {{ x += \$3; } } END {{ print x }}")
         nchunks=1000
         zcat {input.coverage} |
         awk -v base_cov="$base_cov" -v nchunks="$nchunks" '
@@ -127,11 +127,11 @@ rule makeRegions:
             pos = $2; 
             last = $2; 
         }} 
-        (\$1 == chr && sum < bin) {{ 
+        ($1 == chr && sum < bin) {{ 
             sum += $3; 
             last = $2; 
         }} 
-        (\$1 != chr || sum > bin) {{ 
+        ($1 != chr || sum > bin) {{ 
             print chr ":" pos "-" last; 
             sum = $3; 
             chr = $1; 
