@@ -130,7 +130,7 @@ if config["mode"]== "Reference":
         output:
              vcf=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
              sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern),
-             FstSumstats=expand("{path}/filters/{params}/populations.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+             FstSumstats=expand("{path}/filters/{params}/populations.p.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
         params:
              outputDir=expand("{path}",path=config["outputDir"]),
              parDir=expand("{path}/filters/{params}",path=config["outputDir"],params=paramspace.wildcard_pattern),
