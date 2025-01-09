@@ -18,3 +18,5 @@ dependencies:
   - r-ggpmisc
   - r-tidyr
   - r-reshape2
+  - r-ade4
+  - r-gridextra

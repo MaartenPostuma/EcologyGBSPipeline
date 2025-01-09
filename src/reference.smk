@@ -5,6 +5,9 @@ rule make_bwa_mem_index:
         refIndex=expand("{ref}.bwt.2bit.64",ref=config["reference"])
     conda:
         "env/bwa-mem.yaml"
+    threads: 1
+    resources:
+        mem_mb= 1000
     shell:
         "bwa-mem2 index {input.ref}"
 
@@ -20,6 +23,8 @@ rule map_bwa:
         workflow.cores/5
     conda:
         "env/bwa-mem.yaml"
+    resources:
+        mem_mb= 10000
     shell:
         "bwa-mem2 mem -t {threads} {input.ref} {input.samplesR1} {input.samplesR2} | samtools view -buS - > {output.bam}"
 
@@ -28,6 +33,9 @@ rule sort_picard:
         bam=expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["tmpDir"]),
     output:
         sortedBam=temp(expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["tmpDir"]))
+    threads: 1
+    resources:
+        mem_mb= 10000
     conda:
         "env/picard.yaml"
     shell:
@@ -38,6 +46,9 @@ rule add_RG:
         sortedBam=expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["tmpDir"])
     output:
         RGBam=expand("{path}/refMapping/RGBams/{{samples}}.bam",path=config["tmpDir"])
+    threads: 1
+    resources:
+        mem_mb= 10000
     conda:
         "env/picard.yaml"
     shell:
@@ -83,22 +94,53 @@ rule indexBam:
     shell:
         "samtools index {input.RGBam}"
 
-rule makeRegions:
+rule makeRegionsInput:
     input:
         RGBamIndex=expand("{path}/refOut/merged.bam.bai",path=config["outputDir"]),
         RGBam=expand("{path}/refOut/merged.bam",path=config["outputDir"]),
     output:
-        targetRegions=expand("{path}/refOut/targets.regions",path=config["outputDir"]),
         coverage=expand("{path}/refOut/aln.bam.coverage.gz",path=config["outputDir"])
     conda:
         "env/sambabamba.yaml"
     shell:
         """
-        sambamba depth base --combined {input.RGBam} | cut -f 1-3 | pv -l | pigz > {output.coverage}
-        base_cov=\$(zcat {output.coverage} | awk "NR>1 {{ x += \$3; }} END {{ print x }}")
-        nchunks=1000; zcat {output.coverage} | head -100000000 | awk "BEGIN {{ bin="\$base_cov" / "\$nchunks" }} NR==1 {{ next }} NR==2 {{ chr=\$1; pos=\$2; last=\$2; }} (\$1==chr && sum < bin) {{sum += \$3; last=\$2 }} (\$1!=chr || sum > bin) {{ print chr":"pos"-"last; sum = \$3; chr=\$1; pos=\$2; last=\$2; }} END {{ print chr":"pos"-"last; }} " > {output.targetRegions}
+        sambamba depth base --combined {input.RGBam} | cut -f 1-3 | pv -l | pigz -p 1 >  {output.coverage}
         """
 
+rule makeRegions:
+    input:
+        coverage=expand("{path}/refOut/aln.bam.coverage.gz",path=config["outputDir"])
+    output:
+        targetRegions=expand("{path}/refOut/targets.regions",path=config["outputDir"]),
+    shell:
+        """
+        base_cov=$(zcat {input.coverage} | awk "NR>1 {{ x += \$3; }} END {{ print x }}")
+        nchunks=1000
+        zcat {input.coverage} |
+        awk -v base_cov="$base_cov" -v nchunks="$nchunks" '
+        BEGIN {{ 
+            bin = base_cov / nchunks 
+        }}
+        NR == 1 {{ next }} 
+        NR == 2 {{ 
+            chr = $1; 
+            pos = $2; 
+            last = $2; 
+        }} 
+        ($1 == chr && sum < bin) {{ 
+            sum += $3; 
+            last = $2; 
+        }} 
+        ($1 != chr || sum > bin) {{ 
+            print chr ":" pos "-" last; 
+            sum = $3; 
+            chr = $1; 
+            pos = $2; 
+            last = $2; 
+        }} 
+        END {{ print chr ":" pos "-" last; }}
+        ' > {output.targetRegions}
+        """
 
 rule variantCall:
     input:
