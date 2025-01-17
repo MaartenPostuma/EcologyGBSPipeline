@@ -47,8 +47,7 @@ rule polyG:
 			--umi_len 3 \
 			-j {output.fastp_json} \
 			-h {output.fastp_html} \
-			-w {threads} \
-			2> {log}
+			-w {threads}
 		""" 
 
 #Stacks and the rest of the pipeline need to have specific files for barcodes, 
