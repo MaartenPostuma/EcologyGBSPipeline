@@ -34,7 +34,7 @@ rule polyG:
 		"env/fastp.yaml"
 	shell:
 		"""
-		fastp --in1 {input.reaR1ds1} \
+		fastp --in1 {input.R1} \
 			--in2 {input.R2} \
 			--out1 {output.R1} \
 			--out2 {output.R2} \
