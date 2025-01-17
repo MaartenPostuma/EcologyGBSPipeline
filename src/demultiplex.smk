@@ -104,7 +104,7 @@ rule process_radtags:
 	resources:
 		mem_mb= 10000,
 		runtime= 3*60,
-		cpus_per_task= THREADSPERRUN
+		cpus_per_task= "{threads}"
 	shell:
 		"""
 		process_radtags  -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads} -t {params.truncateLength}
@@ -116,7 +116,7 @@ rule process_radtags:
 #Demultiplexing
 rule process_logs:
 	input:
-		log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.clone_filter.log",path=config["outputDir"])
+		log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.log",path=config["outputDir"])
 	output:
 		log=expand("{path}/demultiplex/logs/{{run}}/perInd.tsv",path=config["outputDir"])
 	conda:
@@ -202,7 +202,7 @@ if DUPES==True:
 	rule cat_samples:
 		input:
 			lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
-			log=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN)
+			log=expand("{path}/demultiplex/logs/{run}/process_radtags.log",path=config["outputDir"],run=RUN)
 		output:
 			samplesR1=expand("{path}/demultiplex/samples/{{sample}}.1.fq.gz",path=config["outputDir"]),
 			samplesR2=expand("{path}/demultiplex/samples/{{sample}}.2.fq.gz",path=config["outputDir"])
