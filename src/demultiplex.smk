@@ -28,7 +28,7 @@ rule polyG:
 	resources:
 		mem_mb= 10000,
 		runtime= 120,
-		cpus_per_task= "{threads}"
+		cpus_per_task= 8
 	threads: 8
 	conda:
 		"env/fastp.yaml"
@@ -97,11 +97,11 @@ rule process_radtags:
 		truncateLength=config["truncateLength"]
 	conda:
 		"env/stacks.yaml"
-	threads: THREADSPERRUN
+	threads: 8
 	resources:
 		mem_mb= 10000,
 		runtime= 3*60,
-		cpus_per_task= "{threads}"
+		cpus_per_task= 8
 	shell:
 		"""
 		process_radtags  -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads} -t {params.truncateLength}
