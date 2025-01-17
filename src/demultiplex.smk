@@ -18,20 +18,43 @@ rule polyG:
 		R1=expand("{path}/{{run}}_R1.fq.gz",path=config["inputDir"]),
 		R2=expand("{path}/{{run}}_R2.fq.gz",path=config["inputDir"])
 	output:
-		R1=temp(expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"])),
-		R2=temp(expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"]))
+		R1=expand("{path}/demultiplex/cleaned/{{run}}_R1.fq.gz",path=config["outputDir"]),
+		R2=expand("{path}/demultiplex/cleaned/{{run}}_R2.fq.gz",path=config["outputDir"]),
+		fastp_json=expand("{path}/demultiplex/cleaned/{{run}}.log.fastp_json",path=config["outputDir"]),
+		fastp_html=expand("{path}/demultiplex/cleaned/{{run}}.log.fastp_html",path=config["outputDir"])
+
+	params:
+		adapter1="ATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT" 
+		adapter2="CAAGCAGAAGACGGCATACGAGATCGGTCTCGGCATTCCTGCTGAACCGCTCTTCCGATCT"
 	resources:
 		mem_mb= 10000,
 		runtime= 120,
-		cpus_per_task= 6
-	threads: 6
+		cpus_per_task= "{threads}"
+	threads: 8
 	conda:
 		"env/fastp.yaml"
-	shell:
-		"fastp -i {input.R1} -I {input.R2} -o {output.R1} -O {output.R2} --trim_poly_g"
+    threads: 
+        8
+    shell:
+        """
+        fastp --in1 {input.reaR1ds1} \
+            --in2 {input.R2} \
+            --out1 {output.R1} \
+            --out2 {output.R2} \
+            --adapter_sequence {params.adapter1} \
+            --adapter_sequence_r2 {params.adapter2} \
+            --dedup \
+            --trim_poly_g \
+            --umi \
+            --umi_loc per_read \
+            --umi_len 3 \
+            -j {output.fastp_json} \
+            -h {output.fastp_html} \
+            -w {threads} \
+            2> {log}
+        """ 
 
-
-rule clone_filter:
+""" rule clone_filter:
 	input:
 		barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"]),
 		R1=expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"]),
@@ -52,7 +75,7 @@ rule clone_filter:
 
 	shell: 
 		"clone_filter -1 {input.R1} -2 {input.R2} -o {params.outputdir}/clone_filter/ --oligo_len_1 {params.param_oligo} --oligo_len_2 {params.param_oligo} --inline_inline -i gzfastq"
-
+ """
 #Stacks and the rest of the pipeline need to have specific files for barcodes, 
 #the format is different and we add the control nucleotide and we need to split it per run so we can demultiplex them in parallel
 #popmap (to which population do samples belong),
@@ -89,8 +112,8 @@ rule make_stacks_files:
 
 rule process_radtags:
 	input:
-		R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
-		R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
+		R1=expand("{path}/demultiplex/cleaned/{{run}}_R1.fq.gz",path=config["outputDir"]),
+		R2=expand("{path}/demultiplex/cleaned/{{run}}_R2.fq.gz",path=config["outputDir"]),
 		barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"], bar=config["barcodeFile"])
 	output:
 		hackDir=directory(temp("demux_tmp_{run}")),
