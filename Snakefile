@@ -38,7 +38,7 @@ if config["mode"]== "Demulti":
             popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv", path=config["outputDir"]),
             samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
             samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
-            log=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN)
+            log=expand("{path}/demultiplex/logs/{run}/process_radtags.log",path=config["outputDir"],run=RUN)
 
 
 
@@ -49,7 +49,7 @@ if config["mode"]== "StacksTest":
             DeDuplR2=expand("{path}/demultiplex/clone_filter/{run}_R2.2.fq.gz",path=config["outputDir"],run=RUN),
             popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
             popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv", path=config["outputDir"]),
-            perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN),
+            perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.log",path=config["outputDir"],run=RUN),
             samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
             samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
             MparameterPNG=expand("{dir}/stacksTest/parameter.png",dir=config["outputDir"])
@@ -76,7 +76,7 @@ if config["mode"]== "Denovo":
             popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
             popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv", path=config["outputDir"]),
             popmapFiltered=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
-            perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN),
+            perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.log",path=config["outputDir"],run=RUN),
             samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
             samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
             vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"]),
@@ -102,7 +102,7 @@ if config["mode"]== "Reference":
         input:
             DeDuplR1=expand("{path}/demultiplex/clone_filter/{run}_R1.1.fq.gz",path=config["outputDir"],run=RUN),
             DeDuplR2=expand("{path}/demultiplex/clone_filter/{run}_R2.2.fq.gz",path=config["outputDir"],run=RUN),
-            perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN),
+            perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.log",path=config["outputDir"],run=RUN),
             samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
             samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
             RGBam=expand("{path}/refOut/merged.bam",path=config["outputDir"]),
