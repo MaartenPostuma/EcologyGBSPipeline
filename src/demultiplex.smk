@@ -22,9 +22,8 @@ rule polyG:
 		R2=expand("{path}/demultiplex/cleaned/{{run}}_R2.fq.gz",path=config["outputDir"]),
 		fastp_json=expand("{path}/demultiplex/cleaned/{{run}}.log.fastp_json",path=config["outputDir"]),
 		fastp_html=expand("{path}/demultiplex/cleaned/{{run}}.log.fastp_html",path=config["outputDir"])
-
 	params:
-		adapter1="ATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT" 
+		adapter1="ATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT" ,
 		adapter2="CAAGCAGAAGACGGCATACGAGATCGGTCTCGGCATTCCTGCTGAACCGCTCTTCCGATCT"
 	resources:
 		mem_mb= 10000,
