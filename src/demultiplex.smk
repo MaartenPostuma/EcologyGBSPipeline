@@ -94,7 +94,7 @@ rule process_radtags:
 		barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"], bar=config["barcodeFile"])
 	output:
 		hackDir=directory(temp("demux_tmp_{run}")),
-		log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.clone_filter.log",path=config["outputDir"])
+		log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.log",path=config["outputDir"])
 	params:
 		outputDir=expand("{path}/demultiplex/logs/{{run}}/",path=config["outputDir"]),
 		truncateLength=config["truncateLength"]
@@ -103,11 +103,11 @@ rule process_radtags:
 	threads: THREADSPERRUN
 	resources:
 		mem_mb= 10000,
-		runtime= 6*60,
-		cpus_per_task= 1
+		runtime= 3*60,
+		cpus_per_task= THREADSPERRUN
 	shell:
 		"""
-		process_radtags  -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads 1 -t {params.truncateLength}
+		process_radtags  -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads} -t {params.truncateLength}
 		mkdir {output.hackDir}
 		"""
 #If there are no duplicates we simply move the read files from the demultiplex/logs/ directory to the demultiplex/samples folder.
