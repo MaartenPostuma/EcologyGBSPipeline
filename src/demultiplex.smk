@@ -33,7 +33,7 @@ rule polyG:
 	threads: 8
 	conda:
 		"env/fastp.yaml"
-    shell:
+	shell:
         """
         fastp --in1 {input.reaR1ds1} \
             --in2 {input.R2} \
@@ -52,28 +52,6 @@ rule polyG:
             2> {log}
         """ 
 
-""" rule clone_filter:
-	input:
-		barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"]),
-		R1=expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"]),
-		R2=expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"])
-	params:
-		outputdir=expand("{path}/demultiplex", path=config["outputDir"]),
-		param_oligo=getParam_oligo(param_oligo)
-	output:
-		R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
-		R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"])
-	conda:
-		"env/stacks.yaml"
-	threads: 1
-	resources:
-		mem_mb=lambda wc, input: max(2.5 * input.size_mb,2000),
-		runtime= 6*60,
-		cpus_per_task= 1,
-
-	shell: 
-		"clone_filter -1 {input.R1} -2 {input.R2} -o {params.outputdir}/clone_filter/ --oligo_len_1 {params.param_oligo} --oligo_len_2 {params.param_oligo} --inline_inline -i gzfastq"
- """
 #Stacks and the rest of the pipeline need to have specific files for barcodes, 
 #the format is different and we add the control nucleotide and we need to split it per run so we can demultiplex them in parallel
 #popmap (to which population do samples belong),
