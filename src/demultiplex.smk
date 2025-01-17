@@ -34,23 +34,23 @@ rule polyG:
 	conda:
 		"env/fastp.yaml"
 	shell:
-        """
-        fastp --in1 {input.reaR1ds1} \
-            --in2 {input.R2} \
-            --out1 {output.R1} \
-            --out2 {output.R2} \
-            --adapter_sequence {params.adapter1} \
-            --adapter_sequence_r2 {params.adapter2} \
-            --dedup \
-            --trim_poly_g \
-            --umi \
-            --umi_loc per_read \
-            --umi_len 3 \
-            -j {output.fastp_json} \
-            -h {output.fastp_html} \
-            -w {threads} \
-            2> {log}
-        """ 
+		"""
+		fastp --in1 {input.reaR1ds1} \
+			--in2 {input.R2} \
+			--out1 {output.R1} \
+			--out2 {output.R2} \
+			--adapter_sequence {params.adapter1} \
+			--adapter_sequence_r2 {params.adapter2} \
+			--dedup \
+			--trim_poly_g \
+			--umi \
+			--umi_loc per_read \
+			--umi_len 3 \
+			-j {output.fastp_json} \
+			-h {output.fastp_html} \
+			-w {threads} \
+			2> {log}
+		""" 
 
 #Stacks and the rest of the pipeline need to have specific files for barcodes, 
 #the format is different and we add the control nucleotide and we need to split it per run so we can demultiplex them in parallel
