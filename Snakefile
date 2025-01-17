@@ -32,8 +32,6 @@ for lane, samples in LANESAMPLE.items():
 if config["mode"]== "Demulti":
     rule all:
         input:
-            DeDuplR1=expand("{path}/demultiplex/clone_filter/{run}_R1.1.fq.gz",path=config["outputDir"],run=RUN),
-            DeDuplR2=expand("{path}/demultiplex/clone_filter/{run}_R2.2.fq.gz",path=config["outputDir"],run=RUN),
             popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
             popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv", path=config["outputDir"]),
             samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
@@ -45,8 +43,6 @@ if config["mode"]== "Demulti":
 if config["mode"]== "StacksTest":
     rule all:
         input:
-            DeDuplR1=expand("{path}/demultiplex/clone_filter/{run}_R1.1.fq.gz",path=config["outputDir"],run=RUN),
-            DeDuplR2=expand("{path}/demultiplex/clone_filter/{run}_R2.2.fq.gz",path=config["outputDir"],run=RUN),
             popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
             popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv", path=config["outputDir"]),
             perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.log",path=config["outputDir"],run=RUN),
@@ -71,8 +67,6 @@ if config["mode"]== "Denovo":
 if config["mode"]== "Denovo":
     rule all:
         input:
-            DeDuplR1=expand("{path}/demultiplex/clone_filter/{run}_R1.1.fq.gz",path=config["outputDir"],run=RUN),
-            DeDuplR2=expand("{path}/demultiplex/clone_filter/{run}_R2.2.fq.gz",path=config["outputDir"],run=RUN),
             popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
             popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv", path=config["outputDir"]),
             popmapFiltered=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
@@ -100,8 +94,6 @@ if config["mode"]== "Reference":
 if config["mode"]== "Reference":
     rule all:
         input:
-            DeDuplR1=expand("{path}/demultiplex/clone_filter/{run}_R1.1.fq.gz",path=config["outputDir"],run=RUN),
-            DeDuplR2=expand("{path}/demultiplex/clone_filter/{run}_R2.2.fq.gz",path=config["outputDir"],run=RUN),
             perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.log",path=config["outputDir"],run=RUN),
             samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
             samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
