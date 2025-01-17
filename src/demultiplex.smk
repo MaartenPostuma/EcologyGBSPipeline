@@ -33,8 +33,6 @@ rule polyG:
 	threads: 8
 	conda:
 		"env/fastp.yaml"
-    threads: 
-        8
     shell:
         """
         fastp --in1 {input.reaR1ds1} \
