@@ -18,37 +18,40 @@ rule polyG:
 		R1=expand("{path}/{{run}}_R1.fq.gz",path=config["inputDir"]),
 		R2=expand("{path}/{{run}}_R2.fq.gz",path=config["inputDir"])
 	output:
-		R1=expand("{path}/demultiplex/cleaned/{{run}}_R1.fq.gz",path=config["outputDir"]),
-		R2=expand("{path}/demultiplex/cleaned/{{run}}_R2.fq.gz",path=config["outputDir"]),
-		fastp_json=expand("{path}/demultiplex/cleaned/{{run}}.log.fastp_json",path=config["outputDir"]),
-		fastp_html=expand("{path}/demultiplex/cleaned/{{run}}.log.fastp_html",path=config["outputDir"])
-	params:
-		adapter1="ATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT" ,
-		adapter2="CAAGCAGAAGACGGCATACGAGATCGGTCTCGGCATTCCTGCTGAACCGCTCTTCCGATCT"
+		R1=temp(expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"])),
+		R2=temp(expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"]))
 	resources:
 		mem_mb= 10000,
 		runtime= 120,
-		cpus_per_task= 8
-	threads: 8
+		cpus_per_task= 6
+	threads: 6
 	conda:
 		"env/fastp.yaml"
 	shell:
-		"""
-		fastp --in1 {input.R1} \
-			--in2 {input.R2} \
-			--out1 {output.R1} \
-			--out2 {output.R2} \
-			--adapter_sequence {params.adapter1} \
-			--adapter_sequence_r2 {params.adapter2} \
-			--dedup \
-			--trim_poly_g \
-			--umi \
-			--umi_loc per_read \
-			--umi_len 3 \
-			-j {output.fastp_json} \
-			-h {output.fastp_html} \
-			-w {threads}
-		""" 
+		"fastp -i {input.R1} -I {input.R2} -o {output.R1} -O {output.R2} --trim_poly_g"
+
+
+rule clone_filter:
+	input:
+		barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"]),
+		R1=expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"]),
+		R2=expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"])
+	params:
+		outputdir=expand("{path}/demultiplex", path=config["outputDir"]),
+		param_oligo=getParam_oligo(param_oligo)
+	output:
+		R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
+		R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"])
+	conda:
+		"env/stacks.yaml"
+	threads: 1
+	resources:
+		mem_mb=lambda wc, input: max(2.5 * input.size_mb,2000),
+		runtime= 6*60,
+		cpus_per_task= 1,
+
+	shell: 
+		"clone_filter -1 {input.R1} -2 {input.R2} -o {params.outputdir}/clone_filter/ --oligo_len_1 {params.param_oligo} --oligo_len_2 {params.param_oligo} --inline_inline -i gzfastq"
 
 #Stacks and the rest of the pipeline need to have specific files for barcodes, 
 #the format is different and we add the control nucleotide and we need to split it per run so we can demultiplex them in parallel
@@ -86,8 +89,8 @@ rule make_stacks_files:
 
 rule process_radtags:
 	input:
-		R1=expand("{path}/demultiplex/cleaned/{{run}}_R1.fq.gz",path=config["outputDir"]),
-		R2=expand("{path}/demultiplex/cleaned/{{run}}_R2.fq.gz",path=config["outputDir"]),
+		R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
+		R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
 		barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"], bar=config["barcodeFile"])
 	output:
 		hackDir=directory(temp("demux_tmp_{run}")),
@@ -97,11 +100,11 @@ rule process_radtags:
 		truncateLength=config["truncateLength"]
 	conda:
 		"env/stacks.yaml"
-	threads: 8
+	threads: THREADSPERRUN
 	resources:
 		mem_mb= 10000,
 		runtime= 3*60,
-		cpus_per_task= 8
+		cpus_per_task= 6
 	shell:
 		"""
 		process_radtags  -1 {input.R1} -2 {input.R2} -o {params.outputDir} -b {input.barcodes} --renz_1 aseI --renz_2 nsiI -c --inline-inline --threads {threads} -t {params.truncateLength}
@@ -113,7 +116,7 @@ rule process_radtags:
 #Demultiplexing
 rule process_logs:
 	input:
-		log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.log",path=config["outputDir"])
+		log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.clone_filter.log",path=config["outputDir"])
 	output:
 		log=expand("{path}/demultiplex/logs/{{run}}/perInd.tsv",path=config["outputDir"])
 	conda:
@@ -199,7 +202,7 @@ if DUPES==True:
 	rule cat_samples:
 		input:
 			lambda w: f"demux_tmp_{SAMPLES[w.sample]}",
-			log=expand("{path}/demultiplex/logs/{run}/process_radtags.log",path=config["outputDir"],run=RUN)
+			log=expand("{path}/demultiplex/logs/{run}/process_radtags.clone_filter.log",path=config["outputDir"],run=RUN)
 		output:
 			samplesR1=expand("{path}/demultiplex/samples/{{sample}}.1.fq.gz",path=config["outputDir"]),
 			samplesR2=expand("{path}/demultiplex/samples/{{sample}}.2.fq.gz",path=config["outputDir"])
