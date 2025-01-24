@@ -94,7 +94,7 @@ rule process_radtags:
 		barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"], bar=config["barcodeFile"])
 	output:
 		hackDir=directory(temp("demux_tmp_{run}")),
-		log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.log",path=config["outputDir"])
+		log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.clone_filter.log",path=config["outputDir"])
 	params:
 		outputDir=expand("{path}/demultiplex/logs/{{run}}/",path=config["outputDir"]),
 		truncateLength=config["truncateLength"]
