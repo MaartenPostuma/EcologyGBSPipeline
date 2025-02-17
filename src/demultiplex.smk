@@ -37,8 +37,8 @@ rule deduplicate_trim:
 		"""
 		fastp --in1 {input.reads1} \
 			--in2 {input.reads2} \
-			--out1 {output.filtered1} \
-			--out2 {output.filtered2} \
+			--out1 {output.R1} \
+			--out2 {output.R2} \
 			--adapter_sequence {params.adapter1} \
 			--adapter_sequence_r2 {params.adapter2} \
 			--dedup \
