@@ -13,44 +13,44 @@ def getParam_oligo(param_oligo):
 #including the UMI/wobble/oligo's (random bases that are added at the beginning of the reads)
 #as if all of these are identical it will most likely be a PCR artifact
 rule deduplicate_trim:
-    params:
-        run="{run}",
-        adapter1="AATGATACGGCGACCACCGAGATCTACA" 
-        adapter2="CAAGCAGAAGACGGCATACGAGAT"
-    input:
-        reads1=expand("{input}/{{run}}_R1.fq.gz",input=config["input_dir"]),
-        reads2=expand("{input}/{{run}}_R2.fq.gz",input=config["input_dir"])
-    output:
+	params:
+		run="{run}",
+		adapter1="AATGATACGGCGACCACCGAGATCTACA" 
+		adapter2="CAAGCAGAAGACGGCATACGAGAT"
+	input:
+		reads1=expand("{input}/{{run}}_R1.fq.gz",input=config["input_dir"]),
+		reads2=expand("{input}/{{run}}_R2.fq.gz",input=config["input_dir"])
+	output:
  		R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
  		R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
-        fastp_html=expand("{output_dir}/demultiplex/clone_filter/{{run}}Preprocessing.html", output_dir=config["output_dir"]),
-        fastp_json=expand("{output_dir}/demultiplex/clone_filter/{{run}}Preprocessing.json", output_dir=config["output_dir"])
-    benchmark: 
-       "../Benchmarks/deduplicate_trim.benchmark_{run}.tsv"
-    conda: 
-        "env/fastp.yaml"
-    resources:
-        mem_mb= 10000,
-        runtime= 120,
-        cpus_per_task= 8
-    threads: 
-        8
-    shell:
-        """
-        fastp --in1 {input.reads1} \
-            --in2 {input.reads2} \
-            --out1 {output.filtered1} \
-            --out2 {output.filtered2} \
-            --adapter_sequence {params.adapter1} \
-            --adapter_sequence_r2 {params.adapter2} \
-            --dedup \
-            --trim_poly_g \
-            --umi \
-            --umi_loc per_read \
-            --umi_len 3 \
-            -j {output.fastp_json} \
-            -h {output.fastp_html} \
-            -w {threads} 
+		fastp_html=expand("{output_dir}/demultiplex/clone_filter/{{run}}Preprocessing.html", output_dir=config["output_dir"]),
+		fastp_json=expand("{output_dir}/demultiplex/clone_filter/{{run}}Preprocessing.json", output_dir=config["output_dir"])
+	benchmark: 
+	   "../Benchmarks/deduplicate_trim.benchmark_{run}.tsv"
+	conda: 
+		"env/fastp.yaml"
+	resources:
+		mem_mb= 10000,
+		runtime= 120,
+		cpus_per_task= 8
+	threads: 
+		8
+	shell:
+		"""
+		fastp --in1 {input.reads1} \
+			--in2 {input.reads2} \
+			--out1 {output.filtered1} \
+			--out2 {output.filtered2} \
+			--adapter_sequence {params.adapter1} \
+			--adapter_sequence_r2 {params.adapter2} \
+			--dedup \
+			--trim_poly_g \
+			--umi \
+			--umi_loc per_read \
+			--umi_len 3 \
+			-j {output.fastp_json} \
+			-h {output.fastp_html} \
+			-w {threads} 
 		""" 
 
 #Stacks and the rest of the pipeline need to have specific files for barcodes, 
