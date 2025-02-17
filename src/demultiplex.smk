@@ -15,7 +15,7 @@ def getParam_oligo(param_oligo):
 rule deduplicate_trim:
 	params:
 		run="{run}",
-		adapter1="AATGATACGGCGACCACCGAGATCTACA" 
+		adapter1="AATGATACGGCGACCACCGAGATCTACA", 
 		adapter2="CAAGCAGAAGACGGCATACGAGAT"
 	input:
 		reads1=expand("{input}/{{run}}_R1.fq.gz",input=config["input_dir"]),
