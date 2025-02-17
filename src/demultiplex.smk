@@ -15,8 +15,8 @@ def getParam_oligo(param_oligo):
 rule deduplicate_trim:
     params:
         run="{run}",
-        adapter1="ATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT" 
-        adapter2="CAAGCAGAAGACGGCATACGAGATCGGTCTCGGCATTCCTGCTGAACCGCTCTTCCGATCT"
+        adapter1="AATGATACGGCGACCACCGAGATCTACA" 
+        adapter2="CAAGCAGAAGACGGCATACGAGAT"
     input:
         reads1=expand("{input}/{{run}}_R1.fq.gz",input=config["input_dir"]),
         reads2=expand("{input}/{{run}}_R2.fq.gz",input=config["input_dir"])
@@ -52,46 +52,6 @@ rule deduplicate_trim:
             -h {output.fastp_html} \
             -w {threads} 
 		""" 
-
-# rule polyG:
-# 	input:
-# 		R1=expand("{path}/{{run}}_R1.fq.gz",path=config["inputDir"]),
-# 		R2=expand("{path}/{{run}}_R2.fq.gz",path=config["inputDir"])
-# 	output:
-# 		R1=temp(expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"])),
-# 		R2=temp(expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"]))
-# 	resources:
-# 		mem_mb= 10000,
-# 		runtime= 120,
-# 		cpus_per_task= 6
-# 	threads: 6
-# 	conda:
-# 		"env/fastp.yaml"
-# 	shell:
-# 		"fastp -i {input.R1} -I {input.R2} -o {output.R1} -O {output.R2} --trim_poly_g"
-
-
-# rule clone_filter:
-# 	input:
-# 		barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"]),
-# 		R1=expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"]),
-# 		R2=expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"])
-# 	params:
-# 		outputdir=expand("{path}/demultiplex", path=config["outputDir"]),
-# 		param_oligo=getParam_oligo(param_oligo)
-# 	output:
-# 		R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
-# 		R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"])
-# 	conda:
-# 		"env/stacks.yaml"
-# 	threads: 1
-# 	resources:
-# 		mem_mb=lambda wc, input: max(2.5 * input.size_mb,2000),
-# 		runtime= 6*60,
-# 		cpus_per_task= 1,
-
-# 	shell: 
-# 		"clone_filter -1 {input.R1} -2 {input.R2} -o {params.outputdir}/clone_filter/ --oligo_len_1 {params.param_oligo} --oligo_len_2 {params.param_oligo} --inline_inline -i gzfastq"
 
 #Stacks and the rest of the pipeline need to have specific files for barcodes, 
 #the format is different and we add the control nucleotide and we need to split it per run so we can demultiplex them in parallel
@@ -261,3 +221,46 @@ if DUPES==True:
 			rm {params.outputDir}*/{wildcards.sample}.rem.1.fq.gz
 			rm {params.outputDir}*/{wildcards.sample}.rem.2.fq.gz
 			"""
+
+
+#Old trimming and polyG removal
+
+# rule polyG:
+# 	input:
+# 		R1=expand("{path}/{{run}}_R1.fq.gz",path=config["inputDir"]),
+# 		R2=expand("{path}/{{run}}_R2.fq.gz",path=config["inputDir"])
+# 	output:
+# 		R1=temp(expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"])),
+# 		R2=temp(expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"]))
+# 	resources:
+# 		mem_mb= 10000,
+# 		runtime= 120,
+# 		cpus_per_task= 6
+# 	threads: 6
+# 	conda:
+# 		"env/fastp.yaml"
+# 	shell:
+# 		"fastp -i {input.R1} -I {input.R2} -o {output.R1} -O {output.R2} --trim_poly_g"
+
+
+# rule clone_filter:
+# 	input:
+# 		barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"]),
+# 		R1=expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"]),
+# 		R2=expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"])
+# 	params:
+# 		outputdir=expand("{path}/demultiplex", path=config["outputDir"]),
+# 		param_oligo=getParam_oligo(param_oligo)
+# 	output:
+# 		R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
+# 		R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"])
+# 	conda:
+# 		"env/stacks.yaml"
+# 	threads: 1
+# 	resources:
+# 		mem_mb=lambda wc, input: max(2.5 * input.size_mb,2000),
+# 		runtime= 6*60,
+# 		cpus_per_task= 1,
+
+# 	shell: 
+# 		"clone_filter -1 {input.R1} -2 {input.R2} -o {params.outputdir}/clone_filter/ --oligo_len_1 {params.param_oligo} --oligo_len_2 {params.param_oligo} --inline_inline -i gzfastq"
