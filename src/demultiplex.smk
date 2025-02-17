@@ -12,46 +12,86 @@ def getParam_oligo(param_oligo):
 #It compares reads that are removes reads that are completely identical 
 #including the UMI/wobble/oligo's (random bases that are added at the beginning of the reads)
 #as if all of these are identical it will most likely be a PCR artifact
+rule deduplicate_trim:
+    params:
+        run="{run}",
+        adapter1="ATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT" 
+        adapter2="CAAGCAGAAGACGGCATACGAGATCGGTCTCGGCATTCCTGCTGAACCGCTCTTCCGATCT"
+    input:
+        reads1=expand("{input}/{{run}}_R1.fq.gz",input=config["input_dir"]),
+        reads2=expand("{input}/{{run}}_R2.fq.gz",input=config["input_dir"])
+    output:
+ 		R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
+ 		R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
+        fastp_html=expand("{output_dir}/demultiplex/clone_filter/{{run}}Preprocessing.html", output_dir=config["output_dir"]),
+        fastp_json=expand("{output_dir}/demultiplex/clone_filter/{{run}}Preprocessing.json", output_dir=config["output_dir"])
+    benchmark: 
+       "../Benchmarks/deduplicate_trim.benchmark_{run}.tsv"
+    conda: 
+        "env/fastp.yaml"
+    resources:
+        mem_mb= 10000,
+        runtime= 120,
+        cpus_per_task= 8
+    threads: 
+        8
+    shell:
+        """
+        fastp --in1 {input.reads1} \
+            --in2 {input.reads2} \
+            --out1 {output.filtered1} \
+            --out2 {output.filtered2} \
+            --adapter_sequence {params.adapter1} \
+            --adapter_sequence_r2 {params.adapter2} \
+            --dedup \
+            --trim_poly_g \
+            --umi \
+            --umi_loc per_read \
+            --umi_len 3 \
+            -j {output.fastp_json} \
+            -h {output.fastp_html} \
+            -w {threads} 
+		""" 
 
-rule polyG:
-	input:
-		R1=expand("{path}/{{run}}_R1.fq.gz",path=config["inputDir"]),
-		R2=expand("{path}/{{run}}_R2.fq.gz",path=config["inputDir"])
-	output:
-		R1=temp(expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"])),
-		R2=temp(expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"]))
-	resources:
-		mem_mb= 10000,
-		runtime= 120,
-		cpus_per_task= 6
-	threads: 6
-	conda:
-		"env/fastp.yaml"
-	shell:
-		"fastp -i {input.R1} -I {input.R2} -o {output.R1} -O {output.R2} --trim_poly_g"
+# rule polyG:
+# 	input:
+# 		R1=expand("{path}/{{run}}_R1.fq.gz",path=config["inputDir"]),
+# 		R2=expand("{path}/{{run}}_R2.fq.gz",path=config["inputDir"])
+# 	output:
+# 		R1=temp(expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"])),
+# 		R2=temp(expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"]))
+# 	resources:
+# 		mem_mb= 10000,
+# 		runtime= 120,
+# 		cpus_per_task= 6
+# 	threads: 6
+# 	conda:
+# 		"env/fastp.yaml"
+# 	shell:
+# 		"fastp -i {input.R1} -I {input.R2} -o {output.R1} -O {output.R2} --trim_poly_g"
 
 
-rule clone_filter:
-	input:
-		barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"]),
-		R1=expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"]),
-		R2=expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"])
-	params:
-		outputdir=expand("{path}/demultiplex", path=config["outputDir"]),
-		param_oligo=getParam_oligo(param_oligo)
-	output:
-		R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
-		R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"])
-	conda:
-		"env/stacks.yaml"
-	threads: 1
-	resources:
-		mem_mb=lambda wc, input: max(2.5 * input.size_mb,2000),
-		runtime= 6*60,
-		cpus_per_task= 1,
+# rule clone_filter:
+# 	input:
+# 		barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"]),
+# 		R1=expand("{path}/demultiplex/trim/{{run}}_R1.fq.gz",path=config["outputDir"]),
+# 		R2=expand("{path}/demultiplex/trim/{{run}}_R2.fq.gz",path=config["outputDir"])
+# 	params:
+# 		outputdir=expand("{path}/demultiplex", path=config["outputDir"]),
+# 		param_oligo=getParam_oligo(param_oligo)
+# 	output:
+# 		R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
+# 		R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"])
+# 	conda:
+# 		"env/stacks.yaml"
+# 	threads: 1
+# 	resources:
+# 		mem_mb=lambda wc, input: max(2.5 * input.size_mb,2000),
+# 		runtime= 6*60,
+# 		cpus_per_task= 1,
 
-	shell: 
-		"clone_filter -1 {input.R1} -2 {input.R2} -o {params.outputdir}/clone_filter/ --oligo_len_1 {params.param_oligo} --oligo_len_2 {params.param_oligo} --inline_inline -i gzfastq"
+# 	shell: 
+# 		"clone_filter -1 {input.R1} -2 {input.R2} -o {params.outputdir}/clone_filter/ --oligo_len_1 {params.param_oligo} --oligo_len_2 {params.param_oligo} --inline_inline -i gzfastq"
 
 #Stacks and the rest of the pipeline need to have specific files for barcodes, 
 #the format is different and we add the control nucleotide and we need to split it per run so we can demultiplex them in parallel
@@ -63,8 +103,8 @@ rule make_stacks_files:
 	output:
 		popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
 		popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv",path=config["outputDir"]),
-		barcodes=expand("{path}/stacksFiles/barcodeStacks{run}.tsv", path=config["outputDir"], bar=config["barcodeFile"],run=RUN),
-		popmapSep=expand("{path}/stacksFiles/popmap{run}.tsv", path=config["outputDir"], bar=config["barcodeFile"],run=RUN)
+		barcodes=expand("{path}/stacksFiles/barcodeStacks{run}.tsv", path=config["outputDir"],run=RUN),
+		popmapSep=expand("{path}/stacksFiles/popmap{run}.tsv", path=config["outputDir"],run=RUN)
 	params:
 		outputDir=expand("{path}/stacksFiles",path=config["outputDir"])
 	resources:
@@ -91,7 +131,7 @@ rule process_radtags:
 	input:
 		R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
 		R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
-		barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"], bar=config["barcodeFile"])
+		barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"])
 	output:
 		hackDir=directory(temp("demux_tmp_{run}")),
 		log=expand("{path}/demultiplex/logs/{{run}}/process_radtags.clone_filter.log",path=config["outputDir"])
