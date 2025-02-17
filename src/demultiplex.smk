@@ -21,8 +21,8 @@ rule deduplicate_trim:
 		reads1=expand("{input}/{{run}}_R1.fq.gz",input=config["input_dir"]),
 		reads2=expand("{input}/{{run}}_R2.fq.gz",input=config["input_dir"])
 	output:
- 		R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
- 		R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
+		R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
+		R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
 		fastp_html=expand("{output_dir}/demultiplex/clone_filter/{{run}}Preprocessing.html", output_dir=config["output_dir"]),
 		fastp_json=expand("{output_dir}/demultiplex/clone_filter/{{run}}Preprocessing.json", output_dir=config["output_dir"])
 	conda: 
