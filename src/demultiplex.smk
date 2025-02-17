@@ -25,8 +25,6 @@ rule deduplicate_trim:
  		R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
 		fastp_html=expand("{output_dir}/demultiplex/clone_filter/{{run}}Preprocessing.html", output_dir=config["output_dir"]),
 		fastp_json=expand("{output_dir}/demultiplex/clone_filter/{{run}}Preprocessing.json", output_dir=config["output_dir"])
-	benchmark: 
-	   "../Benchmarks/deduplicate_trim.benchmark_{run}.tsv"
 	conda: 
 		"env/fastp.yaml"
 	resources:
