@@ -20,6 +20,11 @@ rule subset_popmap:
         expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"])
     params:
         getParam_nInds(param_nInds)
+    resources:
+        mem_mb= 100,
+        runtime= 5,
+        cpus_per_task= 1
+
     shell:
         "paste <(cat {input} | sort | uniq | shuf -n {params} | cut -f1) <(yes opt | head -n {params}) > {output}"
 
@@ -30,6 +35,10 @@ rule mkdirLargeM:
         expand("{dir}/stacksTest/M{{largeM}}/test{{largeM}}",dir=config["outputDir"])
     params:
         largeM="{largeM}"
+    resources:
+        mem_mb= 100,
+        runtime= 5,
+        cpus_per_task= 1
     shell:
         "cat {input} | head -n {params.largeM} > {output}"
 
@@ -47,7 +56,10 @@ rule runStacksLargeM:
         inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
     conda:
         "env/stacks.yaml"
-    threads: 4
+    resources:
+                mem_mb= 30000,
+                runtime= 24*60,
+                cpus_per_task= 16
     shell:
         """
         denovo_map.pl --samples {params.inputDir} --popmap {input.popmapSub} -T {threads} \
@@ -62,6 +74,10 @@ rule extractInfoLargeM:
         MparameterTSV=expand("{dir}/stacksTest/parameter.tsv",dir=config["outputDir"])
     params:
         dir=config["outputDir"]
+    resources:
+        mem_mb= 100,
+        runtime= 5,
+        cpus_per_task= 1
     shell:
         """
         paste <(cat {params.dir}/stacksTest/*/denovo_map.log | grep "Kept" | cut -f2,14 -d " ") \
@@ -77,6 +93,10 @@ rule makePlotLargeM:
         MparameterPNG=expand("{dir}/stacksTest/parameter.png",dir=config["outputDir"])
     params:
         dir=expand("{dir}/stacksTest/",dir=config["outputDir"])
+    resources:
+        mem_mb= 100,
+        runtime= 5,
+        cpus_per_task= 1
     conda:
         "env/R.yaml"
     shell:
