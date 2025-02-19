@@ -56,10 +56,11 @@ rule runStacksLargeM:
         inputDir=expand("{path}/demultiplex/samples/",path=config["outputDir"])
     conda:
         "env/stacks.yaml"
+    threads:8
     resources:
                 mem_mb= 30000,
                 runtime= 24*60,
-                cpus_per_task= 16
+                cpus_per_task= 8
     shell:
         """
         denovo_map.pl --samples {params.inputDir} --popmap {input.popmapSub} -T {threads} \
