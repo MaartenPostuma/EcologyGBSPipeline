@@ -1,5 +1,5 @@
 threadsSNPcalling=min(workflow.cores,4096/(len(SAMPLES)*2)-4)
-threadsMapping=workfow.cores/5
+threadsMapping=workflow.cores/5
 
 rule make_bwa_mem_index:
     input:
