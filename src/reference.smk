@@ -7,7 +7,9 @@ rule make_bwa_mem_index:
         "env/bwa-mem.yaml"
     threads: 1
     resources:
-        mem_mb= 1000
+        mem_mb= 10000,
+        runtime= 60,
+        cpus_per_task=1
     shell:
         "bwa-mem2 index {input.ref}"
 
@@ -24,7 +26,10 @@ rule map_bwa:
     conda:
         "env/bwa-mem.yaml"
     resources:
-        mem_mb= 10000
+        mem_mb= 20000,
+        runtime= 60,
+        cpus_per_task=workflow.cores/5
+
     shell:
         "bwa-mem2 mem -t {threads} {input.ref} {input.samplesR1} {input.samplesR2} | samtools view -buS - > {output.bam}"
 
@@ -35,7 +40,9 @@ rule sort_picard:
         sortedBam=temp(expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["tmpDir"]))
     threads: 1
     resources:
-        mem_mb= 10000
+        mem_mb= 20000,
+        runtime= 60,
+        cpus_per_task=1
     conda:
         "env/picard.yaml"
     shell:
@@ -48,7 +55,9 @@ rule add_RG:
         RGBam=expand("{path}/refMapping/RGBams/{{samples}}.bam",path=config["tmpDir"])
     threads: 1
     resources:
-        mem_mb= 10000
+        mem_mb= 20000,
+        runtime= 60,
+        cpus_per_task=1
     conda:
         "env/picard.yaml"
     shell:
@@ -71,6 +80,10 @@ rule merge_sort_bam:
     conda:
         "env/samtools.yaml"
     threads: workflow.cores
+    resources:
+        mem_mb= 20000,
+        runtime= 180,
+        cpus_per_task=workflow.cores
     shell:
         "samtools merge - {input.RGBam} | samtools sort -@ {threads} > {output.mergedBam}"
   
@@ -79,6 +92,11 @@ rule indexRef:
         ref=expand("{ref}",ref=config["reference"])
     output:
         refIndex=expand("{ref}.fai",ref=config["reference"])
+    threads: 1
+    resources:
+        mem_mb= 20000,
+        runtime= 10,
+        cpus_per_task=1
     conda:
         "env/samtools.yaml"
     shell:
@@ -91,6 +109,11 @@ rule indexBam:
         RGBamIndex=expand("{path}/refOut/merged.bam.bai",path=config["outputDir"]),
     conda:
         "env/samtools.yaml"
+    threads: 1
+    resources:
+        mem_mb= 10000,
+        runtime= 10,
+        cpus_per_task=1    
     shell:
         "samtools index {input.RGBam}"
 
@@ -102,6 +125,11 @@ rule makeRegionsInput:
         coverage=expand("{path}/refOut/aln.bam.coverage.gz",path=config["outputDir"])
     conda:
         "env/sambabamba.yaml"
+    threads: 1
+    resources:
+        mem_mb= 10000,
+        runtime= 60,
+        cpus_per_task=1    
     shell:
         """
         sambamba depth base --combined {input.RGBam} | cut -f 1-3 | pv -l | pigz -p 1 >  {output.coverage}
@@ -112,6 +140,10 @@ rule makeRegions:
         coverage=expand("{path}/refOut/aln.bam.coverage.gz",path=config["outputDir"])
     output:
         targetRegions=expand("{path}/refOut/targets.regions",path=config["outputDir"]),
+    resources:
+        mem_mb= 10000,
+        runtime= 60,
+        cpus_per_task=1    
     shell:
         """
         base_cov=$(zcat {input.coverage} | awk "NR>1 {{ x += \$3; }} END {{ print x }}")
@@ -152,6 +184,10 @@ rule variantCall:
     output:
         vcf=expand("{path}/refOut/populations.vcf.gz",path=config["outputDir"])
     threads: min(workflow.cores,4096/(len(SAMPLES)*2)-4)
+    resources:
+        mem_mb= 10000,
+        runtime= 300,
+        cpus_per_task=min(workflow.cores,4096/(len(SAMPLES)*2)-4)
     conda:
         "env/freebayes.yaml"
     shell:

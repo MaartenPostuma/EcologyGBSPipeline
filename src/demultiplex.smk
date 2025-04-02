@@ -18,11 +18,11 @@ rule deduplicate_trim:
 		adapter1="AATGATACGGCGACCACCGAGATCTACA", 
 		adapter2="CAAGCAGAAGACGGCATACGAGAT"
 	input:
-		reads1=expand("{input}/{{run}}_R1.fq.gz",input=config["inputDir"]),
-		reads2=expand("{input}/{{run}}_R2.fq.gz",input=config["inputDir"])
+		reads1=expand("{input}/{{run}}1.fq.gz",input=config["inputDir"]),
+		reads2=expand("{input}/{{run}}2.fq.gz",input=config["inputDir"])
 	output:
-		R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
-		R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
+		R1=expand("{path}/demultiplex/clone_filter/{{run}}1.1.fq.gz",path=config["outputDir"]),
+		R2=expand("{path}/demultiplex/clone_filter/{{run}}2.2.fq.gz",path=config["outputDir"]),
 		fastp_html=expand("{output_dir}/demultiplex/clone_filter/{{run}}Preprocessing.html", output_dir=config["outputDir"]),
 		fastp_json=expand("{output_dir}/demultiplex/clone_filter/{{run}}Preprocessing.json", output_dir=config["outputDir"])
 	conda: 
@@ -87,8 +87,8 @@ rule make_stacks_files:
 
 rule process_radtags:
 	input:
-		R1=expand("{path}/demultiplex/clone_filter/{{run}}_R1.1.fq.gz",path=config["outputDir"]),
-		R2=expand("{path}/demultiplex/clone_filter/{{run}}_R2.2.fq.gz",path=config["outputDir"]),
+		R1=expand("{path}/demultiplex/clone_filter/{{run}}1.1.fq.gz",path=config["outputDir"]),
+		R2=expand("{path}/demultiplex/clone_filter/{{run}}2.2.fq.gz",path=config["outputDir"]),
 		barcodes=expand("{path}/stacksFiles/barcodeStacks{{run}}.tsv", path=config["outputDir"])
 	output:
 		hackDir=directory(temp("demux_tmp_{run}")),
@@ -98,10 +98,10 @@ rule process_radtags:
 		truncateLength=config["truncateLength"]
 	conda:
 		"env/stacks.yaml"
-	threads: THREADSPERRUN
+	threads: 6
 	resources:
 		mem_mb= 10000,
-		runtime= 3*60,
+		runtime= 6*60,
 		cpus_per_task= 6
 	shell:
 		"""
@@ -184,7 +184,7 @@ if DUPES==False:
 			outputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"]),
 		resources:
 			mem_mb= 1000,
-			runtime= 1,
+			runtime= 5,
 			cpus_per_task= 1
 
 		shell:
@@ -208,7 +208,7 @@ if DUPES==True:
 			outputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"])
 		resources:
 			mem_mb= 1000,
-			runtime= 1,
+			runtime= 5,
 			cpus_per_task= 1
 		shell:
 			"""
