@@ -8,7 +8,7 @@ rule make_bwa_mem_index:
         "env/bwa-mem.yaml"
     threads: 1
     resources:
-        mem_mb= 10000,
+        mem_mb= 30000,
         runtime= 60,
         cpus_per_task=1
     shell:
