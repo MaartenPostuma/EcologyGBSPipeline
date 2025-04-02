@@ -1,5 +1,4 @@
 threadsSNPcalling=min(workflow.cores,4096/(len(SAMPLES)*2)-4)
-threadsMapping=workflow.cores/5
 
 rule make_bwa_mem_index:
     input:
@@ -25,13 +24,13 @@ rule map_bwa:
     output:
         bam=temp(expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["tmpDir"])),
     threads:
-        workflow.cores/5
+        threadsMapping
     conda:
         "env/bwa-mem.yaml"
     resources:
         mem_mb= 20000,
         runtime= 60,
-        cpus_per_task=threadsMapping
+        cpus_per_task=5
 
     shell:
         "bwa-mem2 mem -t {threads} {input.ref} {input.samplesR1} {input.samplesR2} | samtools view -buS - > {output.bam}"
@@ -190,7 +189,7 @@ rule variantCall:
     resources:
         mem_mb= 10000,
         runtime= 300,
-        cpus_per_task=threadsSNPcalling
+        cpus_per_task=16
     conda:
         "env/freebayes.yaml"
     shell:
