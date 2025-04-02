@@ -1,4 +1,3 @@
-threadsSNPcalling=min(workflow.cores,4096/(len(SAMPLES)*2)-4)
 
 rule make_bwa_mem_index:
     input:
@@ -24,7 +23,7 @@ rule map_bwa:
     output:
         bam=temp(expand("{path}/refMapping/firstBam/{{samples}}.bam",path=config["tmpDir"])),
     threads:
-        threadsMapping
+        5
     conda:
         "env/bwa-mem.yaml"
     resources:
