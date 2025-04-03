@@ -82,7 +82,7 @@ rule merge_sort_bam:
         "env/samtools.yaml"
     threads: workflow.cores
     resources:
-        mem_mb= 20000,
+        mem_mb= 100000,
         runtime= 180,
         cpus_per_task=workflow.cores
     shell:
