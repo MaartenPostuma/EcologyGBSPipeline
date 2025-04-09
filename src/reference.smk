@@ -184,11 +184,11 @@ rule variantCall:
         targetRegions=expand("{path}/refOut/targets.regions",path=config["outputDir"]),
     output:
         vcf=expand("{path}/refOut/populations.vcf.gz",path=config["outputDir"])
-    threads: min(workflow.cores,4096/(len(SAMPLES)*2)-4)
+    threads: 32
     resources:
-        mem_mb= 10000,
-        runtime= 300,
-        cpus_per_task=16
+        mem_mb= 100000,
+        runtime= 2400,
+        cpus_per_task=32
     conda:
         "env/freebayes.yaml"
     shell:

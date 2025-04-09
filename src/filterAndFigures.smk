@@ -61,7 +61,7 @@ if config["mode"]== "Denovo":
              outputDir=expand("{path}/filters/",path=config["outputDir"]),
              indMissing=individual_missingness,
         resources:
-            mem_mb=2000,
+            mem_mb=10000,
             runtime= 30,
             cpus_per_task= 1
         shell:
@@ -78,7 +78,7 @@ if config["mode"]== "Denovo":
         output:
              vcf=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
              sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern),
-             FstSumstats=expand("{path}/filters/{params}/populations.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+             FstSumstats=expand("{path}/filters/{params}/populations.p.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
         params:
              outputDir=expand("{path}",path=config["outputDir"]),
              parDir=expand("{path}/filters/{params}",path=config["outputDir"],params=paramspace.wildcard_pattern),
@@ -88,7 +88,7 @@ if config["mode"]== "Denovo":
         conda:
              "env/stacks.yaml"
         resources:
-             mem_mb=2000,
+             mem_mb=10000,
              runtime=30,
              cpus_per_task=4
         shell:
@@ -108,7 +108,7 @@ if config["mode"]== "Reference":
              outputDir=expand("{path}/filters/",path=config["outputDir"]),
              indMissing=individual_missingness,
         resources:
-            mem_mb=2000,
+            mem_mb=10000,
             runtime= 30,
             cpus_per_task= 4
      
@@ -130,7 +130,7 @@ if config["mode"]== "Reference":
         output:
              vcf=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
              sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern),
-             FstSumstats=expand("{path}/filters/{params}/populations.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+             FstSumstats=expand("{path}/filters/{params}/populations.p.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
         params:
              outputDir=expand("{path}",path=config["outputDir"]),
              parDir=expand("{path}/filters/{params}",path=config["outputDir"],params=paramspace.wildcard_pattern),
@@ -138,7 +138,7 @@ if config["mode"]== "Reference":
         threads:
              4
         resources:
-            mem_mb=2000,
+            mem_mb=10000,
             runtime= 30,
             cpus_per_task= 4
 
@@ -260,7 +260,7 @@ rule combinePopData:
 
 rule combineFSTData:
      input:
-        FstSumstats=expand("{path}/filters/{params}/populations.fst_summary.tsv",path=config["outputDir"],params=paramspace.instance_patterns),
+        FstSumstats=expand("{path}/filters/{params}/populations.p.fst_summary.tsv",path=config["outputDir"],params=paramspace.instance_patterns),
         barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"])
      output:
         fstStats=expand("{path}/filters/fstStatsAll.tsv",path=config["outputDir"])
