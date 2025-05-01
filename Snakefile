@@ -9,12 +9,12 @@ projectName=random.randint(1,1000000) #To ensure non overlapping tmp directories
 
 df = pd.read_csv(os.path.join(config["inputDir"],config["barcodeFile"]), sep='\t', dtype="object").set_index('sample')
 #Read the barcode file and do some management to create all of the info we need (sample file / seprate into runs / make a dictionary of the both of them etc.)
-df['run'] = df['rawR1'].str.replace("1.fq.gz","",regex=False)
+df['run'] = df['rawR1'].str.replace("_R1.fq.gz","",regex=False)
 df['sample']=df.index
 SAMPLES = df.index
 RAWREADSR1 = df.rawR1.str.replace(".fq.gz","",regex=False).unique()
 RAWREADSR2 = df.rawR2.str.replace(".fq.gz","",regex=False).unique()
-RUN = df.rawR1.str.replace("1.fq.gz","",regex=False).unique()
+RUN = df.rawR1.str.replace("_R1.fq.gz","",regex=False).unique()
 THREADSPERRUN=workflow.cores/RUN.size
 MODE=config["mode"]
 from snakemake.utils import Paramspace

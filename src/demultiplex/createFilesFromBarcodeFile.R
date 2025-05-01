@@ -5,7 +5,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 
 barcodes<-read.table(args[1],h=T,sep="\t")
-barcodes$run<-sub("1.fq.gz","",barcodes$rawR1)
+barcodes$run<-sub("_R1.fq.gz","",barcodes$rawR1)
 
 barcodeStacks<-data.frame(sample=barcodes$sample,
                           barcode1=paste0(barcodes$barcode1,"C"),
@@ -30,4 +30,3 @@ write.table(popmapStacks,paste0(args[2],"/popmap.tsv"),row.names = F,col.names =
 
 popmapSNPFilter<-data.frame(pop=unique(barcodes$pop),metaPop=barcodes$metaPop[duplicated(barcodes$pop)==F])
 write.table(popmapSNPFilter,paste0(args[2],"/SNPFilterPopMap.tsv"),row.names =F,col.names =T,quote=F,sep="\t")
-

@@ -18,8 +18,8 @@ rule deduplicate_trim:
 		adapter1="AATGATACGGCGACCACCGAGATCTACA", 
 		adapter2="CAAGCAGAAGACGGCATACGAGAT"
 	input:
-		reads1=expand("{input}/{{run}}1.fq.gz",input=config["inputDir"]),
-		reads2=expand("{input}/{{run}}2.fq.gz",input=config["inputDir"])
+		reads1=expand("{input}/{{run}}_R1.fq.gz",input=config["inputDir"]),
+		reads2=expand("{input}/{{run}}_R2.fq.gz",input=config["inputDir"])
 	output:
 		R1=expand("{path}/demultiplex/clone_filter/{{run}}1.1.fq.gz",path=config["outputDir"]),
 		R2=expand("{path}/demultiplex/clone_filter/{{run}}2.2.fq.gz",path=config["outputDir"]),

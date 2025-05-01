@@ -130,7 +130,7 @@ if config["mode"]== "Reference":
         output:
              vcf=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
              sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern),
-             FstSumstats=expand("{path}/filters/{params}/populations.p.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+             FstSumstats=expand("{path}/filters/{params}/populations.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
         params:
              outputDir=expand("{path}",path=config["outputDir"]),
              parDir=expand("{path}/filters/{params}",path=config["outputDir"],params=paramspace.wildcard_pattern),
@@ -149,6 +149,8 @@ if config["mode"]== "Reference":
              populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -V {input.vcf} -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --threads {threads} --fstats
              mv {params.parDir}/populations.p.snps.vcf {params.parDir}/populations.snps.vcf
              mv {params.parDir}/populations.p.sumstats_summary.tsv {params.parDir}/populations.sumstats_summary.tsv
+             mv {params.parDir}/populations.p.fst_summary.tsv {params.parDir}/populations.fst_summary.tsv
+
              """     
 
 
