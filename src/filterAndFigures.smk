@@ -150,7 +150,6 @@ if config["mode"]== "Reference":
              mv {params.parDir}/populations.p.snps.vcf {params.parDir}/populations.snps.vcf
              mv {params.parDir}/populations.p.sumstats_summary.tsv {params.parDir}/populations.sumstats_summary.tsv
              mv {params.parDir}/populations.p.fst_summary.tsv {params.parDir}/populations.fst_summary.tsv
-
              """     
 
 
@@ -262,7 +261,7 @@ rule combinePopData:
 
 rule combineFSTData:
      input:
-        FstSumstats=expand("{path}/filters/{params}/populations.p.fst_summary.tsv",path=config["outputDir"],params=paramspace.instance_patterns),
+        FstSumstats=expand("{path}/filters/{params}/populations.fst_summary.tsv",path=config["outputDir"],params=paramspace.instance_patterns),
         barcodes=expand("{path}/{bar}", path=config["inputDir"], bar=config["barcodeFile"])
      output:
         fstStats=expand("{path}/filters/fstStatsAll.tsv",path=config["outputDir"])
