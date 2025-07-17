@@ -90,6 +90,9 @@ if config["mode"]== "Reference":
     include: "src/reference.smk"
     include: "src/filterAndFigures.smk"
 
+if config["mode"]== "ReportReference" or config["mode"]== "ReportDenovo":
+    include: "src/filterAndFigures.smk"
+
 
 if config["mode"]== "Reference":
     rule all:

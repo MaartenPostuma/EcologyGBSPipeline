@@ -47,7 +47,7 @@ rule makeReport:
 
 #So this does a lot of things
 #It determines the % missingness at 80% max-missing per SNP and uses this to filter!
-if config["mode"]== "Denovo": 
+if config["mode"]== "Denovo" or config["mode"]== "ReportDenovo": 
      rule step_1:
         input:
              vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"]),
@@ -71,14 +71,14 @@ if config["mode"]== "Denovo":
              cat {input.popmap} | grep -f  {params.outputDir}/highDP.step1.indv > {output.vcf}
              """
 
-if config["mode"]== "Denovo":
+if config["mode"]== "Denovo" or config["mode"]== "ReportDenovo": 
      rule filter:
         input:
              vcf=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"])
         output:
              vcf=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
              sumstats=expand("{path}/filters/{params}/populations.sumstats_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern),
-             FstSumstats=expand("{path}/filters/{params}/populations.p.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
+             FstSumstats=expand("{path}/filters/{params}/populations.fst_summary.tsv",path=config["outputDir"],params=paramspace.wildcard_pattern)
         params:
              outputDir=expand("{path}",path=config["outputDir"]),
              parDir=expand("{path}/filters/{params}",path=config["outputDir"],params=paramspace.wildcard_pattern),
@@ -92,9 +92,14 @@ if config["mode"]== "Denovo":
              runtime=30,
              cpus_per_task=4
         shell:
-             "populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --fstats --threads {threads}"     
+             """"
+             populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --fstats --threads {threads}
+             mv {params.parDir}/populations.p.snps.vcf {params.parDir}/populations.snps.vcf
+             mv {params.parDir}/populations.p.sumstats_summary.tsv {params.parDir}/populations.sumstats_summary.tsv
+             mv {params.parDir}/populations.p.fst_summary.tsv {params.parDir}/populations.fst_summary.tsv
+             """
 
-if config["mode"]== "Reference": 
+if config["mode"]== "Reference" or config["mode"]== "ReportReference": 
      rule step_1:
         input:
              vcf=expand("{path}/refOut/populations.vcf.gz",path=config["outputDir"]),
@@ -122,7 +127,7 @@ if config["mode"]== "Reference":
              """
 
 
-if config["mode"]== "Reference":
+if config["mode"]== "Reference" or config["mode"]== "ReportReference": 
      rule filter:
         input:
              popmap=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),

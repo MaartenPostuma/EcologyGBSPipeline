@@ -5,7 +5,7 @@ args = commandArgs(trailingOnly=TRUE)
 #        "resultsFraaiHersthooi/filters/max_missing~1e-05/maf~0.01/populations.fst_summary.tsv")
 fileList<-args[-c(1,2)]
 output<-args[1] #First arg = output
-barcodes<-read.table(args[2],h=T) #3rd arg is barcode file
+barcodes<-read.table(args[2],h=T,sep="\t") #3rd arg is barcode file
 listOfFiles<-list()
 
 for(i in 1:length(fileList)){

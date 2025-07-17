@@ -21,7 +21,7 @@ rule subset_popmap:
     params:
         getParam_nInds(param_nInds)
     resources:
-        mem_mb= 100,
+        mem_mb= 1000,
         runtime= 5,
         cpus_per_task= 1
 
@@ -36,7 +36,7 @@ rule mkdirLargeM:
     params:
         largeM="{largeM}"
     resources:
-        mem_mb= 100,
+        mem_mb= 1000,
         runtime= 5,
         cpus_per_task= 1
     shell:
@@ -76,7 +76,7 @@ rule extractInfoLargeM:
     params:
         dir=config["outputDir"]
     resources:
-        mem_mb= 100,
+        mem_mb= 1000,
         runtime= 5,
         cpus_per_task= 1
     shell:
@@ -95,7 +95,7 @@ rule makePlotLargeM:
     params:
         dir=expand("{dir}/stacksTest/",dir=config["outputDir"])
     resources:
-        mem_mb= 100,
+        mem_mb= 1000,
         runtime= 5,
         cpus_per_task= 1
     conda:

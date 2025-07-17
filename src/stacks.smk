@@ -24,7 +24,7 @@ if config["mode"]=="Denovo":
                 "denovo_map.pl --samples {params.inputDir} --popmap {input.popmap} -T  {threads}  --paired      -o {params.outputDir} -n {params.M} -m {params.M} -X 'populations: --vcf'"
 
      if len(df.index) > 100: 
-        rule subset_popmap:
+        rule subset_popmap_denovo:
              input:
                 popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"]),
              output:
@@ -32,7 +32,7 @@ if config["mode"]=="Denovo":
              params:
                 90
              resources:
-                mem_mb= 100,
+                mem_mb= 1000,
                 runtime= 5,
                 cpus_per_task= 1
              shell:
