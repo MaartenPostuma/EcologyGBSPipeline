@@ -14,11 +14,11 @@ if config["mode"]=="Denovo":
                 vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"])
              conda:
                 "env/stacks.yaml"
-             threads:workflow.cores
+             threads:16
              resources:
                 mem_mb= 30000,
                 runtime= 24*60,
-                cpus_per_task= workflow.cores
+                cpus_per_task= 16
 
              shell:
                 "denovo_map.pl --samples {params.inputDir} --popmap {input.popmap} -T  {threads}  --paired      -o {params.outputDir} -n {params.M} -m {params.M} -X 'populations: --vcf'"
@@ -52,10 +52,10 @@ if config["mode"]=="Denovo":
                 vcf=expand("{path}/stacks/populations.snps.vcf",path=config["outputDir"])
              conda:
                 "env/stacks.yaml"
-             threads:workflow.cores
+             threads:16
              resources:
                 mem_mb= 30000,
                 runtime= 24*60,
-                cpus_per_task= workflow.cores
+                cpus_per_task= 16
              shell:
                 "denovo_map.pl --samples {params.inputDir} --popmap {input.popmap} -T  {threads} --catalog-popmap {input.popmap_sub} --paired        -o {params.outputDir} -n {params.M} -m {params.M} -X 'populations: --vcf'"
