@@ -66,8 +66,8 @@ if config["mode"]== "Denovo" or config["mode"]== "ReportDenovo":
             cpus_per_task= 1
         shell:
              """vcftools --vcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs --max-missing 0.5
-             mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/lowDP.step1.indv
-             mawk '$5 < {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/highDP.step1.indv
+             mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 | sed '1s/$/\tAge/;2,$s/$/\t/'> {params.outputDir}/lowDP.step1.indv
+             mawk '$5 < {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 | sed '1s/$/\tAge/;2,$s/$/\t/' > {params.outputDir}/highDP.step1.indv
              cat {input.popmap} | grep -f  {params.outputDir}/highDP.step1.indv > {output.vcf}
              """
 
@@ -94,9 +94,9 @@ if config["mode"]== "Denovo" or config["mode"]== "ReportDenovo":
         shell:
              """"
              populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --fstats --threads {threads}
-             mv {params.parDir}/populations.p.snps.vcf {params.parDir}/populations.snps.vcf
-             mv {params.parDir}/populations.p.sumstats_summary.tsv {params.parDir}/populations.sumstats_summary.tsv
-             mv {params.parDir}/populations.p.fst_summary.tsv {params.parDir}/populations.fst_summary.tsv
+             mv {params.parDir}/*.vcf {params.parDir}/populations.snps.vcf
+             mv {params.parDir}/*sumstats_summary.tsv {params.parDir}/populations.sumstats_summary.tsv
+             mv {params.parDir}/*fst_summary.tsv {params.parDir}/populations.fst_summary.tsv
              """
 
 if config["mode"]== "Reference" or config["mode"]== "ReportReference": 
@@ -120,8 +120,8 @@ if config["mode"]== "Reference" or config["mode"]== "ReportReference":
         shell:
              """
              vcftools --gzvcf {input.vcf}  --missing-indv --out {params.outputDir}/missingIndvs --max-missing 0.5
-             mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/lowDP.step1.indv
-             mawk '$5 < {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 > {params.outputDir}/highDP.step1.indv
+             mawk '$5 > {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 | sed '1s/$/\tAge/;2,$s/$/\t/'> {params.outputDir}/lowDP.step1.indv
+             mawk '$5 < {params.indMissing}' {params.outputDir}/missingIndvs.imiss | cut -f1 | sed '1s/$/\tAge/;2,$s/$/\t/' > {params.outputDir}/highDP.step1.indv
              cat {input.popmap} | grep -f  {params.outputDir}/highDP.step1.indv > {output.vcf}
              mkdir -p {params.outputDir}/finalVCF/
              """

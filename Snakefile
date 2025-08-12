@@ -15,7 +15,6 @@ SAMPLES = df.index
 RAWREADSR1 = df.rawR1.str.replace(".fq.gz","",regex=False).unique()
 RAWREADSR2 = df.rawR2.str.replace(".fq.gz","",regex=False).unique()
 RUN = df.rawR1.str.replace("_R1.fq.gz","",regex=False).unique()
-THREADSPERRUN=workflow.cores/RUN.size
 MODE=config["mode"]
 from snakemake.utils import Paramspace
 paramspace = Paramspace(pd.read_csv("src/filterAndFigures/paramTest.tsv", sep="\t"))
