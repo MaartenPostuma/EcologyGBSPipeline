@@ -99,7 +99,6 @@ if config["mode"]== "Reference":
             perRUNDemulti=expand("{path}/demultiplex/logs/{run}/process_radtags.log",path=config["outputDir"],run=RUN),
             samplesR1=expand("{path}/demultiplex/samples/{samples}.1.fq.gz",path=config["outputDir"],samples=SAMPLES),
             samplesR2=expand("{path}/demultiplex/samples/{samples}.2.fq.gz",path=config["outputDir"],samples=SAMPLES),
-            RGBam=expand("{path}/refOut/merged.bam",path=config["outputDir"]),
             vcf=expand("{path}/refOut/populations.vcf.gz",path=config["outputDir"]),
             pcaDataAll=expand("{path}/filters/pcaAll.tsv",path=config["outputDir"]),
             treeLabels=expand("{path}/filters/treeLabelsAll.tsv",path=config["outputDir"]),

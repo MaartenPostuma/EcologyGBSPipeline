@@ -53,7 +53,7 @@ rule add_RG:
     input:
         sortedBam=expand("{path}/refMapping/sorted/{{samples}}.bam",path=config["tmpDir"])
     output:
-        RGBam=expand("{path}/refMapping/RGBams/{{samples}}.bam",path=config["tmpDir"])
+        RGBam=temp(expand("{path}/refMapping/RGBams/{{samples}}.bam",path=config["tmpDir"]))
     threads: 1
     resources:
         mem_mb= 20000,
@@ -77,7 +77,7 @@ rule merge_sort_bam:
     input:
         RGBam=expand("{path}/refMapping/RGBams/{samples}.bam",path=config["tmpDir"],samples=SAMPLES)
     output:
-        mergedBam=expand("{path}/refOut/merged.bam",path=config["outputDir"])
+        mergedBam=temp(expand("{path}/refOut/merged.bam",path=config["outputDir"]))
     conda:
         "env/samtools.yaml"
     threads: 16
@@ -107,7 +107,7 @@ rule indexBam:
     input:
         RGBam=expand("{path}/refOut/merged.bam",path=config["outputDir"]),
     output:
-        RGBamIndex=expand("{path}/refOut/merged.bam.bai",path=config["outputDir"]),
+        RGBamIndex=temp(expand("{path}/refOut/merged.bam.bai",path=config["outputDir"])),
     conda:
         "env/samtools.yaml"
     threads: 1
