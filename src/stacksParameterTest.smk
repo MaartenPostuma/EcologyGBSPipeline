@@ -59,7 +59,7 @@ rule runStacksLargeM:
     threads:8
     resources:
                 mem_mb= 30000,
-                runtime= 24*60,
+                runtime= 6*60,
                 cpus_per_task= 8
     shell:
         """
