@@ -92,8 +92,7 @@ if config["mode"]== "Denovo" or config["mode"]== "ReportDenovo":
              runtime=30,
              cpus_per_task=4
         shell:
-             """"
-             mkdir -p {params.parDir}
+             """
              populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --fstats --threads {threads}
              mv {params.parDir}/*.vcf {params.parDir}/populations.snps.vcf
              mv {params.parDir}/*sumstats_summary.tsv {params.parDir}/populations.sumstats_summary.tsv
