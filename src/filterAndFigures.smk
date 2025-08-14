@@ -152,9 +152,9 @@ if config["mode"]== "Reference" or config["mode"]== "ReportReference":
         shell:
              """
              populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -V {input.vcf} -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --threads {threads} --fstats
-             mv {params.parDir}/populations.p.snps.vcf {params.parDir}/populations.snps.vcf
-             mv {params.parDir}/populations.p.sumstats_summary.tsv {params.parDir}/populations.sumstats_summary.tsv
-             mv {params.parDir}/populations.p.fst_summary.tsv {params.parDir}/populations.fst_summary.tsv
+             mv {params.parDir}/*.vcf {params.parDir}/populations.snps.vcf
+             mv {params.parDir}/*sumstats_summary.tsv {params.parDir}/populations.sumstats_summary.tsv
+             mv {params.parDir}/*fst_summary.tsv {params.parDir}/populations.fst_summary.tsv
              """     
 
 
