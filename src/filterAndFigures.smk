@@ -94,7 +94,7 @@ if config["mode"]== "Denovo" or config["mode"]== "ReportDenovo":
         shell:
              """
              populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -P {params.outputDir}/stacks -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --fstats --threads {threads}
-             mv {params.parDir}/*.vcf {params.parDir}/populations.snps.vcf
+             mv {params.parDir}/*snps.vcf {params.parDir}/populations.snps.vcf
              mv {params.parDir}/*sumstats_summary.tsv {params.parDir}/populations.sumstats_summary.tsv
              mv {params.parDir}/*fst_summary.tsv {params.parDir}/populations.fst_summary.tsv
              """
@@ -152,7 +152,7 @@ if config["mode"]== "Reference" or config["mode"]== "ReportReference":
         shell:
              """
              populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -V {input.vcf} -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --threads {threads} --fstats
-             mv {params.parDir}/*.vcf {params.parDir}/populations.snps.vcf
+             mv {params.parDir}/*snps.vcf {params.parDir}/populations.snps.vcf
              mv {params.parDir}/*sumstats_summary.tsv {params.parDir}/populations.sumstats_summary.tsv
              mv {params.parDir}/*fst_summary.tsv {params.parDir}/populations.fst_summary.tsv
              """     
