@@ -144,7 +144,7 @@ rule get_low_indvs:
 		runtime= 1,
 		cpus_per_task= 1
 	shell:
-		"""cat {input.log} | awk '$8<1000 {{print $2}}' > {output.log}"""
+		"""cat {input.log} | awk '$8<1000 {{print $2}}' | sed '1s/$/\tAge/;2,$s/$/\t/' > {output.log}"""
 
 rule filter_popmap:
 	input:

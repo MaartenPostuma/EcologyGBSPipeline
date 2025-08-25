@@ -15,7 +15,7 @@ LARGEM = list(range(1,12))
 
 rule subset_popmap:
     input:
-        popmap=expand("{path}/stacksFiles/popmap.tsv", path=config["outputDir"]),
+        popmap=expand("{path}/stacksFiles/popmapFiltDemulti.tsv", path=config["outputDir"]),
     output:
         expand("{dir}/stacksTest/popmapSub.tsv",dir=config["outputDir"])
     params:
@@ -26,7 +26,7 @@ rule subset_popmap:
         cpus_per_task= 1
 
     shell:
-        "paste <(cat {input} | sort | uniq | shuf -n {params} | cut -f1) <(yes opt | head -n {params}) > {output}"
+        "paste <(cat {input} | sort | uniq | shuf -n {params} | cut -f1) <(yes opt | head -n {params}) | sort | uniq > {output}"
 
 rule mkdirLargeM:
     input:
