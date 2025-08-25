@@ -49,3 +49,7 @@ param_StacksTest:
 param_filtering:
   individual_missingness: "0.8"
 
+#Number of reads a demultiplexed sample needs to have to be included in the analysis. Default is 1000 to make sure the pipeline runs
+#But can be increased to higher values in case of a lot of missing data leading to bad denovo_map performance
+param_demultifiltering:
+  numberOfReads: "1000"

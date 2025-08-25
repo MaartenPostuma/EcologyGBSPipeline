@@ -1,4 +1,5 @@
 param_oligo=config["param_demultiplex"]["nOligo"]
+demultiFilter=config["param_demultiFiltering"]["numberOfReads"]
 
 #We always use 3 as the number of oligo for our adapters. (If we would ever change this we can account for this)
 def getParam_oligo(param_oligo):
@@ -139,12 +140,14 @@ rule get_low_indvs:
 		log=expand("{path}/demultiplex/logs/{{run}}/perInd.tsv",path=config["outputDir"])
 	output:
 		log=expand("{path}/demultiplex/logs/{{run}}/removeInds.tsv",path=config["outputDir"])
+	params:
+		nReads=demultiFilter
 	resources:
 		mem_mb= 1000,
 		runtime= 1,
 		cpus_per_task= 1
 	shell:
-		"""cat {input.log} | awk '$8<1000 {{print $2}}' | sed '1s/$/\tAge/;2,$s/$/\t/' > {output.log}"""
+		"""cat {input.log} | awk '$8<{params.nReads} {{print $2}}' | sed '1s/$/\t/;2,$s/$/\t/' > {output.log}"""
 
 rule filter_popmap:
 	input:
