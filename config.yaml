@@ -51,5 +51,5 @@ param_filtering:
 
 #Number of reads a demultiplexed sample needs to have to be included in the analysis. Default is 1000 to make sure the pipeline runs
 #But can be increased to higher values in case of a lot of missing data leading to bad denovo_map performance
-param_demultifiltering:
+param_demultiFiltering:
   numberOfReads: "1000"
