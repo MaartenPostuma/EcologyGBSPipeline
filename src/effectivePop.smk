@@ -2,34 +2,45 @@ configfile: "src/effectivePop/configEP.yaml"
 import pandas as pd
 import os
 import random
-df = pd.read_csv("fraaiHertshooi/results/stacksFiles/popmapFiltered.tsv", sep='\t', dtype="object")
+
+
+
+colnames=["sample","population"]
+df = pd.read_csv(os.path.join("../results","stacksFiles/popmapFiltered.tsv"), sep='\t', dtype="object",names=colnames,header=None)
+vc = df.population.value_counts()
+POPS=vc[vc>5].index
 
 
 rule all:
-    EffPop=expand("{path}/effectivePopsize/{pop}/{pop}_NE.txt",path=config["inputDir"],pop=POPS)
+    input:
+        EffPop=expand("{path}/effectivePopsize/{population}/{population}_Ne.txt",path=config["inputDir"],population=POPS)
 
 
 rule splitPopmap:
     input:
         popmap=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["inputDir"]),
     output:
-        popmap=expand("{path}/effectivePopsize/popmaps/{{pop}}map.tsv",path=config["inputDir"])
+        popmap=expand("{path}/effectivePopsize/{population}/{population}map.tsv",path=config["inputDir"],population=POPS)
     conda:
         "env/R.yaml"
     params:
-        outputDir=config["inputDir"]
+        outputDir=expand("{path}/",path=config["inputDir"])
+    resources:
+            mem_mb=1000,
+            runtime=15,
+            cpus_per_task=1        
     shell:
-        """src/effectivePop/effectivePopSplit.R {input.popmap} {params.outputDir}"""
+        """Rscript src/effectivePop/effectivePopSplit.R {input.popmap} {params.outputDir}/effectivePopsize/"""
 
 rule perPopStacks:
     input:
-        popmap=expand("{path}/effectivePopsize/{{pop}}/{{pop}}map.tsv",path=config["inputDir"])
+        popmap=expand("{path}/effectivePopsize/{{population}}/{{population}}map.tsv",path=config["inputDir"])
     output:
-        vcf=expand("{path}/effectivePopsize/{{pop}}/populations.snps.genepop",path=config["inputDir"]),
+        vcf=expand("{path}/effectivePopsize/{{population}}/populations.snps.genepop",path=config["inputDir"]),
     params:
-        inputDir=expand("{path}/",path=config["inputDir"])
-        parDir=expand("{path}/effectivePopsize/{{pop}}/",path=config["inputDir"])
-        maf=config["maf"]
+        inputDir=expand("{path}/",path=config["inputDir"]),
+        parDir=expand("{path}/effectivePopsize/{{population}}/",path=config["inputDir"]),
+        maf=config["maf"],
         max_missing=config["max_missing"]
     threads:
             4
@@ -41,25 +52,36 @@ rule perPopStacks:
             cpus_per_task=4
     shell:
         """
-        populations -M {input.popmap} -P {params.inputDir}/filters/max_missing~{params.max_missing}/maf{params.maf} --min-maf {params.maf} --vcf -O {params.parDir} --threads {threads}
+        populations -M {input.popmap} -P {params.inputDir}/stacks/ -R {params.max_missing} --min-mac 2  --genepop -O {params.parDir} --threads {threads}
         """ 
 
 rule makeInfoFile:
     input:
         inputFile="src/effectivePop/NEstimatorTemplate.info"
     output:
-        outFile=expand("{path}/effectivePopsize/{{pop}}/{{pop}}.info",path=config["inputDir"])
+        outFile=expand("{path}/effectivePopsize/{{population}}/{{population}}.info",path=config["inputDir"])
     params:
-        outDir=expand("{path}/effectivePopsize/{{pop}}/",path=config["inputDir"])
+        outDir=expand("{path}/effectivePopsize/{{population}}/",path=config["inputDir"]),
+        population="{population}"
+    resources:
+        mem_mb=1000,
+        runtime=15,
+        cpus_per_task=1            
     shell:
-        """sed 's|inputDir|{params.outDir}/|g' {input.inputFile}"""
+        """cat {input.inputFile} | sed 's|inputDir|{params.outDir}/|g'   | sed  's|pop1|{params.population}|g' > {output.outFile}"""
 
 rule runNEestimator:
     input:
-        inFile=expand("{path}/effectivePopsize/{{pop}}/{{pop}}.info",path=config["inputDir"]),
-        genepop=expand("{path}/effectivePopsize/{{pop}}/populations.snps.genepop",path=config["inputDir"])
+        inFile=expand("{path}/effectivePopsize/{{population}}/{{population}}.info",path=config["inputDir"]),
+        genepop=expand("{path}/effectivePopsize/{{population}}/populations.snps.genepop",path=config["inputDir"])
     output:
-        EffPop=expand("{path}/effectivePopsize/{{pop}}/{{pop}}_NE.txt",path=config["inputDir"])
+        EffPop=expand("{path}/effectivePopsize/{{population}}/{{population}}_Ne.txt",path=config["inputDir"])
+    params:
+        NeEstimator=config["NeEstimatorLoc"]
+    resources:
+        mem_mb=10000,
+        runtime=15,
+        cpus_per_task=1            
     shell:
-        """src/effectivePop/NE2L i:{input.inFile}"""
+        """{params.NeEstimator}/Ne2L i:{input.inFile}"""
     
