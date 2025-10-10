@@ -2,3 +2,4 @@ inputDir: /lustre/nobackup/WUR/ESG/postu003/projects/fraaiHertshooi/results
 maf: 0.05
 max_missing: 0.8
 NeEstimatorLoc: /lustre/nobackup/WUR/ESG/postu003/projects/effectivePopSize/NeEstimator2.X
+min_samples: 5

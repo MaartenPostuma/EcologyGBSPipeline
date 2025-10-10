@@ -4,16 +4,18 @@ import os
 import random
 
 
-
+min_samples= config["min_samples"]
 colnames=["sample","population"]
-df = pd.read_csv(os.path.join("../results","stacksFiles/popmapFiltered.tsv"), sep='\t', dtype="object",names=colnames,header=None)
+df = pd.read_csv(os.path.join(config["inputDir"],"stacksFiles/popmapFiltered.tsv"), sep='\t', dtype="object",names=colnames,header=None)
 vc = df.population.value_counts()
-POPS=vc[vc>5].index
+POPS=vc[vc>=min_samples].index
 
 
 rule all:
     input:
-        EffPop=expand("{path}/effectivePopsize/{population}/{population}_Ne.txt",path=config["inputDir"],population=POPS)
+        EffPop=expand("{path}/effectivePopsize/{population}/{population}_Ne.txt",path=config["inputDir"],population=POPS),
+        combined=expand("{path}/effectivePopsize/combined.tsv",path=config["inputDir"])
+
 
 
 rule splitPopmap:
@@ -24,13 +26,16 @@ rule splitPopmap:
     conda:
         "env/R.yaml"
     params:
-        outputDir=expand("{path}/",path=config["inputDir"])
+        outputDir=expand("{path}/",path=config["inputDir"]),
+        min_samples=config["min_samples"]
     resources:
             mem_mb=1000,
             runtime=15,
             cpus_per_task=1        
     shell:
-        """Rscript src/effectivePop/effectivePopSplit.R {input.popmap} {params.outputDir}/effectivePopsize/"""
+        """
+        Rscript src/effectivePop/effectivePopSplit.R {input.popmap} {params.outputDir}/effectivePopsize/ {params.min_samples}
+        """
 
 rule perPopStacks:
     input:
@@ -80,8 +85,23 @@ rule runNEestimator:
         NeEstimator=config["NeEstimatorLoc"]
     resources:
         mem_mb=10000,
-        runtime=15,
+        runtime=60,
         cpus_per_task=1            
     shell:
         """{params.NeEstimator}/Ne2L i:{input.inFile}"""
     
+rule combineResults:
+    input:
+        EffPop=expand("{path}/effectivePopsize/{population}/{population}_Ne.txt",path=config["inputDir"],population=POPS)
+    output:
+        combined=expand("{path}/effectivePopsize/combined.tsv",path=config["inputDir"])
+    conda:
+        "env/R.yaml"
+    resources:
+            mem_mb=1000,
+            runtime=15,
+            cpus_per_task=1        
+    shell:
+        """
+        Rscript src/effectivePop/combineEffectivePopSize.R {output.combined} {input.EffPop}
+        """
