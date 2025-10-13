@@ -1,5 +1,5 @@
+args = commandArgs(trailingOnly=TRUE)
 outFile<-args[1]
-args<-list.files("data/fraaiHertshooi/",pattern="Ne.txt",full.names=T)
 files<-args[-1]
 
 allOut<-data.frame()
