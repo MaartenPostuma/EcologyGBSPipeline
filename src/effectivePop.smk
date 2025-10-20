@@ -14,7 +14,7 @@ POPS=vc[vc>=min_samples].index
 rule all:
     input:
         EffPop=expand("{path}/effectivePopsize/{population}/{population}_Ne.txt",path=config["inputDir"],population=POPS),
-        combined=expand("{path}/effectivePopsize/combined.tsv",path=config["inputDir"])
+        combined=expand("{path}/effectivePopsize/combinedEffectivePopSize.tsv",path=config["inputDir"])
 
 
 
@@ -94,7 +94,7 @@ rule combineResults:
     input:
         EffPop=expand("{path}/effectivePopsize/{population}/{population}_Ne.txt",path=config["inputDir"],population=POPS)
     output:
-        combined=expand("{path}/effectivePopsize/combined.tsv",path=config["inputDir"])
+        combined=expand("{path}/effectivePopsize/combinedEffectivePopSize.tsv",path=config["inputDir"])
     conda:
         "env/R.yaml"
     resources:
