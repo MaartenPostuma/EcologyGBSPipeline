@@ -89,7 +89,7 @@ if config["mode"]== "Denovo" or config["mode"]== "ReportDenovo":
              "env/stacks.yaml"
         resources:
              mem_mb=10000,
-             runtime=30,
+             runtime=60,
              cpus_per_task=4
         shell:
              """
@@ -114,7 +114,7 @@ if config["mode"]== "Reference" or config["mode"]== "ReportReference":
              indMissing=individual_missingness,
         resources:
             mem_mb=10000,
-            runtime= 30,
+            runtime= 60,
             cpus_per_task= 4
      
         shell:
@@ -280,4 +280,3 @@ rule combineFSTData:
         """
         Rscript src/filterAndFigures/fst.R {output.fstStats} {input.barcodes} {input.FstSumstats} 
         """
-
