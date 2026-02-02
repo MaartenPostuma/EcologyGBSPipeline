@@ -35,4 +35,4 @@ if(sum(colnames(barcodes)=="lat")&sum(colnames(barcodes)=="lon")){
 popStatsAll<-merge(popStatsAll,unique(barcodes[,c("lat","lon","pop")]),by="pop", sort=F)
 
 }
-write.table(popStatsAll,output,row.names=F)
+write.table(popStatsAll,output,row.names=F,sep="\t")

@@ -24,4 +24,4 @@ listOfFiles[[i]]<-popDataTemp
 
 popStatsAll<-do.call(rbind,listOfFiles)
 popStatsAll<-merge(dataPop,popStatsAll,by="pop")
-write.table(popStatsAll,output,row.names=F)
+write.table(popStatsAll,output,row.names=F,sep="\t")

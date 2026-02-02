@@ -44,13 +44,13 @@ treeSegments$maf<-sub("^.*~","",mafString)
 treeSegments$max_missing<-sub("^.*~","",max_missingString)
 treeLabelsFinal$nSNPs<-nSNPs
 treeLabelsFinal<-merge(treeLabelsFinal,dataPop,by="pop")
-write.table(treeLabelsFinal,args[4],row.names=F,quote=F)
-write.table(treeSegments,args[5],row.names=F,quote=F)
+write.table(treeLabelsFinal,args[4],row.names=F,sep="\t")
+write.table(treeSegments,args[5],row.names=F,sep="\t")
 
 snpgdsClose(genofile)
 },error=function(cond) {
             message(conditionMessage(cond))
-            write.table(data.frame(pop=NA,label=NA,x=NA,y=NA,max_missing=max_missingString,maf=mafString, nSNPs=0, metaPop=NA),args[4],row.names=F,quote=F)
-            write.table(data.frame(x=NA,y=NA,xend=NA,yend=NA,max_missing=max_missingString,maf=mafString),args[5],row.names=F,quote=F)
+            write.table(data.frame(pop=NA,label=NA,x=NA,y=NA,max_missing=max_missingString,maf=mafString, nSNPs=0, metaPop=NA),args[4],row.names=F,sep="\t")
+            write.table(data.frame(x=NA,y=NA,xend=NA,yend=NA,max_missing=max_missingString,maf=mafString),args[5],row.names=F,sep="\t")
 
 })

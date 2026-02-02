@@ -57,16 +57,16 @@ The distribution of individual missingness
 
 ```{r fig.cap="Fig.1: Histogram of the fraction of missingness across individuals, red line indicates the cutoff used in filtering step 2"}
 #Import the individual missingness and makes a histogram with a line to show the cutoff from the config file.
-indCoverage<-read.table(paste0(params$args[1],"filters/missingIndvs.imiss"),h=T)
+indCoverage<-read.table(paste0(params$args[1],"filters/missingIndvs.imiss"),h=T,sep="\t")
 rawCutOff<-system("cat config.yaml | grep 'individual_missingness'| cut -f2 -d :",intern=T)
 
 cutOff<-as.numeric(gsub("[^0-9.-]", "", rawCutOff))
 if(cutOff==0.0){
   cutOff<-0.8
 }
-popMapFilter<-read.table(paste0(params$args[1],"/stacksFiles/popmapFiltered.tsv"))
+popMapFilter<-read.table(paste0(params$args[1],"/stacksFiles/popmapFiltered.tsv"),sep="\t")
 numberOfIndividuals<-nrow(popMapFilter)
-popmap<-read.table(paste0(params$args[1],"/stacksFiles/popmap.tsv"))
+popmap<-read.table(paste0(params$args[1],"/stacksFiles/popmap.tsv"),sep="\t")
 
 ggplot(indCoverage,aes(x=F_MISS))+geom_histogram(col="black",fill="lightblue",binwidth=0.025)+
   ggtitle(paste0(numberOfIndividuals,"out of ",nrow(popmap)))+ylab("fraction missing")+
@@ -86,10 +86,10 @@ popmap$V1[!popmap$V1%in%popMapFilter$V1]
 #Big thing that makes all the analysis 
 parameters<-read.table("src/filterAndFigures/paramTest.tsv",h=T)
 pcaData<-read.table(paste0(params$args[1],"filters/pcaAll.tsv"),h=T)
-treeSegments<-read.table(paste0(params$args[1],"filters/treeSegmentsAll.tsv"),h=T)
-treeLabels<-read.table(paste0(params$args[1],"filters/treeLabelsAll.tsv"),h=T)
-popStats<-read.table(paste0(params$args[1],"filters/popStatsAll.tsv"),h=T)
-fstStats<-read.table(paste0(params$args[1],"filters/fstStatsAll.tsv"),h=T)
+treeSegments<-read.table(paste0(params$args[1],"filters/treeSegmentsAll.tsv"),h=T,sep="\t")
+treeLabels<-read.table(paste0(params$args[1],"filters/treeLabelsAll.tsv"),h=T,sep="\t")
+popStats<-read.table(paste0(params$args[1],"filters/popStatsAll.tsv"),h=T,sep="\t")
+fstStats<-read.table(paste0(params$args[1],"filters/fstStatsAll.tsv"),h=T,sep="\t")
 
 for(j in 1:length(unique(parameters$max_missing))){
 max_missing<-unique(parameters$max_missing)[j]
