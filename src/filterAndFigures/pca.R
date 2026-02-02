@@ -1,9 +1,9 @@
 library(SNPRelate)
 
 args = commandArgs(trailingOnly=TRUE)
-dataPop<-read.table(args[1],h=T)
+dataPop<-read.table(args[1],h=T,sep="\t")
 gdsFile<-args[2]
-popmap<-read.table(args[3])
+popmap<-read.table(args[3],sep="\t")
 genofile<-snpgdsOpen(gdsFile)
 
 colnames(popmap)<-c("sample.id","pop")

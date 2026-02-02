@@ -1,8 +1,8 @@
 args = commandArgs(trailingOnly=TRUE)
-#args= c("resultsFraaiHersthooi/filters/fstStatsAll.tsv",
-#        "/scratch2/maarten/rawData/peperboompje/2022/fraaiHertshooi/fraaiHersthooi.txt", 
-#        "resultsFraaiHersthooi/filters/max_missing~1e-05/maf~1e-05/populations.fst_summary.tsv",
-#        "resultsFraaiHersthooi/filters/max_missing~1e-05/maf~0.01/populations.fst_summary.tsv")
+#args= c("../results/filters/fstStatsAll.tsv",
+#        "../rawData/barcodes_run2.txt", 
+#        "../results/filters/max_missing~1e-05/maf~0.05/populations.fst_summary.tsv",
+#        "../results/filters/max_missing~1e-05/maf~0.01/populations.fst_summary.tsv")
 fileList<-args[-c(1,2)]
 output<-args[1] #First arg = output
 barcodes<-read.table(args[2],h=T,sep="\t") #3rd arg is barcode file
@@ -11,20 +11,16 @@ listOfFiles<-list()
 for(i in 1:length(fileList)){
 file<-fileList[i]
 
-fstDataTemp<-read.table(file,h=T,fill=T)
+fstDataTemp<-read.table(file,h=T,fill=T,sep="\t")
 
 splittedPath<-strsplit(file,split="/")[[1]]
 max_missingString<-splittedPath[grep("max_missing",splittedPath)]
 mafString<-splittedPath[grep("maf~",splittedPath)]
 
 row.names(fstDataTemp)<-fstDataTemp[,1]
-fstDataTemp[,1]<-NA
+fstDataTemp<-fstDataTemp[,-1]
 fstDataTemp[ncol(fstDataTemp),]<-NA
 row.names(fstDataTemp)[ncol(fstDataTemp)]<-colnames(fstDataTemp)[ncol(fstDataTemp)]
-
-for(j in 1:nrow(fstDataTemp)){
-  fstDataTemp[j,1:ncol(fstDataTemp)]<-c(rep(NA,times=j-1),fstDataTemp[j,1:(ncol(fstDataTemp)-(j-1))])
-}
 
 
 fstDataTemp[lower.tri(fstDataTemp)]<-t(fstDataTemp)[lower.tri(fstDataTemp)]

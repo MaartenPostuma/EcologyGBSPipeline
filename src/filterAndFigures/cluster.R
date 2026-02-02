@@ -1,12 +1,12 @@
 library(SNPRelate)
 library(ggdendro)
 args = commandArgs(trailingOnly=TRUE)
-#dataPop<-read.table("resultsBosbingelkruid/stacksFiles/SNPFilterPopMap.tsv",h=T)
-dataPop<-read.table(args[1],h=T)
-#gdsFile<-"resultsBosbingelkruid/filters/max_missing~0.8/maf~0.025/populations.snps.gds"
+#dataPop<-read.table("../results/stacksFiles/SNPFilterPopMap.tsv",h=T,sep="\t")
+dataPop<-read.table(args[1],h=T,sep="\t")
+#gdsFile<-"../results/filters/max_missing~0.8/maf~0.025/populations.snps.gds"
 gdsFile<-args[2]
-popmap<-read.table(args[3])
-#popmap<-read.table("resultsBosbingelkruid/stacksFiles/popmapFiltered.tsv")
+popmap<-read.table(args[3],sep="\t")
+#popmap<-read.table("../results/stacksFiles/popmapFiltered.tsv",sep="\t")
 genofile<-snpgdsOpen(gdsFile)
 
 colnames(popmap)<-c("sample.id","pop")

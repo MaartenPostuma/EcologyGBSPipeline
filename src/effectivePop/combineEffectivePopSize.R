@@ -20,4 +20,5 @@ out$maf<-c(0.05,0.02,0.01,0)
 out$pop<-gsub("_Ne.txt","",gsub("^.*/","",file))
 allOut<-rbind(allOut,out)
 }
+allOut[is.na(allOut)]<-Inf
 write.table(allOut,outFile,row.names=F)
