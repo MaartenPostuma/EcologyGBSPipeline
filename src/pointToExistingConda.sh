@@ -1,0 +1,5 @@
+for file in src/*.smk 
+do
+cat $file | sed 's|env/stacks.yaml|stacks|' > $file-2
+mv $file-2 $file
+done
