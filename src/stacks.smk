@@ -35,7 +35,7 @@ if config["mode"]=="Denovo":
                   runtime= 5,
                   cpus_per_task= 1
                shell:
-                  "paste <(shuf -n {params} {input.popmap} | cut -f1) <(yes opt | head -n {params}) | grep "[0-9]" > {output}"
+                  "paste <(shuf -n {params} {input.popmap} | cut -f1) <(yes opt | head -n {params}) | grep '[0-9]' > {output}"
          
          rule ustacks:
             input:
