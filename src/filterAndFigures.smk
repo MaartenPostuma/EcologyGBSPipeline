@@ -86,7 +86,7 @@ if config["mode"]== "Denovo" or config["mode"]== "ReportDenovo":
         threads:
              4
         conda:
-             "env/stacks.yaml"
+             "stacks"
         resources:
              mem_mb=10000,
              runtime=60,
@@ -148,7 +148,7 @@ if config["mode"]== "Reference" or config["mode"]== "ReportReference":
             cpus_per_task= 4
 
         conda:
-             "env/stacks.yaml"
+             "stacks"
         shell:
              """
              populations -M {params.outputDir}/stacksFiles/popmapFiltered.tsv -V {input.vcf} -R {wildcards.max_missing} --min-maf {params.maf} --vcf -O {params.parDir} --threads {threads} --fstats
@@ -160,7 +160,7 @@ if config["mode"]== "Reference" or config["mode"]== "ReportReference":
 
 rule makePCAData:
      input:
-        gds=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.wildcard_pattern),
+        gds=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
         popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv",path=config["outputDir"]),
         popmap=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
      output:
@@ -192,7 +192,7 @@ rule combinePCAData:
 
 rule makeTreeData:
      input:
-        gds=expand("{path}/filters/{params}/populations.snps.gds",path=config["outputDir"],params=paramspace.wildcard_pattern),
+        gds=expand("{path}/filters/{params}/populations.snps.vcf",path=config["outputDir"],params=paramspace.wildcard_pattern),
         popmapSNPFilter=expand("{path}/stacksFiles/SNPFilterPopMap.tsv",path=config["outputDir"]),
         popmap=expand("{path}/stacksFiles/popmapFiltered.tsv",path=config["outputDir"]),
      output:

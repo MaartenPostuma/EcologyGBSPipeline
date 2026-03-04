@@ -4,11 +4,10 @@ channels:
   - conda-forge
   - defaults
   - r
-dependencies: 
+dependencies:
   - r-base
   - r-ggplot2
   - r-reshape2
-  - bioconductor-snprelate
   - r-knitr
   - r-ggdendro
   - r-rmarkdown
@@ -20,3 +19,5 @@ dependencies:
   - r-reshape2
   - r-ade4
   - r-gridextra
+  - r-adegenet
+  - r-vcfr
