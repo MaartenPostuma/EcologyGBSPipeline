@@ -71,7 +71,7 @@ if config["mode"]=="Denovo":
                   M=config["M"],
                   outputDir=expand("{path}/stacks/",path=config["outputDir"]),
             output:
-                  catalog=expand("{path}/stacks/catalog.fa.gz",path=config["outputDir"]),
+                  catalog=expand("{path}/stacks/catalog.alleles.tsv.gz",path=config["outputDir"]),
                   cstackslog=expand("{path}/stacks/cstacks.log",path=config["outputDir"])
             resources:
                   mem_mb= 30000,
@@ -102,7 +102,7 @@ if config["mode"]=="Denovo":
                   "env/stacks.yaml"
             shell:
                """
-                  sstacks --threads 16 -n {params.M} -M {input.popmap_sub} -P {params.outputDir} > {output.ssstackslog}
+                  sstacks --threads 16  -M {input.popmap_sub} -P {params.outputDir} > {output.ssstackslog}
                """
 
          rule tsv2bam:
@@ -123,7 +123,7 @@ if config["mode"]=="Denovo":
                   "env/stacks.yaml"
             shell:
                """
-               tsv2bam -P {params.outputDir}  --threads 16 -M {params.inputDir} -R {params.inputDir} > {output.tsv2bamlog}
+               tsv2bam -P {params.outputDir}  --threads 16 -M {input.popmap} -R {params.inputDir} > {output.tsv2bamlog}
                """
          rule gstacks:
             input:
