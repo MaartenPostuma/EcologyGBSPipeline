@@ -168,8 +168,8 @@ rule makePCAData:
      conda:
         "env/R.yaml"
      resources:
-        mem_mb=1000,
-        runtime= 10,
+        mem_mb=10000,
+        runtime= 60,
         cpus_per_task= 1     
      params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
