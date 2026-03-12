@@ -8,7 +8,7 @@ vcf<-read.vcfR(gdsFile)
 genlight<-vcfR2genlight(vcf) 
 colnames(popmap)<-c("sample.id","pop")
 nSNPs<-ncol(genlight)
-pca<-glPca(genlight,nf = nrow(genlight)-1,) 
+pca<-glPca(genlight,nf = nrow(genlight)-1,n.cores=4,parallel=T)
 pcavar<-round(pca$eig/sum(pca$eig)*100,digits = 1) 
 pcaPlot <- 
 data.frame(sample.id=	row.names(pca$scores),

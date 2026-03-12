@@ -170,7 +170,7 @@ rule makePCAData:
      resources:
         mem_mb=10000,
         runtime= 60,
-        cpus_per_task= 1     
+        cpus_per_task= 4     
      params:
         outputDir=expand("{path}/filters/",path=config["outputDir"]),
      shell:
