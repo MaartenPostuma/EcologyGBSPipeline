@@ -86,7 +86,7 @@ if config["mode"]=="Denovo":
 
          rule ssstacks:
             input:
-                  popmap_sub=expand("{path}/stacks/popmapSub.tsv",path=config["outputDir"]),
+                  popmap_sub=expand("{path}/stacksFiles/popmapFiltDemulti.tsv",path=config["outputDir"]),
                   catalog=expand("{path}/stacks/catalog.alleles.tsv.gz",path=config["outputDir"]),
                   cstackslog=expand("{path}/stacks/cstacks.log",path=config["outputDir"])
             params:
