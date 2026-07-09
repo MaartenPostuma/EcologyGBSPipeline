@@ -43,18 +43,32 @@ rule mvStacksFiles:
         cpus_per_task= 1
     shell:
         """cp -r {input.stacksFiles} {output.stacksFiles}"""
+if config["mode"]== "Denovo":
+    rule mvVCF:
+        input:
+            vcf=expand("{path}/stacks/populations.snps.vcf", path=config["outputDir"]),    
+        output:
+            vcf=expand("{path}/archive/populations.snps.vcf",path=config["outputDir"])
+        resources:
+            mem_mb= 1000,
+            runtime= 1,
+            cpus_per_task= 1
+        shell:
+            """cp -r {input.vcf} {output.vcf}"""
 
-rule mvVCF:
-    input:
-        vcf=expand("{path}/stacks/populations.snps.vcf", path=config["outputDir"]),    
-    output:
-        vcf=expand("{path}/archive/populations.snps.vcf",path=config["outputDir"])
-    resources:
-        mem_mb= 1000,
-        runtime= 1,
-        cpus_per_task= 1
-    shell:
-        """cp -r {input.vcf} {output.vcf}"""
+if config["mode"]== "Reference":
+    rule mvVCF:
+        input:
+            vcf=expand("{path}/refOut/populations.snps.vcf", path=config["outputDir"]),    
+        output:
+            vcf=expand("{path}/archive/populations.snps.vcf",path=config["outputDir"])
+        resources:
+            mem_mb= 1000,
+            runtime= 1,
+            cpus_per_task= 1
+        shell:
+            """cp -r {input.vcf} {output.vcf}"""
+
 
 rule mvVCFfilt:
     input:

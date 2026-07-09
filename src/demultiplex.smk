@@ -187,13 +187,17 @@ if DUPES==False:
 			outputDir=expand("{path}/demultiplex/logs/",path=config["outputDir"]),
 		resources:
 			mem_mb= 1000,
-			runtime= 5,
+			runtime= 15,
 			cpus_per_task= 1
 
 		shell:
 			"""
-			mv {params.outputDir}/*/{wildcards.sample}.1.fq.gz {output.samplesR1}
-			mv {params.outputDir}/*/{wildcards.sample}.2.fq.gz {output.samplesR2}
+			cp {params.outputDir}/*/{wildcards.sample}.1.fq.gz {output.samplesR1}
+			cp {params.outputDir}/*/{wildcards.sample}.2.fq.gz {output.samplesR2}
+			rm {params.outputDir}*/{wildcards.sample}.1.fq.gz
+			rm {params.outputDir}*/{wildcards.sample}.2.fq.gz
+			rm {params.outputDir}*/{wildcards.sample}.rem.1.fq.gz
+			rm {params.outputDir}*/{wildcards.sample}.rem.2.fq.gz
 			"""
 #If there are duplicates in the log file we cannot move the files. As two files with the same name in different runs should be catted
 #For whatever reason snakemake selects only one combination of run/sample from the dictionary if there are two or more? So by including the logs files as inputs we ensure all
