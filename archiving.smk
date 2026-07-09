@@ -59,7 +59,7 @@ if config["mode"]== "Denovo":
 if config["mode"]== "Reference":
     rule mvVCF:
         input:
-            vcf=expand("{path}/refOut/populations.snps.vcf", path=config["outputDir"]),    
+            vcf=expand("{path}/refOut/populations.snps.vcf.gz", path=config["outputDir"]),    
         output:
             vcf=expand("{path}/archive/populations.snps.vcf",path=config["outputDir"])
         resources:
